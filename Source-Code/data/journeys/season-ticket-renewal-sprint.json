@@ -1,0 +1,217 @@
+{
+  "categoryId": "ticketing-sales",
+  "categoryName": "Ticketing & Sales",
+  "categoryDescription": "Journeys focused on ticket conversion, renewals, and premium inventory monetization.",
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "slug": "season-ticket-renewal-sprint",
+  "name": "Season Ticket Renewal Sprint",
+  "brief": "Subscribers are inside the final renewal window. Use benefits-led reminders, deadline messaging, and a premium-value variant to improve renewal completion while preserving a small holdout.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-04-26",
+  "journeyOverrides": {
+    "name": "Season Ticket Renewal Sprint",
+    "objective": "Increase renewal completion before the renewal deadline with a measured multi-touch journey.",
+    "audience": "Subscription_Renewal_Window_10d",
+    "variantA": "Benefits reminder cadence",
+    "variantB": "Price lock plus premium benefit framing"
+  },
+  "nodeOverrides": {
+    "n3": {
+      "title": [
+        "Email 1"
+      ],
+      "subtitle": [
+        "Renew now",
+        "benefits recap"
+      ]
+    },
+    "n3b": {
+      "title": [
+        "Email 1B"
+      ],
+      "subtitle": [
+        "Premium renewal",
+        "price lock"
+      ]
+    },
+    "n6": {
+      "title": [
+        "Push 1"
+      ],
+      "subtitle": [
+        "Renewal window",
+        "10 days left"
+      ]
+    },
+    "n9": {
+      "title": [
+        "Email 2"
+      ],
+      "subtitle": [
+        "Deadline soon",
+        "renew today"
+      ]
+    },
+    "n11": {
+      "title": [
+        "Renewal",
+        "Completed?"
+      ]
+    }
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Email 1",
+      "timing": {
+        "description": "+24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Renew now — benefits recap",
+      "cta": "Email 1",
+      "tracking": {
+        "campaignId": "email_email1",
+        "deliveryId": "del_email_2",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Push 1",
+      "timing": {
+        "description": "+72h from entry",
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "Renewal window — 10 days left",
+      "cta": "Push 1",
+      "tracking": {
+        "campaignId": "push_push1",
+        "deliveryId": "del_push_3",
+        "trackingEvents": [
+          "push_sent",
+          "push_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Email 2",
+      "timing": {
+        "description": "+168h from entry",
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Deadline soon — renew today",
+      "cta": "Email 2",
+      "tracking": {
+        "campaignId": "email_email2",
+        "deliveryId": "del_email_4",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "season_ticket_renewal_sprint_qualified",
+    "eventId": "evt_season_ticket_renewal_sprint_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Subscription_Renewal_Window_10d"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Subscription_Renewal_Window_10d"
+  },
+  "exitConditions": [
+    {
+      "event": "renewal_completed",
+      "eventId": "evt_renewal_completed_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "season_ticket_renewal_sprint_qualified",
+        "eventId": "evt_season_ticket_renewal_sprint_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "renewal_completed",
+          "field": "renewalCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "renewal_completed",
+          "field": "renewalCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "season-ticket-renewal-sprint"
+}

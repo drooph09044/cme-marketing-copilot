@@ -1,0 +1,141 @@
+{
+  "id": "074",
+  "matrix_row_id": 74,
+  "matrix_row_name": "Rivalry Saturday Push - The Game (UM-OSU)",
+  "template": "tpl_game_day",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "matchup",
+  "teams_referenced": "MICH,OSU",
+  "seed_replica": false,
+  "prompts": [
+    "Build a game-day journey for The Game — Michigan vs Ohio State on rivalry Saturday.",
+    "Create a rivalry-Saturday push journey for The Game (Michigan-Ohio State, last Saturday of November). Per-school variants for alumni and HMA fans of both schools: T-3d email with game preview, morning-of push with weather and broadcast info, and a kickoff push. Copy and imagery split per school so each fan sees their team's framing.",
+    "Need a UM-OSU rivalry-Saturday journey with per-school variants. Lead with a preview email a few days out, morning-of push, kickoff push."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-the-game-um-osu-2026",
+    "metadata": {
+      "name": "The Game - Michigan vs Ohio State (Rivalry Saturday)",
+      "internal_name": "NCAA_TheGame_MICH_OSU_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": "ESPN"},
+      "purpose": "Drive rivalry-Saturday tune-in to The Game with school-affinity variants for Michigan and Ohio State alumni and fans.",
+      "archetype": "game_day",
+      "launch_date": "2026-11-25",
+      "end_date": "2026-11-29",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to The Game on the rivalry Saturday broadcast.", "kpi": "Tune-in rate among UM/OSU alumni and fans", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Three-touch cadence: T-3d preview email, morning-of push, and kickoff push. Per-school variants: each fan sees their team's framing — Michigan fans see Maize-and-Blue imagery and storylines; Ohio State fans see Scarlet-and-Gray imagery. Suppress non-UM/OSU fans (this is a per-rivalry-school journey, not a national audience).",
+        "timing_rationale": "The Game kicks off the last Saturday of November (Nov 28, 2026, noon ET).",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {"id": "aud_um_fan", "name": "Michigan fan or alum", "criteria": {"any_of": [{"field": "favorite_team", "op": "equals", "value": "MICH"}, {"field": "ncaa.alumni_school", "op": "equals", "value": "MICH"}]}},
+      {"id": "aud_osu_fan", "name": "Ohio State fan or alum", "criteria": {"any_of": [{"field": "favorite_team", "op": "equals", "value": "OSU"}, {"field": "ncaa.alumni_school", "op": "equals", "value": "OSU"}]}}
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "espn_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Rivalry-week cadence opens (T-3d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "split_school",
+        "type": "audience_split",
+        "label": "Michigan vs Ohio State fan split",
+        "audiences": ["aud_um_fan", "aud_osu_fan"],
+        "mode": "parallel"
+      },
+      {
+        "id": "email_um_preview",
+        "type": "action",
+        "label": "Email T-3d - Michigan rivalry preview",
+        "channel": "ch_email",
+        "touch_id": "TA-UM",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-25"},
+        "copy": {
+          "subject": "Beat Ohio: The Game is Saturday",
+          "preview": "Maize-and-Blue traditions, key matchups, kickoff info"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "email_osu_preview",
+        "type": "action",
+        "label": "Email T-3d - Ohio State rivalry preview",
+        "channel": "ch_email",
+        "touch_id": "TA-OSU",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-25"},
+        "copy": {
+          "subject": "The Game is Saturday: Beat Michigan",
+          "preview": "Scarlet-and-Gray traditions, key matchups, kickoff info"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (ESPN App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_espn_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_morning_of",
+        "type": "action",
+        "label": "Push Saturday morning - The Game today",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-28", "time_local": "08:00 ET"},
+        "copy": {"headline": "{{FT}} plays The Game at noon - here's the forecast and broadcast"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push - Kickoff",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-28", "time_local": "12:00 ET"},
+        "copy": {"headline": "The Game kicks off - {{FT}} on ESPN"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_school"},
+      {"from": "split_school", "to": "email_um_preview", "branch_label": "um"},
+      {"from": "split_school", "to": "email_osu_preview", "branch_label": "osu"},
+      {"from": "email_um_preview", "to": "dec_push_optin"},
+      {"from": "email_osu_preview", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_morning_of", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_morning_of", "to": "push_kickoff"},
+      {"from": "push_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Tune-in rate among UM/OSU alumni and fans"}],
+      "secondary_kpis": [{"name": "Per-school email open rate"}, {"name": "Kickoff push view rate"}],
+      "tests": []
+    }
+  }
+}

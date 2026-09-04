@@ -1,0 +1,277 @@
+{
+  "id": "007",
+  "matrix_row_id": 7,
+  "matrix_row_name": "Abandon Cart - NFLShop merch",
+  "template": "tpl_abandon_cart",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NFLShop abandon-cart journey with two emails and a 10% discount.",
+    "Create an NFLShop merch cart-abandonment journey. Email 1 at 1h after abandonment with a 10% off code, Email 2 at 72h as a last reminder. Apply a journey-level frequency cap of 1 email per 24h to prevent overlapping touches. Suppress fans who completed the purchase between touches.",
+    "Need a two-email recovery sequence for NFLShop carts \u2014 10% off on both, capped at 1 send per day."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nflshop-merch-abandon-cart",
+    "metadata": {
+      "name": "NFLShop Merch Abandon Cart",
+      "internal_name": "NFL_NFLShop_AbandonCart_2026",
+      "brand": {
+        "vertical": "ecommerce",
+        "league": "NFL",
+        "team": null,
+        "product": "NFLShop"
+      },
+      "purpose": "Recover NFLShop cart abandoners with a two-email cadence and a flat 10% discount.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-06-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Convert NFLShop cart abandoners.",
+          "kpi": "NFLShop conversions attributable to journey",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Email 1 at 1h after abandonment; Email 2 at 72h. Flat 10% discount on both. Global frequency cap 1 email/24h to prevent fatigue.",
+        "timing_rationale": "Classic 1h / 72h e-commerce abandon-cart spacing.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email"
+      ],
+      "moments_that_matter": [
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_nflshop_abandoner",
+        "name": "NFLShop cart abandoner",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "nflshop.cart_status",
+              "op": "equals",
+              "value": "abandoned"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_not_null"
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_purchased",
+        "name": "Already purchased",
+        "scope": "global",
+        "criteria": {
+          "field": "nflshop.purchased_within_session",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 7,
+        "unit": "day"
+      }
+    },
+    "frequency_caps": [
+      {
+        "scope": "journey",
+        "limit": 1,
+        "window": {
+          "value": 24,
+          "unit": "hour"
+        },
+        "applies_to": [
+          "ch_email"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Cart abandoned",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "nflshop_cart_abandoned"
+        }
+      },
+      {
+        "id": "wait_1h",
+        "type": "wait",
+        "label": "Wait 1h",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "email_1",
+        "type": "action",
+        "label": "Email 1 - 10% off your NFLShop cart",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "10% off your {{FT}} gear",
+          "cta_label": "Complete purchase"
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_72h",
+        "type": "wait",
+        "label": "Wait until 72h after abandonment",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 71,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "dec_purchased",
+        "type": "decision",
+        "label": "Already purchased?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nflshop.purchased_within_session",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_2",
+        "type": "action",
+        "label": "Email 2 - Last chance 10% off",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Final reminder: 10% off your cart",
+          "cta_label": "Buy now"
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ]
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Journey End - Converted",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "wait_1h"
+      },
+      {
+        "from": "wait_1h",
+        "to": "email_1"
+      },
+      {
+        "from": "email_1",
+        "to": "wait_72h"
+      },
+      {
+        "from": "wait_72h",
+        "to": "dec_purchased"
+      },
+      {
+        "from": "dec_purchased",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_purchased",
+        "to": "email_2",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_2",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "NFLShop conversions attributable to journey"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Email 1 open / click rate"
+        },
+        {
+          "name": "Email 2 open / click rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

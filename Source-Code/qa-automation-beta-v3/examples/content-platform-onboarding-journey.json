@@ -1,0 +1,222 @@
+{
+  "useCaseId": "content-platform-onboarding-journey",
+  "name": "Content Platform Onboarding Journey",
+  "category": {
+    "categoryId": "digital-engagement",
+    "categoryName": "Digital Engagement & Onboarding"
+  },
+  "journeyTable": {
+    "journeyName": "Content Platform Onboarding Journey",
+    "journeyGoal": "Drive early engagement, content consumption, and feature adoption for new users on the platform",
+    "entryTrigger": "account_created",
+    "journeyCategory": "Digital Engagement & Onboarding",
+    "totalDuration": "7 days",
+    "exitClause": "Exit when user becomes active subscriber OR journey completed"
+  },
+  "entryCriteria": {
+    "event": "account_created",
+    "eventId": "evt_account_created_001",
+    "conditions": [
+      {
+        "field": "isNewUser",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "New_Platform_Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 0",
+      "timing": {
+        "relativeDay": 0,
+        "description": "Immediately after account creation"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Welcome – account setup confirmation, top 3 personalised content picks",
+      "cta": "Start Watching",
+      "tracking": {
+        "campaignId": "email_onboarding_welcome",
+        "deliveryId": "del_email_1101",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "recommendedContent",
+        "contentPreferences"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 1",
+      "timing": {
+        "relativeDay": 1,
+        "description": "1 day after signup"
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Trending Now – curated content list based on Day 0 viewing behaviour",
+      "cta": "Keep Watching",
+      "tracking": {
+        "campaignId": "content_trending_push",
+        "deliveryId": "del_push_email_1102",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "watchHistory",
+        "trendingContent"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 3",
+      "timing": {
+        "relativeDay": 3,
+        "description": "3 days after signup"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Did you know? – feature discovery (downloads, watchlists, multi-screen) + content recommendations",
+      "cta": "Explore Features",
+      "tracking": {
+        "campaignId": "email_feature_discovery",
+        "deliveryId": "del_email_1103",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "featureUsageHints",
+        "recommendedGenres"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 7",
+      "timing": {
+        "relativeDay": 7,
+        "description": "7 days after signup"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your Week 1 Recap – content consumed, suggested next series, invite to rate",
+      "cta": "Rate & Discover More",
+      "tracking": {
+        "campaignId": "email_weekly_recap",
+        "deliveryId": "del_email_1104",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "watchSummary",
+        "nextBestContent",
+        "ratingsPrompt"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "accountCreationDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "account_created",
+        "eventId": "evt_account_created_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n6",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_active",
+      "eventId": "evt_subscription_active_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowDays": 7
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "active_subscriber",
+        "condition": "subscription_active == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "content_viewed",
+      "subscription_active"
+    ],
+    "eventMapping": {
+      "account_created": "evt_account_created_001",
+      "subscription_active": "evt_subscription_active_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "content_viewed",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "watch_time"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 7
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

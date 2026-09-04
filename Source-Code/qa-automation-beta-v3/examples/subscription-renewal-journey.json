@@ -1,0 +1,260 @@
+{
+  "useCaseId": "subscription-renewal-journey",
+  "name": "Subscription Renewal Journey",
+  "active": false,
+  "category": {
+    "categoryId": "retention-renewals",
+    "categoryName": "Retention & Renewals"
+  },
+  "journeyTable": {
+    "journeyName": "Subscription Renewal Journey",
+    "journeyGoal": "Maximise renewals through proactive reminders, loyalty incentives, and assisted selling",
+    "entryTrigger": "renewal_window_open",
+    "journeyCategory": "Retention & Renewals",
+    "totalDuration": "90 days",
+    "exitClause": "Exit when subscription_renewed OR contract_expired"
+  },
+  "entryCriteria": {
+    "event": "renewal_window_open",
+    "eventId": "evt_renewal_window_001",
+    "conditions": [
+      {
+        "field": "daysToContractEnd",
+        "operator": "EQUALS",
+        "value": 90
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Customers_Up_For_Renewal"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day -90",
+      "timing": {
+        "relativeDay": -90,
+        "description": "90 days before renewal"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your plan is up for renewal – personalised upgrade options",
+      "cta": "Explore My Options",
+      "tracking": {
+        "campaignId": "email_renewal_intro",
+        "deliveryId": "del_email_1501",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "currentPlan",
+        "upgradeOptions",
+        "pricingSummary"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day -60",
+      "timing": {
+        "relativeDay": -60,
+        "description": "60 days before renewal"
+      },
+      "channel": [
+        "EMAIL",
+        "SMS"
+      ],
+      "messageTheme": "Loyalty reward – exclusive renewal rate or device upgrade for existing customers",
+      "cta": "Claim My Loyalty Offer",
+      "tracking": {
+        "campaignId": "loyalty_renewal_offer",
+        "deliveryId": "del_email_sms_1502",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click",
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "loyaltyTier",
+        "exclusiveOffer",
+        "deviceUpgradeOptions"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day -30",
+      "timing": {
+        "relativeDay": -30,
+        "description": "30 days before renewal"
+      },
+      "channel": [
+        "PUSH",
+        "SMS"
+      ],
+      "messageTheme": "30 days to go – reminder with best available plan + one-tap renewal CTA",
+      "cta": "Renew Now",
+      "tracking": {
+        "campaignId": "renewal_30_day_reminder",
+        "deliveryId": "del_push_sms_1503",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "bestPlan",
+        "renewalLink"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day -14",
+      "timing": {
+        "relativeDay": -14,
+        "description": "14 days before renewal"
+      },
+      "channel": "CALL",
+      "messageTheme": "Rep outreach – handle objections, confirm renewal or discuss alternatives",
+      "cta": "Speak to My Account Mgr",
+      "tracking": {
+        "campaignId": "renewal_call_outreach",
+        "deliveryId": "del_call_1504",
+        "trackingEvents": [
+          "call_attempted",
+          "call_connected"
+        ]
+      },
+      "personalization": [
+        "accountManagerName",
+        "planUsageInsights"
+      ]
+    },
+    {
+      "tpId": "TP5",
+      "label": "Day -3",
+      "timing": {
+        "relativeDay": -3,
+        "description": "3 days before renewal expiry"
+      },
+      "channel": "SMS",
+      "messageTheme": "Final reminder – contract expires in 3 days; self-serve renewal portal link",
+      "cta": "Renew in 60 Seconds",
+      "tracking": {
+        "campaignId": "final_renewal_reminder",
+        "deliveryId": "del_sms_1505",
+        "trackingEvents": [
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "renewalLink",
+        "expiryDate"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "contractEndDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "renewal_window_open",
+        "eventId": "evt_renewal_window_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP5"
+      },
+      {
+        "id": "n7",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_renewed",
+      "eventId": "evt_subscription_renewed_001",
+      "action": "IMMEDIATE_EXIT"
+    },
+    {
+      "event": "contract_expired",
+      "eventId": "evt_contract_expired_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 5,
+      "timeWindowDays": 90
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_renewed",
+        "condition": "subscription_renewed == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "subscription_renewed"
+    ],
+    "eventMapping": {
+      "renewal_window_open": "evt_renewal_window_001",
+      "subscription_renewed": "evt_subscription_renewed_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "subscription_renewed",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "sms_click",
+      "call_connected"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 90
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

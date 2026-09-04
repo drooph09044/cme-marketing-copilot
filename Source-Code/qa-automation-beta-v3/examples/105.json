@@ -1,0 +1,138 @@
+{
+  "id": "105",
+  "matrix_row_id": 105,
+  "matrix_row_name": "F1 Team Merch Cross-Sell",
+  "template": "tpl_merch_cross_sell",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a team-merch cross-sell journey timed to each F1 team's home-country Grand Prix.",
+    "Create a team-specific F1 merch cross-sell journey on F1 Authentics. Push and email cadence timed to the Grand Prix nearest each constructor's HQ or manufacturer country (Ferrari for Italian GP, McLaren and Williams for British GP, Mercedes for German-region weekend, Red Bull for Austrian GP, etc.). Per-fav-team push 1w before that GP with team-specific merch line.",
+    "Need a constructor-themed merch send timed to each team's home-country race weekend — push first then email with the merch story."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-team-merch-cross-sell-2026",
+    "metadata": {
+      "name": "F1 Team Merch Cross-Sell",
+      "internal_name": "F1_Team_Merch_2026",
+      "brand": {"vertical": "ecommerce", "league": "F1", "team": null, "product": "F1 Authentics"},
+      "purpose": "Drive F1 Authentics team-merch sales by timing each team's promotion to the Grand Prix nearest that constructor's HQ or manufacturer country.",
+      "archetype": "cross_sell",
+      "launch_date": "2026-04-15",
+      "end_date": "2026-11-30",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive F1 Authentics team-merch revenue.", "kpi": "F1 Authentics revenue attributable to journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "For each constructor, fire the journey one week before that team's home-country GP. Ferrari ahead of Italian GP, McLaren/Williams ahead of British GP, Mercedes ahead of the German-region weekend, Red Bull ahead of Austrian GP, Aston Martin ahead of British GP, Alpine ahead of French/Belgian region race, etc. Per-fav-team push at T-7d, then email Day +2 with team-specific merch line.",
+        "timing_rationale": "Home-country race weekends create natural lift for team-merch interest.",
+        "notes": null
+      },
+      "considerations": ["Confirm F1 Authentics per-team SKUs and creative are ready 14 days before each home-country GP."],
+      "capabilities_used": ["push", "email", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_team_supporter",
+        "name": "Fan of team whose home GP is in 7 days",
+        "description": "Fan whose favorite team's home-country GP is 7 days away.",
+        "criteria": {
+          "all_of": [
+            {"field": "f1.favorite_team", "op": "is_not_null"},
+            {"field": "favorite_team.home_country_gp_in_days", "op": "equals", "value": 7}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "GP", "name": "Home Country Grand Prix"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 30, "unit": "day"}, "max_entries": 2},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Team home-GP T-7d trigger", "entry_criteria": {"trigger": "event", "event_name": "fav_team_home_gp_t_minus_7"}},
+      {
+        "id": "dec_team_match",
+        "type": "decision",
+        "label": "Which constructor / home GP?",
+        "decision_basis": "audience",
+        "condition": {"field": "f1.favorite_team", "op": "in", "value": ["FERRARI", "MCLAREN", "MERCEDES", "RED_BULL", "WILLIAMS", "ASTON_MARTIN", "ALPINE", "HAAS", "KICK_SAUBER", "RB"]}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_f1", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_team_merch",
+        "type": "action",
+        "label": "Push T-7d - Team-specific merch launch",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "relative_to_event", "event": "fav_team_home_gp", "direction": "before", "offset": {"value": 7, "unit": "day"}},
+        "copy": {"headline": "{{FT}} race home at the {{GP}} - shop the new collection"},
+        "personalization_used": ["FT", "GP"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_2d",
+        "type": "wait",
+        "label": "Wait 2 days",
+        "timing": {"type": "wait", "duration": {"value": 2, "unit": "day"}}
+      },
+      {
+        "id": "email_team_collection",
+        "type": "action",
+        "label": "Email T-5d - Team-specific collection + race-weekend story",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "fav_team_home_gp", "direction": "before", "offset": {"value": 5, "unit": "day"}},
+        "copy": {
+          "subject": "{{FT}} home race week: the {{GP}} collection is here",
+          "cta_label": "Shop the collection",
+          "modules": [
+            {"rank": "primary", "name": "Team-themed race-weekend collection"},
+            {"rank": "secondary", "name": "Driver-signed memorabilia and Authentics car parts"}
+          ]
+        },
+        "personalization_used": ["FN", "FT", "GP"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "converted"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_team_match"},
+      {"from": "dec_team_match", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_team_match", "to": "end_journey", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_team_merch", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_2d", "branch_label": "no"},
+      {"from": "push_team_merch", "to": "wait_2d"},
+      {"from": "wait_2d", "to": "email_team_collection"},
+      {"from": "email_team_collection", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "F1 Authentics revenue attributable to journey"}],
+      "secondary_kpis": [{"name": "Push open rate"}, {"name": "Per-team email click-through rate"}],
+      "tests": []
+    }
+  }
+}

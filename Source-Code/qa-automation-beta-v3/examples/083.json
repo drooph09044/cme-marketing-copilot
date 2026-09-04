@@ -1,0 +1,171 @@
+{
+  "id": "083",
+  "matrix_row_id": 83,
+  "matrix_row_name": "CFP Bracket Reveal & 12-Team Bracket Push",
+  "template": "tpl_playoff_push",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a CFP Selection Day bracket-reveal push journey with first-round tune-in cadence.",
+    "Create a CFP playoff push journey for Dec 7 Selection Day. Real-time bracket reveal push at announcement, bracket-fill engagement on NCAA.com, then per-fav-school first-round tune-in cadence covering Dec 19-20. Audience segmented to fans of the 12 teams in the bracket.",
+    "Need a 12-team CFP push — bracket reveal day-of, then ramp toward first-round games for fans of the schools in the bracket."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cfp-bracket-reveal-2026",
+    "metadata": {
+      "name": "CFP Bracket Reveal & 12-Team Push - 2026",
+      "internal_name": "NCAA_CFP_Bracket_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": "ESPN"},
+      "purpose": "Drive Selection Day awareness and first-round tune-in for the 2026 College Football Playoff 12-team bracket on ESPN.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-12-07",
+      "end_date": "2026-12-21",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to CFP first-round games (Dec 19-20).", "kpi": "First-round tune-in lift", "forecast": null},
+        {"rank": "secondary", "description": "Drive bracket-fill engagement on NCAA.com.", "kpi": "Bracket-fill completion rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Real-time push on Selection Day (Dec 7) the moment the bracket is announced. Bracket-fill engagement experience drives interactivity on NCAA.com. Per-fav-school first-round push for fans of the 12 teams in the bracket; neutral coverage push for all other fans.",
+        "timing_rationale": "Selection Day Dec 7, first-round games Dec 19-20.",
+        "notes": "Second year of the 12-team CFP format."
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "realtime_signal"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_cfb_fan_us",
+        "name": "US college football fan",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "equals", "value": "US"},
+            {"field": "ncaa.football_affinity", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_bracket_school_fan",
+        "name": "Fan of a school in the CFP bracket",
+        "description": "Fan whose favorite school is one of the 12 teams in the 2026 CFP bracket.",
+        "criteria": {"field": "ncaa.favorite_school_in_cfp_bracket", "op": "equals", "value": true}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "ncaa_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"},
+      {"key": "SEED", "name": "Seed Number"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Selection Day trigger", "entry_criteria": {"trigger": "external_signal", "event_name": "cfp_bracket_announced"}},
+      {
+        "id": "dec_push_optin_announce",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_ncaa", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_bracket_reveal",
+        "type": "action",
+        "label": "Push - Real-time bracket reveal",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "realtime", "refresh_minutes": 5},
+        "copy": {"headline": "The 12-team CFP bracket is in - see who made it"}
+      },
+      {
+        "id": "email_bracket_recap",
+        "type": "action",
+        "label": "Email - Bracket-fill experience",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-07", "time_local": "20:00 ET"},
+        "copy": {
+          "subject": "Fill your CFP bracket: 12 teams, one champion",
+          "cta_label": "Fill the bracket"
+        }
+      },
+      {
+        "id": "wait_to_first_round",
+        "type": "wait",
+        "label": "Wait until first-round week (Dec 16)",
+        "timing": {"type": "wait", "duration": {"value": 9, "unit": "day"}}
+      },
+      {
+        "id": "dec_school_in_bracket",
+        "type": "decision",
+        "label": "Fav school in bracket?",
+        "decision_basis": "audience",
+        "condition": {"field": "ncaa.favorite_school_in_cfp_bracket", "op": "equals", "value": true}
+      },
+      {
+        "id": "email_school_first_round",
+        "type": "action",
+        "label": "Email T-3d - Fav-school first-round preview",
+        "channel": "ch_email",
+        "touch_id": "TB1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-16"},
+        "copy": {
+          "subject": "{{FT}} kicks off the CFP this weekend",
+          "preview": "Seed {{SEED}} - your path to Miami"
+        },
+        "personalization_used": ["FN", "FT", "SEED"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_neutral_first_round",
+        "type": "action",
+        "label": "Email T-3d - Neutral first-round slate",
+        "channel": "ch_email",
+        "touch_id": "TB2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-16"},
+        "copy": {"subject": "CFP first round: four games, two days, ESPN"}
+      },
+      {
+        "id": "push_friday_kickoff",
+        "type": "action",
+        "label": "Push Fri Dec 18 - First-round kickoff",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-18", "time_local": "19:00 ET"},
+        "copy": {"headline": "CFP first round starts now - ESPN"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_push_optin_announce"},
+      {"from": "dec_push_optin_announce", "to": "push_bracket_reveal", "branch_label": "yes"},
+      {"from": "dec_push_optin_announce", "to": "email_bracket_recap", "branch_label": "no"},
+      {"from": "push_bracket_reveal", "to": "email_bracket_recap"},
+      {"from": "email_bracket_recap", "to": "wait_to_first_round"},
+      {"from": "wait_to_first_round", "to": "dec_school_in_bracket"},
+      {"from": "dec_school_in_bracket", "to": "email_school_first_round", "branch_label": "yes"},
+      {"from": "dec_school_in_bracket", "to": "email_neutral_first_round", "branch_label": "no"},
+      {"from": "email_school_first_round", "to": "push_friday_kickoff"},
+      {"from": "email_neutral_first_round", "to": "push_friday_kickoff"},
+      {"from": "push_friday_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "CFP first-round tune-in lift"}, {"name": "Bracket-fill completion rate"}],
+      "secondary_kpis": [{"name": "Bracket reveal push open rate"}],
+      "tests": []
+    }
+  }
+}

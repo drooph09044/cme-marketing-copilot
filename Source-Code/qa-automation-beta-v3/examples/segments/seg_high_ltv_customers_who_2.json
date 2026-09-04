@@ -1,0 +1,30 @@
+{
+  "id": "seg_high_ltv_customers_who_2",
+  "name": "High Ltv Customers Who",
+  "purpose": "Custom audience segment",
+  "size": "3.9K",
+  "refresh": "Daily",
+  "exclusions": "None defined",
+  "status": "Draft",
+  "rules": [
+    {
+      "id": "ai_rule_ltv",
+      "field": "LTV Tier",
+      "value": "High",
+      "joiner": ""
+    },
+    {
+      "id": "ai_rule_eng",
+      "field": "Engagement Tier",
+      "value": "Low",
+      "joiner": "AND"
+    },
+    {
+      "id": "ai_rule_rec",
+      "field": "Recency",
+      "value": "High",
+      "joiner": "AND"
+    }
+  ],
+  "isPreset": false
+}

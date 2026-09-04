@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-browsing-event-activation",
+  "name": "Abandoned Browsing: Event Promotion - Activation Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Browsing: Event Promotion - Activation",
+    "journeyGoal": "Re-engage users who added an event to cart but did not complete engagement and activate them",
+    "entryTrigger": "user_added_event",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after event engagement or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_event",
+    "eventId": "evt_add_event_001",
+    "conditions": [
+      {
+        "field": "eventType",
+        "operator": "EQUALS",
+        "value": "Event"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Event Users – Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Event Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You added this event – complete your engagement now and activate your benefits!",
+      "cta": "View Event",
+      "tracking": {
+        "campaignId": "email_event_activation",
+        "deliveryId": "del_email_17",
+        "trackingEvents": [
+          "email_open",
+          "event_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Event Activation Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your selected event is waiting – activate now and don’t miss out!",
+      "cta": "View Event",
+      "tracking": {
+        "campaignId": "push_event_activation",
+        "deliveryId": "del_push_17",
+        "trackingEvents": [
+          "push_open",
+          "event_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_event",
+        "eventId": "evt_add_event_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "event_view",
+          "field": "eventViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "event_view",
+          "field": "eventViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "event_view",
+      "eventId": "evt_event_002",
+      "condition": "eventViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "event_view"
+    ],
+    "eventMapping": {
+      "event_view": "evt_event_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "event_view",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

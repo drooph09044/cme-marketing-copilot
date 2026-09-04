@@ -1,0 +1,25 @@
+{
+  "name": "workflow-test-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Journey Test Console — Next.js + FastAPI monorepo.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:web": "pnpm --filter @workflow-test/web dev",
+    "dev:api": "pnpm --filter @workflow-test/api dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

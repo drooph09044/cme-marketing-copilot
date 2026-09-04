@@ -1,0 +1,300 @@
+{
+  "id": "026",
+  "matrix_row_id": 26,
+  "matrix_row_name": "Schedule Release Day - May 14",
+  "template": "tpl_schedule_release",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Schedule Release Day journey for May 14, 2026.",
+    "Real-time push at moment of schedule release to all opted-in fans, plus a per-fav-team email within 1h containing 17 regular-season matchups with broadcast windows, primetime games highlighted, and a sortable schedule view in-app. App modal also fires at release.",
+    "Need a Schedule Release Day cadence \u2014 push and modal at release, then per-fav-team email within 1h."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-schedule-release-2026",
+    "metadata": {
+      "name": "Schedule Release Day - May 14 2026",
+      "internal_name": "NFL_Schedule_Release_2026_05_14",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL App"
+      },
+      "purpose": "Drive engagement on Schedule Release Day (May 14, 2026) with real-time push to all fans, plus a per-fav-team email within 1h listing all 17 matchups.",
+      "archetype": "calendar_touchpoint",
+      "launch_date": "2026-05-14",
+      "end_date": "2026-05-15",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive Schedule Release engagement.",
+          "kpi": "Per-fav-team email open / click rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Real-time push at moment of release to all opted-in fans. Per-fav-team email within 1h with 17 regular-season matchups, broadcast windows, primetime games highlighted.",
+        "timing_rationale": "Schedule Release announced May 14, 2026 at 8pm ET.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push",
+        "app_modal"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "GET PUMPED"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_all_active",
+        "name": "Active NFL fans",
+        "criteria": {
+          "field": "activity.last_active_within_days",
+          "op": "lte",
+          "value": 365
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_fav_team_set",
+        "name": "Fans with fav-team set",
+        "criteria": {
+          "field": "favorite_team",
+          "op": "is_not_null"
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_app_modal",
+        "type": "app_modal",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Schedule Release announced",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "schedule_released"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_release",
+        "type": "action",
+        "label": "Push - Schedule is live",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "The 2026 NFL Schedule is here"
+        }
+      },
+      {
+        "id": "modal_release",
+        "type": "action",
+        "label": "App modal - Schedule reveal",
+        "channel": "ch_app_modal",
+        "touch_id": "A1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Your team's 2026 schedule"
+        }
+      },
+      {
+        "id": "wait_1h",
+        "type": "wait",
+        "label": "Wait 1h",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "dec_fav_team",
+        "type": "decision",
+        "label": "Fav-team set?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "favorite_team",
+          "op": "is_not_null"
+        }
+      },
+      {
+        "id": "email_fav_team",
+        "type": "action",
+        "label": "Email - Fav-team 17-game slate",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Your {{FT}} 2026 schedule",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "17-game matchup list with broadcast windows"
+            },
+            {
+              "rank": "secondary",
+              "name": "Primetime games highlighted"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Sortable in-app schedule view"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_generic",
+        "type": "action",
+        "label": "Email - League schedule overview (no fav team)",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "The 2026 NFL Schedule: marquee games and primetime"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_release",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "modal_release",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_release",
+        "to": "modal_release"
+      },
+      {
+        "from": "modal_release",
+        "to": "wait_1h"
+      },
+      {
+        "from": "wait_1h",
+        "to": "dec_fav_team"
+      },
+      {
+        "from": "dec_fav_team",
+        "to": "email_fav_team",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_fav_team",
+        "to": "email_generic",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_fav_team",
+        "to": "end_journey"
+      },
+      {
+        "from": "email_generic",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Schedule Release engagement rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Email open / click"
+        },
+        {
+          "name": "Push view rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "id": "068",
+  "matrix_row_id": 68,
+  "matrix_row_name": "Audi MLS Cup Playoffs Push",
+  "template": "tpl_playoff_push",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an Audi MLS Cup Playoffs push journey covering bracket reveal through MLS Cup Final.",
+    "Create an MLS playoff push journey: bracket reveal email at the end of Decision Day (Nov 7), per-fav-club push on matchdays during Round One and Conference Semis/Finals, and a MLS Cup Final Dec 18 tune-in cadence with T-3d email + matchday morning push + kickoff push. Composite audience split by fav-club playoff participation.",
+    "Need an MLS Cup Playoffs tune-in journey from Decision Day through the Cup Final. Bracket reveal, per-matchday pushes for fav-club fans, then a final cadence into MLS Cup."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-cup-playoffs-2026",
+    "metadata": {
+      "name": "Audi MLS Cup Playoffs Push",
+      "internal_name": "MLS_CupPlayoffs_2026",
+      "brand": {"vertical": "sports_league", "league": "MLS", "team": null, "product": "MLS Season Pass"},
+      "purpose": "Drive tune-in across Audi MLS Cup Playoffs Nov-Dec with bracket reveal, per-club matchday push cadence, and an MLS Cup Final tune-in sequence.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-11-07",
+      "end_date": "2026-12-19",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive playoff tune-in on MLS Season Pass.", "kpi": "Playoff round tune-in rate among fav-club fans", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Bracket reveal email at the close of Decision Day. Composite audience: fav-club-in-playoffs fans get per-matchday push through Round One and Conference Semis/Finals; non-playoff fav-club fans drop out after the bracket email. All audiences re-enter for the MLS Cup Final cadence: T-3d email, matchday morning push, kickoff push.",
+        "timing_rationale": "Decision Day Nov 7 sets the bracket. MLS Cup Final Dec 18.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {"id": "aud_mls_fan", "name": "Active MLS fan", "criteria": {"field": "mls.activity_within_days", "op": "lte", "value": 365}, "refresh": "dynamic"},
+      {
+        "id": "aud_fav_club_in_playoffs",
+        "name": "Fan of a playoff club",
+        "criteria": {"all_of": [{"field": "favorite_team", "op": "is_not_null"}, {"field": "favorite_team.in_playoff_bracket", "op": "equals", "value": true}]},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"},
+      {"key": "OPP", "name": "Opponent"},
+      {"key": "SS", "name": "Series Status"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Decision Day concludes (Nov 7)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_bracket_reveal",
+        "type": "action",
+        "label": "Email - Playoff bracket reveal",
+        "channel": "ch_email",
+        "touch_id": "BR",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-07"},
+        "copy": {
+          "subject": "The Audi MLS Cup Playoffs bracket is set",
+          "cta_label": "View the bracket",
+          "modules": [
+            {"rank": "primary", "name": "Full playoff bracket"},
+            {"rank": "secondary", "name": "Fav-club series spotlight"}
+          ]
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_fav_club_in_playoffs",
+        "type": "decision",
+        "label": "Fav club in playoff bracket?",
+        "decision_basis": "audience",
+        "condition": {"field": "favorite_team.in_playoff_bracket", "op": "equals", "value": true}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_per_matchday",
+        "type": "action",
+        "label": "Push - Per-matchday during Round One and Conference rounds",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_playoff_match",
+          "direction": "before",
+          "offset": {"value": 6, "unit": "hour"}
+        },
+        "copy": {
+          "headline": "{{FC}} vs {{OPP}} - kickoff in 6h",
+          "body": "Series: {{SS}}. Watch on Season Pass."
+        },
+        "personalization_used": ["FC", "OPP", "SS"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_cup_t3",
+        "type": "wait",
+        "label": "Wait until MLS Cup T-3d",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-15"}
+      },
+      {
+        "id": "email_cup_t3",
+        "type": "action",
+        "label": "Email T-3d - MLS Cup Final preview",
+        "channel": "ch_email",
+        "touch_id": "T3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-15"},
+        "copy": {"subject": "MLS Cup Final this Friday", "cta_label": "Set a reminder"}
+      },
+      {
+        "id": "push_cup_morning",
+        "type": "action",
+        "label": "Push - MLS Cup Final matchday morning",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-18", "time_local": "10:00 ET"},
+        "copy": {"headline": "MLS Cup Final tonight - watch on Season Pass"}
+      },
+      {
+        "id": "push_cup_kickoff",
+        "type": "action",
+        "label": "Push - MLS Cup Final kickoff",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-18", "time_local": "20:00 ET"},
+        "copy": {"headline": "MLS Cup Final kicks off now"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_bracket_reveal"},
+      {"from": "email_bracket_reveal", "to": "dec_fav_club_in_playoffs"},
+      {"from": "dec_fav_club_in_playoffs", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_fav_club_in_playoffs", "to": "wait_to_cup_t3", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_per_matchday", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_to_cup_t3", "branch_label": "no"},
+      {"from": "push_per_matchday", "to": "wait_to_cup_t3"},
+      {"from": "wait_to_cup_t3", "to": "email_cup_t3"},
+      {"from": "email_cup_t3", "to": "push_cup_morning"},
+      {"from": "push_cup_morning", "to": "push_cup_kickoff"},
+      {"from": "push_cup_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Playoff round tune-in rate among fav-club fans"}],
+      "secondary_kpis": [{"name": "Bracket reveal email open rate"}, {"name": "MLS Cup Final kickoff push view rate"}],
+      "tests": []
+    }
+  }
+}

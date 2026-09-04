@@ -1,0 +1,310 @@
+{
+  "id": "019",
+  "matrix_row_id": 19,
+  "matrix_row_name": "Sunday Game Day Push Cadence",
+  "template": "tpl_game_day",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a four-touch Sunday game-day push cadence.",
+    "Four push touches per Sunday game for fans of competing teams: T-1h preview, kickoff, halftime, and final whistle. One journey instance per fav-team game played that Sunday. Suppress fans whose fav-team has a bye that week.",
+    "Need a Sunday game-day push series: preview, kickoff, halftime, final. Triggered per fav-team game per Sunday."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-sunday-game-day-push",
+    "metadata": {
+      "name": "Sunday Game Day Push Cadence",
+      "internal_name": "NFL_Sunday_GameDay_Push_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL App"
+      },
+      "purpose": "Drive Sunday-game engagement with a four-touch push cadence (preview / kickoff / halftime / final) for fans of competing teams.",
+      "archetype": "game_day",
+      "launch_date": "2026-09-06",
+      "end_date": "2027-01-11",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive in-game NFL App engagement on Sundays.",
+          "kpi": "Push view rate by touch",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Four touchpoints per game: T-1h preview, kickoff, halftime recap, final whistle recap.",
+        "timing_rationale": "Aligned to game phases for max engagement.",
+        "notes": "One journey instance per fav-team game per Sunday."
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "push"
+      ],
+      "moments_that_matter": [
+        "GET PUMPED",
+        "GET READY",
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_competing_team_fans",
+        "name": "Fans of competing teams (push opted in)",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            },
+            {
+              "field": "consent.push_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "game.fav_team_playing_today",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_bye",
+        "name": "Fav-team on bye",
+        "scope": "global",
+        "criteria": {
+          "field": "game.fav_team_bye_this_week",
+          "op": "equals",
+          "value": true
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 6,
+        "unit": "day"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Sunday game day - fav-team playing",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "game_day_fav_team"
+        }
+      },
+      {
+        "id": "wait_t1h",
+        "type": "wait",
+        "label": "Wait to T-1h before kickoff",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "push_preview",
+        "type": "action",
+        "label": "Push T-1h - Pre-game preview",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "{{MTC}} - kickoff in 1 hour"
+        },
+        "personalization_used": [
+          "FT",
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_kickoff",
+        "type": "wait",
+        "label": "Wait to kickoff",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 0,
+            "unit": "minute"
+          }
+        }
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push - Kickoff",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Kickoff: {{MTC}}"
+        },
+        "personalization_used": [
+          "MTC"
+        ]
+      },
+      {
+        "id": "wait_halftime",
+        "type": "wait",
+        "label": "Wait to halftime",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "halftime",
+          "direction": "after",
+          "offset": {
+            "value": 0,
+            "unit": "minute"
+          }
+        }
+      },
+      {
+        "id": "push_halftime",
+        "type": "action",
+        "label": "Push - Halftime recap",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Halftime: top plays from {{MTC}}"
+        },
+        "personalization_used": [
+          "MTC"
+        ]
+      },
+      {
+        "id": "wait_final",
+        "type": "wait",
+        "label": "Wait to final whistle",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "final_whistle",
+          "direction": "after",
+          "offset": {
+            "value": 0,
+            "unit": "minute"
+          }
+        }
+      },
+      {
+        "id": "push_final",
+        "type": "action",
+        "label": "Push - Final whistle recap",
+        "channel": "ch_push",
+        "touch_id": "P4",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Final: {{MTC}} - stat lines, scoring, standings"
+        },
+        "personalization_used": [
+          "MTC"
+        ]
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "wait_t1h"
+      },
+      {
+        "from": "wait_t1h",
+        "to": "push_preview"
+      },
+      {
+        "from": "push_preview",
+        "to": "wait_kickoff"
+      },
+      {
+        "from": "wait_kickoff",
+        "to": "push_kickoff"
+      },
+      {
+        "from": "push_kickoff",
+        "to": "wait_halftime"
+      },
+      {
+        "from": "wait_halftime",
+        "to": "push_halftime"
+      },
+      {
+        "from": "push_halftime",
+        "to": "wait_final"
+      },
+      {
+        "from": "wait_final",
+        "to": "push_final"
+      },
+      {
+        "from": "push_final",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Per-touch push view rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "NFL App session length on Sunday"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

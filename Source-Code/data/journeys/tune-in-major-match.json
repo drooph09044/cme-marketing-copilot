@@ -1,0 +1,207 @@
+{
+  "useCaseId": "tune-in-major-match",
+  "name": "Tune In for Major Match Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Major Match Tune-In",
+    "journeyGoal": "Maximize live viewership and attendance for key matches",
+    "entryTrigger": "major_match_scheduled",
+    "journeyCategory": "Engagement",
+    "totalDuration": "7 days",
+    "exitClause": "Exit if fan watches or attends match"
+  },
+  "entryCriteria": {
+    "event": "fixture_release",
+    "eventId": "evt_fixture_001",
+    "conditions": [
+      {
+        "field": "matchImportance",
+        "operator": "EQUALS",
+        "value": "HIGH"
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Active_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Match Announcement Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Big match incoming – don’t miss it",
+      "cta": "Watch Live",
+      "tracking": {
+        "campaignId": "email_match_1",
+        "deliveryId": "del_match_1",
+        "trackingEvents": [
+          "email_open",
+          "stream_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Countdown Push",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "Only days left to watch live action",
+      "cta": "Set Reminder",
+      "tracking": {
+        "campaignId": "push_match_2",
+        "deliveryId": "del_match_2",
+        "trackingEvents": [
+          "push_open",
+          "reminder_set"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Final Reminder SMS",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "SMS",
+      "messageTheme": "Kickoff is near – tune in now",
+      "cta": "Watch Now",
+      "tracking": {
+        "campaignId": "sms_match_3",
+        "deliveryId": "del_match_3",
+        "trackingEvents": [
+          "sms_click",
+          "view_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fixture_release",
+        "eventId": "evt_fixture_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "match_view",
+          "field": "viewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "match_view",
+          "field": "viewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "match_view",
+          "field": "viewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "match_view",
+      "eventId": "evt_match_view_001",
+      "condition": "viewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "match_view"
+    ],
+    "eventMapping": {
+      "match_view": "evt_match_view_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "match_view",
+    "secondaryKPIs": [
+      "reminder_set"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

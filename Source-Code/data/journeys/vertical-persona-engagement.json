@@ -1,0 +1,179 @@
+{
+  "useCaseId": "vertical-persona-engagement",
+  "name": "Vertical Persona Engagement Journey",
+  "category": {
+    "categoryId": "personalization",
+    "categoryName": "Personalization"
+  },
+  "journeyTable": {
+    "journeyName": "Vertical Persona Engagement",
+    "journeyGoal": "Personalize messaging by vertical and usage patterns",
+    "entryTrigger": "persona_match_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "10 days",
+    "exitClause": "Exit after engagement achieved"
+  },
+  "entryCriteria": {
+    "event": "persona_match_detected",
+    "eventId": "evt_persona_001",
+    "conditions": [
+      {
+        "field": "firmographicSegment",
+        "operator": "IN",
+        "value": [
+          "SMB",
+          "Enterprise",
+          "Consumer"
+        ]
+      },
+      {
+        "field": "usagePatternMatch",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "CRM"
+    },
+    "audienceName": "Persona_Based_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Personalized Recommendation",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Solutions tailored for your business",
+      "cta": "Explore Solutions",
+      "tracking": {
+        "campaignId": "email_persona_match",
+        "deliveryId": "del_email_v1",
+        "trackingEvents": [
+          "email_click",
+          "product_interest"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Industry Success Story",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "IN_APP",
+      "messageTheme": "See how businesses like yours succeed",
+      "cta": "Read Case Study",
+      "tracking": {
+        "campaignId": "inapp_case_study",
+        "deliveryId": "del_inapp_v2",
+        "trackingEvents": [
+          "inapp_view",
+          "case_study_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "persona_match_detected",
+        "eventId": "evt_persona_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_interest",
+          "field": "interestShown",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_interest",
+          "field": "interestShown",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_interest",
+      "eventId": "evt_interest_001",
+      "condition": "interestShown == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 240
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_interest",
+      "case_study_click"
+    ],
+    "eventMapping": {
+      "product_interest": "evt_interest_001",
+      "case_study_click": "evt_case_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_interest",
+    "secondaryKPIs": [
+      "email_click",
+      "case_study_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 240
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

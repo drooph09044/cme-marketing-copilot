@@ -1,0 +1,168 @@
+{
+  "useCaseId": "loyalty-enrollment-promotion",
+  "name": "Loyalty Enrollment Promotion Journey",
+  "category": {
+    "categoryId": "loyalty-journey",
+    "categoryName": "Loyalty"
+  },
+  "journeyTable": {
+    "journeyName": "Loyalty Enrollment Promotion",
+    "journeyGoal": "Encourage users to enroll in the loyalty program",
+    "entryTrigger": "user_logged_in",
+    "journeyCategory": "Loyalty",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after loyalty enrollment or 3 days"
+  },
+  "entryCriteria": {
+    "event": "user_logged_in",
+    "eventId": "evt_login_002",
+    "conditions": [
+      {
+        "field": "loyaltyMember",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Non-Loyalty Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Loyalty Enrollment Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Join our loyalty program and unlock exclusive rewards!",
+      "cta": "Enroll Now",
+      "tracking": {
+        "campaignId": "email_loyalty_enrollment",
+        "deliveryId": "del_email_23",
+        "trackingEvents": [
+          "email_open",
+          "loyalty_enrollment"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Loyalty Enrollment Push",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "PUSH",
+      "messageTheme": "You’re one step away from exclusive benefits – join today!",
+      "cta": "Join Loyalty",
+      "tracking": {
+        "campaignId": "push_loyalty_enrollment",
+        "deliveryId": "del_push_23",
+        "trackingEvents": [
+          "push_open",
+          "loyalty_enrollment"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_logged_in",
+        "eventId": "evt_login_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "loyalty_enrollment",
+          "field": "loyaltyEnrolled",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "loyalty_enrollment",
+          "field": "loyaltyEnrolled",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 23
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "loyalty_enrollment",
+      "eventId": "evt_loyalty_001",
+      "condition": "loyaltyEnrolled == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 72
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "loyalty_enrollment"
+    ],
+    "eventMapping": {
+      "loyalty_enrollment": "evt_loyalty_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "loyalty_enrollment",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 72
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

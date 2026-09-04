@@ -1,0 +1,127 @@
+{
+  "useCaseId": "checkin-reminder-email-followup",
+  "name": "Check-in Reminder – Email Follow-up Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Check-in Reminder – Email Follow-up",
+    "journeyGoal": "Follow up with users via email who haven’t completed check-in and encourage app download",
+    "entryTrigger": "user_checkin_pending",
+    "journeyCategory": "Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after app download or check-in"
+  },
+  "entryCriteria": {
+    "event": "user_checkin_pending",
+    "eventId": "evt_checkin_003",
+    "conditions": [
+      {
+        "field": "appInstalled",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Pending Check-in Users – Email Follow-up"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Email Check-in Reminder",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You haven’t checked in yet – download the app and complete check-in!",
+      "cta": "Check-in Now",
+      "tracking": {
+        "campaignId": "email_checkin_followup",
+        "deliveryId": "del_email_15",
+        "trackingEvents": [
+          "email_open",
+          "app_download"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_checkin_pending",
+        "eventId": "evt_checkin_003"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_download",
+          "field": "appDownloaded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "app_download",
+      "eventId": "evt_app_003",
+      "condition": "appDownloaded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "app_download"
+    ],
+    "eventMapping": {
+      "app_download": "evt_app_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "app_download",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

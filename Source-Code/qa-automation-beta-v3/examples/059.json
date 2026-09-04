@@ -1,0 +1,158 @@
+{
+  "id": "059",
+  "matrix_row_id": 59,
+  "matrix_row_name": "NHL Shop Jersey Cross-Sell",
+  "template": "tpl_merch_cross_sell",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NHL Shop jersey cross-sell triggered by fav-team setting or roster news.",
+    "Create a single-channel NHL Shop jersey cross-sell. Trigger when a fan sets a favorite team in their profile, or when their fav team makes a notable trade or free-agent signing. Email features a fav-team jersey-of-the-week promo with player-name customization for top roster moves.",
+    "Need a merch cross-sell pushing NHL Shop jerseys, fired off when a fan picks a fav team or when their team makes a big trade or signing."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-shop-jersey-cross-sell",
+    "metadata": {
+      "name": "NHL Shop Jersey Cross-Sell",
+      "internal_name": "NHL_Shop_Jersey_Cross_Sell_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "NHL Shop"},
+      "purpose": "Drive jersey purchases on NHL Shop via single-channel email triggered by fav-team setting or notable roster moves.",
+      "archetype": "cross_sell",
+      "launch_date": "2025-09-01",
+      "end_date": "2026-09-01",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive NHL Shop jersey purchases.", "kpi": "Jersey revenue per recipient", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Always-on, event-triggered cross-sell. Fires on two signals: fan sets a favorite team in their profile, or fav team makes a notable roster move (trade, free-agent signing). Single email per trigger with fav-team jersey of the week and dynamic player-name customization for top roster moves.",
+        "timing_rationale": "Real-time on trigger event.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "dynamic_content", "event_triggered"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nhl_fan_with_fav_team",
+        "name": "NHL fan with favorite team set",
+        "criteria": {"field": "favorite_team", "op": "is_not_null"},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}},
+      {"id": "supp_recent_jersey_buyer", "name": "Bought a fav-team jersey in last 60d", "scope": "global", "criteria": {"all_of": [{"field": "nhl_shop.last_jersey_purchase_days_ago", "op": "lte", "value": 60}]}}
+    ],
+    "channels": [{"id": "ch_email", "type": "email"}],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "PN", "name": "Featured Player Name"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 30, "unit": "day"}, "max_entries": 6},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: fav-team set or notable roster move",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "fav_team_set_or_roster_move"
+        }
+      },
+      {
+        "id": "dec_trigger_type",
+        "type": "decision",
+        "label": "Trigger type: roster move?",
+        "decision_basis": "behavior",
+        "condition": {"field": "event.type", "op": "equals", "value": "roster_move"}
+      },
+      {
+        "id": "email_roster_move",
+        "type": "action",
+        "label": "Email - {{FT}} just added {{PN}}",
+        "channel": "ch_email",
+        "touch_id": "T1A",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FT}} just added {{PN}} - get the jersey",
+          "headline": "Welcome to {{FT}}, {{PN}}",
+          "cta_label": "Shop {{PN}} jersey"
+        },
+        "personalization_used": ["FN", "FT", "PN"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_fav_team_set",
+        "type": "action",
+        "label": "Email - Welcome to {{FT}} fans, here's your jersey",
+        "channel": "ch_email",
+        "touch_id": "T1B",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Rep {{FT}}: jersey of the week",
+          "headline": "Now that you're following {{FT}}, suit up",
+          "cta_label": "Shop {{FT}} jerseys"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_3_days",
+        "type": "wait",
+        "label": "Wait 3 days for click follow-up window",
+        "timing": {"type": "wait", "duration": {"value": 3, "unit": "day"}}
+      },
+      {
+        "id": "dec_clicked",
+        "type": "decision",
+        "label": "Clicked but didn't purchase?",
+        "decision_basis": "behavior",
+        "condition": {
+          "all_of": [
+            {"field": "email.last_click_within_days", "op": "lte", "value": 3},
+            {"field": "nhl_shop.purchase_since_send", "op": "equals", "value": false}
+          ]
+        }
+      },
+      {
+        "id": "email_followup",
+        "type": "action",
+        "label": "Email - Still browsing? Free shipping on {{FT}} jerseys",
+        "channel": "ch_email",
+        "touch_id": "T2",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Still thinking it over? Free shipping on {{FT}} jerseys",
+          "cta_label": "Complete your purchase"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_trigger_type"},
+      {"from": "dec_trigger_type", "to": "email_roster_move", "branch_label": "yes"},
+      {"from": "dec_trigger_type", "to": "email_fav_team_set", "branch_label": "no"},
+      {"from": "email_roster_move", "to": "wait_3_days"},
+      {"from": "email_fav_team_set", "to": "wait_3_days"},
+      {"from": "wait_3_days", "to": "dec_clicked"},
+      {"from": "dec_clicked", "to": "email_followup", "branch_label": "yes"},
+      {"from": "dec_clicked", "to": "end_journey", "branch_label": "no"},
+      {"from": "email_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Jersey revenue per recipient"}],
+      "secondary_kpis": [{"name": "Roster-move trigger click rate"}, {"name": "Fav-team-set trigger click rate"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "useCaseId": "streaming-engagement-reengagement",
+  "name": "Streaming Engagement – Re-engagement Journey",
+  "category": {
+    "categoryId": "real-time-engagement",
+    "categoryName": "Real-Time Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Streaming Engagement – Re-engagement",
+    "journeyGoal": "Re-engage users who have not started or returned to streams recently",
+    "entryTrigger": "user_inactive_streaming",
+    "journeyCategory": "Engagement",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after stream started or 3 days"
+  },
+  "entryCriteria": {
+    "event": "user_inactive_streaming",
+    "eventId": "evt_inactive_stream_001",
+    "conditions": [
+      {
+        "field": "lastStreamViewed",
+        "operator": "GREATER_THAN",
+        "value": "72 hours ago"
+      },
+      {
+        "field": "subscriptionStatus",
+        "operator": "EQUALS",
+        "value": "ACTIVE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Inactive Stream Users – Re-engagement"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Re-engagement Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "We miss you! Your favorite stream is waiting – come back now!",
+      "cta": "Watch Stream",
+      "tracking": {
+        "campaignId": "push_stream_reengagement",
+        "deliveryId": "del_push_44",
+        "trackingEvents": [
+          "push_open",
+          "stream_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Re-engagement Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Catch up on the latest streams you might have missed!",
+      "cta": "Watch Stream",
+      "tracking": {
+        "campaignId": "email_stream_reengagement",
+        "deliveryId": "del_email_44",
+        "trackingEvents": [
+          "email_open",
+          "stream_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_inactive_streaming",
+        "eventId": "evt_inactive_stream_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "stream_start",
+          "field": "streamStarted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "stream_start",
+          "field": "streamStarted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "stream_start",
+      "eventId": "evt_stream_005",
+      "condition": "streamStarted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 72
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "stream_start"
+    ],
+    "eventMapping": {
+      "stream_start": "evt_stream_005"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "stream_start",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 72
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

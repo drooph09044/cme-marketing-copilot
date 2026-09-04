@@ -1,0 +1,38 @@
+name: Deploy to Databricks Apps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        working-directory: Source-Code
+        run: npm install
+
+      - name: Build React frontend
+        working-directory: Source-Code
+        run: npm run build
+
+      - name: Install Databricks CLI
+        run: pip install databricks-sdk
+
+      - name: Deploy to Databricks Apps
+        working-directory: Source-Code
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          databricks apps deploy marketing-copilot --source-code-path .

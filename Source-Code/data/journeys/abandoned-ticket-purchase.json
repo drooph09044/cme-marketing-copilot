@@ -1,0 +1,167 @@
+{
+  "useCaseId": "abandoned-ticket-purchase",
+  "name": "Abandoned Ticket Purchase Reminder",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Monetization"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Ticket Recovery",
+    "journeyGoal": "Recover abandoned ticket purchases and increase conversion rate",
+    "entryTrigger": "checkout_abandonment_detected",
+    "journeyCategory": "Conversion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit if ticket purchase is completed"
+  },
+  "entryCriteria": {
+    "event": "checkout_abandon",
+    "eventId": "evt_checkout_abandon_001",
+    "conditions": [
+      {
+        "field": "checkoutStatus",
+        "operator": "EQUALS",
+        "value": "abandoned"
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Abandoned_Buyers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Reminder Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "You left something behind – your tickets are waiting",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "push_abandon_1",
+        "deliveryId": "del_abandon_1",
+        "trackingEvents": [
+          "push_open",
+          "checkout_resume"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Recovery Email",
+      "timing": {
+        "offsetHours": 12
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your seats are reserved for a short time",
+      "cta": "Return to Checkout",
+      "tracking": {
+        "campaignId": "email_abandon_2",
+        "deliveryId": "del_abandon_2",
+        "trackingEvents": [
+          "email_open",
+          "checkout_resume"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "checkout_abandon",
+        "eventId": "evt_checkout_abandon_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 11
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_purchase",
+      "eventId": "evt_ticket_purchase_001",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "ticket_purchase"
+    ],
+    "eventMapping": {
+      "ticket_purchase": "evt_ticket_purchase_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_purchase",
+    "secondaryKPIs": [
+      "checkout_resume"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

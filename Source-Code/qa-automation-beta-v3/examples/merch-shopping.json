@@ -1,0 +1,105 @@
+{
+  "useCaseId": "merch-shopping",
+  "clientTag": "PGA",
+  "name": "Merch Shopping Journey",
+  "subCategoryId": "loyalty-commerce",
+  "subCategoryName": "Loyalty & Commerce",
+  "category": {
+    "categoryId": "revenue",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Merch Shopping",
+    "journeyGoal": "Drive merchandise purchases",
+    "entryTrigger": "product_view",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after purchase"
+  },
+  "entryCriteria": {
+    "event": "product_view",
+    "eventId": "evt_product_001",
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Merchandise_Buyers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Browse Reminder",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "PUSH",
+      "messageTheme": "Still thinking? Grab your favorite gear",
+      "cta": "Buy Now",
+      "tracking": {
+        "campaignId": "push_merch",
+        "deliveryId": "del_push_m1",
+        "trackingEvents": [
+          "push_open",
+          "purchase_completed"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "product_view",
+        "eventId": "evt_product_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "duration": 2,
+        "unit": "HOURS"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_completed",
+      "eventId": "evt_purchase_001",
+      "condition": "purchaseDone == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 72
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "purchase_completed"
+    ]
+  },
+  "analytics": {
+    "primaryKPI": "purchase_completed",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 72
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,144 @@
+{
+  "useCaseId": "monetize-moments-showcase-new-merchandise",
+  "name": "SHOWCASE new merchandise to fans",
+  "clientTag": "PGA",
+  "subCategoryId": "loyalty-commerce",
+  "subCategoryName": "Loyalty & Commerce",
+  "category": {
+    "categoryId": "monetize-moments",
+    "categoryName": "Monetize Moments"
+  },
+  "journeyTable": {
+    "journeyName": "SHOWCASE new merchandise to fans",
+    "journeyGoal": "Build excitement around merchandise beyond the field",
+    "entryTrigger": "new_merchandise_launch",
+    "journeyCategory": "Commerce",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after merchandise purchase"
+  },
+  "entryCriteria": {
+    "event": "new_merchandise_launch",
+    "eventId": "evt_merch_001",
+    "conditions": [
+      {
+        "field": "purchaseHistory",
+        "operator": "GREATER_THAN",
+        "value": 0
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Merchandise_Shoppers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Merch Launch Alert",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "New team merchandise just dropped",
+      "cta": "Shop Now",
+      "tracking": {
+        "campaignId": "push_merch_launch",
+        "deliveryId": "del_push_mm1",
+        "trackingEvents": [
+          "push_open",
+          "product_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Limited Edition Reminder",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Limited edition gear is selling fast",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "email_merch_reminder",
+        "deliveryId": "del_email_mm2",
+        "trackingEvents": [
+          "email_open",
+          "purchase_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "new_merchandise_launch",
+        "eventId": "evt_merch_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "duration": 24,
+        "unit": "HOURS"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_complete",
+      "eventId": "evt_purchase_001",
+      "condition": "purchaseCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 72
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_view",
+      "purchase_complete"
+    ],
+    "eventMapping": {
+      "purchase_complete": "evt_purchase_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_complete",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "last_touch",
+      "lookbackHours": 72
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

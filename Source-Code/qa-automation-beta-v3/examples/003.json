@@ -1,0 +1,867 @@
+{
+  "id": "003",
+  "matrix_row_id": 3,
+  "matrix_row_name": "Draft Local - 2026 Pittsburgh",
+  "template": "tpl_event_registration_drive",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": true,
+  "prompts": [
+    "Build a local registration drive journey for the 2026 NFL Draft in Pittsburgh, Apr 23-25.",
+    "Create a Draft Experience local journey for Pittsburgh fans within drive distance of the 2026 NFL Draft (Apr 23-25). Multi-channel waterfall audience layered across activity, geo, and fav-team. Sequence: registration-open email + push at T-5w, follow-up emails at T-4w and T-3w, then pre-draft ramp T-2w / T-1w / T-3d / T-1d, daily takeover emails Draft Days 1-3, post-draft recap +2 days. SMS to opted-in registrants prompting OnePass app download.",
+    "Need a Pittsburgh-local Draft journey for 2026. Reactivate inactive fans into registering, then nurture registrants with trip-planning + SMS through Draft Days."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-draft-local-2024",
+    "metadata": {
+      "name": "2024 NFL Draft - Local (Detroit)",
+      "internal_name": "NFL_Multi_DraftLocal_Q1_2024_AJO",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": "DET",
+        "product": "NFL Draft Experience"
+      },
+      "purpose": "Drive fans in the Detroit market to register for and attend the NFL Draft Experience, and drive OnePass app logins/usage.",
+      "archetype": "event_promotion",
+      "launch_date": "2024-03-19",
+      "end_date": "2024-04-29",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive NFL Draft experience registrations.",
+          "kpi": "# of fans who register for NFL Draft Experience",
+          "forecast": null
+        },
+        {
+          "rank": "primary",
+          "description": "Drive OnePass App logins/usage.",
+          "kpi": "# of fans who logged into OnePass App",
+          "forecast": null
+        },
+        {
+          "rank": "secondary",
+          "description": "Reactivate fans with no activity in the last year.",
+          "kpi": "# of fans with no DB activity in last year who engaged (open/click) with any touchpoint",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Multi-channel sequenced journey from registration open through draft day, then post-draft recap. Use OnePass Realtime Outbound for next-best-message after registration; SMS via Attentive; two different Draft start dates (March 19 for Local, April 1 for Tune-In).",
+        "timing_rationale": "Begin 3/19 with registration open; layer email + SMS + push + modal as Draft approaches; daily takeover content during Draft Days 1-3; recap touch 2 days after.",
+        "notes": "CLUB ORCHESTRATION: send Clubs Toolkit. Simplified Local and Tune-In comms. LIONS ORCHESTRATION: hoping to coordinate with Lions for league local and custom Lions draft."
+      },
+      "considerations": [
+        "NFL Draft Experience runs from 4/20-4/27.",
+        "The local Draft Experience is a free event, but fans must be registered to attend.",
+        "Draft registrations tentatively start 3/19."
+      ],
+      "capabilities_used": [
+        "greencopper_onepass_direct_integration",
+        "onepass_realtime_outbound",
+        "sms_via_attentive",
+        "real_time_connections",
+        "triggered_campaigns"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "GET PUMPED",
+        "LOOK AHEAD",
+        "PLAN & COMMIT",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_all_2yr_active_waterfall",
+        "name": "All 2 Year Active (waterfall)",
+        "description": "Composite waterfall audience layered across multiple targeting criteria.",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "jebbit.registry_of_interest_2024",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "geolocation.state",
+              "op": "equals",
+              "value": "MI"
+            },
+            {
+              "expression": "(fav_team = CHI AND HMA = CHI AND ticket_purchased_2023 WHERE CHI_was_away) OR (fav_team = WAS AND HMA = WAS AND ticket_purchased_2023 WHERE WAS_was_away) repeat for NE, AZ, LAC, NYG, TEN, ATL, NYJ"
+            },
+            {
+              "field": "lions.hma",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "favorite_team",
+              "op": "equals",
+              "value": "DET"
+            },
+            {
+              "field": "geolocation.miles_from_DET",
+              "op": "lte",
+              "value": 500
+            },
+            {
+              "expression": "Shop purchasers from last 2 seasons that bought Lions merchandise"
+            },
+            {
+              "expression": "All event attendees/registrants from last 2 seasons (Draft, PBG, SB, Combine, Kickoff)"
+            },
+            {
+              "field": "onepass.downloaded_not_registered_draft_2024",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "fantasy.season_2023_registered_joined_drafted",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "nfl_com_app.draft_pages_visitor",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "favorite_team",
+              "op": "in",
+              "value": [
+                "CHI",
+                "WAS",
+                "NE",
+                "AZ",
+                "LAC",
+                "NYG",
+                "TEN",
+                "ATL",
+                "NYJ"
+              ]
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_lions_esp",
+        "name": "Fans in Detroit Lions ESP",
+        "scope": "global",
+        "criteria": {
+          "field": "club.esp_lions",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_club_only_reconsented_active",
+        "name": "Club Only Fans, Club Reconsented Fans, League Active 13-24M",
+        "scope": "global",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "club.only_fan",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "club.reconsented",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "league.activity_band",
+              "op": "equals",
+              "value": "13-24M"
+            }
+          ]
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_sms",
+        "type": "sms",
+        "vendor": "Attentive"
+      },
+      {
+        "id": "ch_push_nfl",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_push_onepass",
+        "type": "push",
+        "platform": "onepass_app"
+      },
+      {
+        "id": "ch_app_modal",
+        "type": "app_modal",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_web_target",
+        "type": "web_target_banner"
+      },
+      {
+        "id": "ch_app_target",
+        "type": "app_target_banner"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "LO",
+        "name": "Location"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 3/19 launch",
+        "entry_criteria": {
+          "trigger": "schedule",
+          "event_name": null
+        }
+      },
+      {
+        "id": "dec_email_optin",
+        "type": "decision",
+        "label": "Email opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_t1_local_reg",
+        "type": "action",
+        "label": "Email 1 - Local Experience Registration (3/19)",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-03-19",
+          "time_local": "morning ET"
+        },
+        "copy": {
+          "subject": "Local Experience Registration",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Local Experience Registration"
+            },
+            {
+              "rank": "secondary",
+              "name": "SMS signup promo: Get the latest info about the Draft as we lock it in"
+            }
+          ]
+        }
+      },
+      {
+        "id": "dec_onepass_app_pushed_and_optin",
+        "type": "decision",
+        "label": "OnePass App opted-in AND NOT NFL+ Subscriber?",
+        "decision_basis": "pull",
+        "condition": {
+          "all_of": [
+            {
+              "field": "consent.push_onepass",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "nfl_plus_subscription_status",
+              "op": "not_equals",
+              "value": "active"
+            }
+          ]
+        }
+      },
+      {
+        "id": "push_t6_onepass_reg",
+        "type": "action",
+        "label": "OnePass Push - 2024 Draft Experience Registrations now Open!",
+        "channel": "ch_push_onepass",
+        "touch_id": "T6",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-03-19"
+        },
+        "copy": {
+          "headline": "2024 Draft Experience Registrations now Open!"
+        }
+      },
+      {
+        "id": "push_t6_nfl_reg",
+        "type": "action",
+        "label": "NFL App Push - 2024 Draft Experience Registrations now Open!",
+        "channel": "ch_push_nfl",
+        "touch_id": "T6",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-03-19"
+        },
+        "copy": {
+          "headline": "2024 Draft Experience Registrations now Open!"
+        }
+      },
+      {
+        "id": "email_t2_local_reg_followup",
+        "type": "action",
+        "label": "Email 2 - Local Experience Registration follow-up (3/28)",
+        "channel": "ch_email",
+        "touch_id": "T2",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-03-28"
+        },
+        "copy": {
+          "subject": "Don't miss the 2024 Draft Experience"
+        }
+      },
+      {
+        "id": "email_t3_local_reg_third",
+        "type": "action",
+        "label": "Email 3 - Local Experience Registration third pass (4/8)",
+        "channel": "ch_email",
+        "touch_id": "T3",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-08"
+        }
+      },
+      {
+        "id": "dec_registered_first",
+        "type": "decision",
+        "label": "Registered after Email 2/3?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "draft.registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_t4_2weeks_before",
+        "type": "action",
+        "label": "Email - 2 Weeks Before Draft",
+        "channel": "ch_email",
+        "touch_id": "T4",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "draft_day_1",
+          "direction": "before",
+          "offset": {
+            "value": 2,
+            "unit": "week"
+          }
+        }
+      },
+      {
+        "id": "email_t5_1week_before",
+        "type": "action",
+        "label": "Email - 1 Week Before Draft",
+        "channel": "ch_email",
+        "touch_id": "T5",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "draft_day_1",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "week"
+          }
+        }
+      },
+      {
+        "id": "email_t7_3days_before",
+        "type": "action",
+        "label": "Email - 3 Days Before Draft (4/22)",
+        "channel": "ch_email",
+        "touch_id": "T7",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-22"
+        }
+      },
+      {
+        "id": "email_t8_1day_before",
+        "type": "action",
+        "label": "Email - 1 Day Before Draft (4/24)",
+        "channel": "ch_email",
+        "touch_id": "T8",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-24"
+        }
+      },
+      {
+        "id": "email_t9_day1_consolidated",
+        "type": "action",
+        "label": "Email - Day 1 Consolidated Schedule of Events (4/25)",
+        "channel": "ch_email",
+        "touch_id": "T9",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "push_p2_day1_events",
+        "type": "action",
+        "label": "Push - Day 1 Schedule of Events / time-to-register reminder",
+        "channel": "ch_push_nfl",
+        "touch_id": "P2",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "email_t10_day2",
+        "type": "action",
+        "label": "Email - Draft Day 2 (4/26)",
+        "channel": "ch_email",
+        "touch_id": "T10",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-26"
+        }
+      },
+      {
+        "id": "email_t11_day3",
+        "type": "action",
+        "label": "Email - Draft Day 3 (4/27)",
+        "channel": "ch_email",
+        "touch_id": "T11",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-27"
+        }
+      },
+      {
+        "id": "push_p3_fav_team_pick",
+        "type": "action",
+        "label": "Push P3 - How did your FAV team perform / coming out of the Draft?",
+        "channel": "ch_push_nfl",
+        "touch_id": "P3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "draft_day_3",
+          "direction": "after",
+          "offset": {
+            "value": 1,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_t12_post_draft_recap",
+        "type": "action",
+        "label": "Email - NFL Daily Takeover or Draft Recap (4/29)",
+        "channel": "ch_email",
+        "touch_id": "T12",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-29"
+        }
+      },
+      {
+        "id": "dec_registered_realtime",
+        "type": "decision",
+        "label": "Registered (real-time)?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "draft.registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_reg_confirm",
+        "type": "action",
+        "label": "Registration Confirmation Email (deploys through 4/27)",
+        "channel": "ch_email",
+        "touch_id": "RC",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "You're registered for the 2024 NFL Draft Experience!",
+          "modules": [
+            {
+              "rank": "secondary",
+              "name": "Conditional OnePass App download/login content"
+            },
+            {
+              "rank": "tertiary",
+              "name": "If fan does not have favorite team set: 'During reg did they already select dyn., they are going.'"
+            }
+          ]
+        },
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted-in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.sms",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "wait_2_days_sms_check",
+        "type": "wait",
+        "label": "Wait 2 days then check OnePass logged in via NFL ID",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "sms_onepass_prompt",
+        "type": "action",
+        "label": "SMS - Make sure you download the OnePass App and Log in with your NFL ID",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "body": "Make sure you download the OnePass App and Log in with your NFL ID."
+        }
+      },
+      {
+        "id": "wait_2_days_post_reg",
+        "type": "wait",
+        "label": "Wait 2 days from registration",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_t13_trip_planning",
+        "type": "action",
+        "label": "Email - Detroit Trip Planning / Things to know about the city",
+        "channel": "ch_email",
+        "touch_id": "T13",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_has_onepass_opted_in_post_reg",
+        "type": "decision",
+        "label": "Has OnePass + SMS Opted In?",
+        "decision_basis": "pull",
+        "condition": {
+          "all_of": [
+            {
+              "field": "onepass.downloaded",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "consent.sms",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "sms_thank_you_engagement",
+        "type": "action",
+        "label": "SMS - Thank you, know the prospects? Link to engagement experience",
+        "channel": "ch_sms",
+        "touch_id": "S2",
+        "timing": {
+          "type": "realtime"
+        }
+      },
+      {
+        "id": "email_t14_consolidated_schedule_for_registrants",
+        "type": "action",
+        "label": "Email - Day 1 Consolidated Schedule of Events for registrants (4/25)",
+        "channel": "ch_email",
+        "touch_id": "T14",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "modal_a1_promoting_reg",
+        "type": "action",
+        "label": "NFL App Modal promoting reg (rolling period)",
+        "channel": "ch_app_modal",
+        "touch_id": "A1",
+        "timing": {
+          "type": "realtime"
+        }
+      },
+      {
+        "id": "target_w1_target_banner",
+        "type": "action",
+        "label": "NFL.com and App Target Banner promoting reg (rolling period)",
+        "channel": "ch_web_target",
+        "touch_id": "W1",
+        "timing": {
+          "type": "realtime"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_email_optin"
+      },
+      {
+        "from": "dec_email_optin",
+        "to": "email_t1_local_reg",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_email_optin",
+        "to": "dec_onepass_app_pushed_and_optin",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_t1_local_reg",
+        "to": "dec_onepass_app_pushed_and_optin"
+      },
+      {
+        "from": "dec_onepass_app_pushed_and_optin",
+        "to": "push_t6_onepass_reg",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_onepass_app_pushed_and_optin",
+        "to": "push_t6_nfl_reg",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t6_onepass_reg",
+        "to": "dec_registered_realtime"
+      },
+      {
+        "from": "push_t6_nfl_reg",
+        "to": "dec_registered_realtime"
+      },
+      {
+        "from": "dec_registered_realtime",
+        "to": "email_reg_confirm",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_registered_realtime",
+        "to": "email_t2_local_reg_followup",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_reg_confirm",
+        "to": "dec_sms_optin"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "sms_onepass_prompt",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "wait_2_days_sms_check",
+        "branch_label": "no"
+      },
+      {
+        "from": "sms_onepass_prompt",
+        "to": "wait_2_days_post_reg"
+      },
+      {
+        "from": "wait_2_days_sms_check",
+        "to": "wait_2_days_post_reg"
+      },
+      {
+        "from": "wait_2_days_post_reg",
+        "to": "email_t13_trip_planning"
+      },
+      {
+        "from": "email_t13_trip_planning",
+        "to": "dec_has_onepass_opted_in_post_reg"
+      },
+      {
+        "from": "dec_has_onepass_opted_in_post_reg",
+        "to": "sms_thank_you_engagement",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_has_onepass_opted_in_post_reg",
+        "to": "email_t14_consolidated_schedule_for_registrants",
+        "branch_label": "no"
+      },
+      {
+        "from": "sms_thank_you_engagement",
+        "to": "email_t14_consolidated_schedule_for_registrants"
+      },
+      {
+        "from": "email_t14_consolidated_schedule_for_registrants",
+        "to": "email_t12_post_draft_recap"
+      },
+      {
+        "from": "email_t2_local_reg_followup",
+        "to": "email_t3_local_reg_third"
+      },
+      {
+        "from": "email_t3_local_reg_third",
+        "to": "dec_registered_first"
+      },
+      {
+        "from": "dec_registered_first",
+        "to": "email_reg_confirm",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_registered_first",
+        "to": "email_t4_2weeks_before",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_t4_2weeks_before",
+        "to": "email_t5_1week_before"
+      },
+      {
+        "from": "email_t5_1week_before",
+        "to": "email_t7_3days_before"
+      },
+      {
+        "from": "email_t7_3days_before",
+        "to": "email_t8_1day_before"
+      },
+      {
+        "from": "email_t8_1day_before",
+        "to": "email_t9_day1_consolidated"
+      },
+      {
+        "from": "email_t9_day1_consolidated",
+        "to": "push_p2_day1_events"
+      },
+      {
+        "from": "push_p2_day1_events",
+        "to": "email_t10_day2"
+      },
+      {
+        "from": "email_t10_day2",
+        "to": "email_t11_day3"
+      },
+      {
+        "from": "email_t11_day3",
+        "to": "push_p3_fav_team_pick"
+      },
+      {
+        "from": "push_p3_fav_team_pick",
+        "to": "email_t12_post_draft_recap"
+      },
+      {
+        "from": "email_t12_post_draft_recap",
+        "to": "end_journey"
+      },
+      {
+        "from": "start",
+        "to": "modal_a1_promoting_reg"
+      },
+      {
+        "from": "modal_a1_promoting_reg",
+        "to": "end_journey"
+      },
+      {
+        "from": "start",
+        "to": "target_w1_target_banner"
+      },
+      {
+        "from": "target_w1_target_banner",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "learning_objectives": [
+        "Understand performance against KPIs by audience to inform audience selections for next year's Draft journeys.",
+        "Determine whether Day 2 and Day 3 tune-in emails should be sent to fans who don't engage with Day 1 emails."
+      ],
+      "primary_kpis": [
+        {
+          "name": "# of fans who register for NFL Draft Experience"
+        },
+        {
+          "name": "# of fans who logged into OnePass App"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Reactivated fans engaged with journey",
+          "definition": "Fans with no DB activity in the last year who engaged with any touchpoint."
+        }
+      ],
+      "tests": [
+        {
+          "name": "Day 2 & 3 Email Test",
+          "hypothesis": "Sending Day 2/3 emails to fans who didn't engage with Day 1 will lift engagement without lifting unsubscribe rate.",
+          "design": "50% of non-engagers receive Day 2/3 emails; 50% do not.",
+          "control_holdout_pct": 50.0
+        },
+        {
+          "name": "Content tests",
+          "hypothesis": "Registration copy, landing UX, timing, and subject line variations affect registration conversion.",
+          "design": "TBD content testing in partnership with 1:1 team."
+        }
+      ]
+    }
+  }
+}

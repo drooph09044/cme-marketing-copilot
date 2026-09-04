@@ -1,0 +1,26 @@
+{
+  "categoryId": "ticketing-sales",
+  "categoryName": "Ticketing & Sales",
+  "categoryDescription": "Journeys focused on ticket conversion, renewals, and premium inventory monetization.",
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "slug": "premium-suite-upsell",
+  "name": "Premium Suite Upsell",
+  "brief": "High-value buyers with recent premium browsing activity have not requested a callback. Use concierge-style email and push with a hospitality-led variant to generate premium lead submissions.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-03",
+  "journeyOverrides": {
+    "name": "Premium Suite Upsell",
+    "objective": "Capture premium lead submissions from high-intent premium buyers with a concierge-style orchestration.",
+    "audience": "Premium_Browsers_14d",
+    "variantA": "Standard concierge follow-up",
+    "variantB": "Hospitality-led premium positioning"
+  },
+  "nodeOverrides": {
+    "n3": { "title": ["Email 1"], "subtitle": ["Premium options", "concierge intro"] },
+    "n3b": { "title": ["Email 1B"], "subtitle": ["Hospitality preview", "priority host"] },
+    "n6": { "title": ["Push 1"], "subtitle": ["Premium seats", "book a callback"] },
+    "n9": { "title": ["Email 2"], "subtitle": ["Final premium slot", "callback CTA"] },
+    "n11": { "title": ["Lead", "Submitted?"] }
+  }
+}

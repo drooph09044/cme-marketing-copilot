@@ -1,0 +1,127 @@
+{
+  "useCaseId": "destination-promotion",
+  "name": "Destination Promotion Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Destination Promotion",
+    "journeyGoal": "Promote destinations to users and drive exploration",
+    "entryTrigger": "user_engaged",
+    "journeyCategory": "Promotion",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after destination viewed or 1 day"
+  },
+  "entryCriteria": {
+    "event": "user_engaged",
+    "eventId": "evt_engagement_001",
+    "conditions": [
+      {
+        "field": "interestType",
+        "operator": "EQUALS",
+        "value": "Destination"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Destination Interested Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Destination Promotion Push",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "Explore our featured destinations today!",
+      "cta": "Explore Destinations",
+      "tracking": {
+        "campaignId": "push_destination_promo",
+        "deliveryId": "del_push_11",
+        "trackingEvents": [
+          "push_open",
+          "destination_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_engaged",
+        "eventId": "evt_engagement_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "destination_view",
+          "field": "destinationViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "destination_view",
+      "eventId": "evt_destination_001",
+      "condition": "destinationViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "destination_view"
+    ],
+    "eventMapping": {
+      "destination_view": "evt_destination_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "destination_view",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

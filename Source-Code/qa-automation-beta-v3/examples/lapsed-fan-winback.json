@@ -1,0 +1,27 @@
+{
+  "categoryId": "loyalty-commerce",
+  "categoryName": "Loyalty & Commerce",
+  "categoryDescription": "Journeys that blend loyalty nudges, win-back motions, and merchandise conversion.",
+  "subCategoryId": "loyalty-commerce",
+  "subCategoryName": "Loyalty & Commerce",
+  "slug": "lapsed-fan-winback",
+  "name": "Lapsed Fan Win-back",
+  "active": false,
+  "brief": "Dormant customers have not attended, purchased, or opened the app recently. Use a multi-touch email and push sequence with an offer variant and a holdout group to measure reactivation lift.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-16",
+  "journeyOverrides": {
+    "name": "Lapsed Fan Win-back - 45 Day",
+    "objective": "Bring lapsed customers back into the app and purchase funnel with a measured win-back sequence.",
+    "audience": "Lapsed_Customers_45d",
+    "variantA": "Standard win-back cadence",
+    "variantB": "Discount plus loyalty reminder"
+  },
+  "nodeOverrides": {
+    "n3": { "title": ["Email 1"], "subtitle": ["We miss you", "return offer"] },
+    "n3b": { "title": ["Email 1B"], "subtitle": ["Discount reminder", "bonus value"] },
+    "n6": { "title": ["Push 1"], "subtitle": ["Come back", "limited-time offer"] },
+    "n10": { "title": ["Push 2"], "subtitle": ["Final reminder", "bonus points"] },
+    "n11": { "title": ["Reactivated", "User?"] }
+  }
+}

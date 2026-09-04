@@ -1,0 +1,53 @@
+# FastAPI / Python (apps/api)
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build / packaging
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+*.whl
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Env (local-only — committed template lives in .env.example)
+.env
+.env.local
+.env.*.local
+
+# Logs / pids
+*.log
+*.pid
+
+# Local SQLite / scratch
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+.scratch/
+
+# Editors / OS
+.DS_Store
+*.swp

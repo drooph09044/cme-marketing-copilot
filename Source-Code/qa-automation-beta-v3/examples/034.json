@@ -1,0 +1,169 @@
+{
+  "id": "034",
+  "matrix_row_id": 34,
+  "matrix_row_name": "NBA fan birthday wish",
+  "template": "tpl_anniversary_milestone",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NBA fan birthday journey themed to favorite team with an NBA Store offer.",
+    "Create a birthday wish journey for NBA fans. Email in the fan's favorite team's colors and voice on their birthday morning, plus a push CTA driving to the next nationally televised fav-team game. Include an NBA Store discount code valid for 7 days.",
+    "Need a birthday touch for NBA fans — wish them happy birthday in their fav team's colors, drop an NBA Store coupon, and link to their team's next national TV game."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-fan-birthday",
+    "metadata": {
+      "name": "NBA Fan Birthday",
+      "internal_name": "NBA_Fan_Birthday_2026",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA"},
+      "purpose": "Wish NBA fans a happy birthday with content themed to their favorite team, an NBA Store discount offer, and a CTA into the next nationally televised fav-team game.",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive birthday engagement and personal connection to fan's favorite NBA team.", "kpi": "Birthday email open / click rate", "forecast": null},
+        {"rank": "secondary", "description": "Drive NBA Store and fav-team game tune-in conversions.", "kpi": "Shop conversions and tune-in lift from birthday journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Birthday-morning email themed to fan's favorite team (colors, mascot, team voice); push later that day driving to next nationally televised fav-team game. Both touches include a 15% NBA Store discount code valid for 7 days. Fall back to a generic NBA birthday template when fav team is unknown.",
+        "timing_rationale": "Birthday-morning sends maximize relevance and open rate.",
+        "notes": null
+      },
+      "considerations": ["NBA Store discount code generator must support per-fan 7-day codes."],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nba_fan_with_birthdate",
+        "name": "NBA fan with birthdate on file",
+        "criteria": {
+          "all_of": [
+            {"field": "nba.profile_active", "op": "equals", "value": true},
+            {"field": "profile.birthdate", "op": "is_not_null"}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nba_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "month"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Birthday trigger",
+        "entry_criteria": {"trigger": "event", "event_name": "fan_birthday_today"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite NBA team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_fav_team_wish",
+        "type": "action",
+        "label": "Email - Fav-team themed birthday wish",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from your {{FT}}",
+          "preview": "A gift in your team's colors",
+          "modules": [
+            {"rank": "primary", "name": "Fav-team-themed birthday card"},
+            {"rank": "secondary", "name": "15% off NBA Store (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_generic_wish",
+        "type": "action",
+        "label": "Email - Generic NBA birthday wish",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from the NBA",
+          "modules": [
+            {"rank": "primary", "name": "Generic NBA birthday card"},
+            {"rank": "secondary", "name": "15% off NBA Store (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_next_natl_tv_game",
+        "type": "action",
+        "label": "Push - CTA to next national TV fav-team game",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 4, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} on national TV soon - tune in for your birthday"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "email_fav_team_wish", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_generic_wish", "branch_label": "no"},
+      {"from": "email_fav_team_wish", "to": "dec_push_optin"},
+      {"from": "email_generic_wish", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_next_natl_tv_game", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_next_natl_tv_game", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Birthday email open and click rate"}],
+      "secondary_kpis": [{"name": "NBA Store conversions from birthday code"}, {"name": "Fav-team game tune-in lift on birthday-day"}],
+      "tests": []
+    }
+  }
+}

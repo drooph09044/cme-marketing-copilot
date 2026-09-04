@@ -1,0 +1,391 @@
+{
+  "legacy_runtime": {
+    "source_map": {
+      "media": {
+        "med_subscription_billing": "Subscription Billing",
+        "med_billing_history": "Billing History",
+        "med_streaming_activity": "Streaming Activity",
+        "med_streaming_events": "Streaming Events",
+        "med_app_events": "App Events",
+        "med_mobile_app_events": "Mobile App Events",
+        "med_customer_support": "Customer Support",
+        "med_support_tickets": "Support Tickets",
+        "med_email_engagement": "Email Engagement",
+        "med_email_events": "Email Events",
+        "med_push_events": "Push Notifications",
+        "med_sms_events": "SMS Messages",
+        "med_subscription_history": "Subscription History"
+      },
+      "sports": {
+        "spt_fan_accounts": "Fan Accounts",
+        "spt_ticket_orders": "Ticket Orders",
+        "sports_ticketing": "Ticket Orders",
+        "sports_attendance": "Attendance",
+        "spt_loyalty_members": "Loyalty Members",
+        "sports_loyalty_activity": "Loyalty Activity",
+        "spt_app_events": "App Events",
+        "sports_app_events": "App Events",
+        "spt_commerce_orders": "Commerce Orders",
+        "sports_orders": "Commerce Orders",
+        "spt_ott_streaming_sessions": "Streaming Sessions",
+        "sports_streaming_events": "Streaming Events",
+        "spt_fantasy_gaming_accounts": "Fantasy Gaming Accounts",
+        "sports_support_tickets": "Customer Support"
+      },
+      "automotive": {
+        "aut_campaign_eligibility": "Campaign",
+        "aut_campaign_interactions": "Campaign",
+        "aut_campaign_validation_report": "Campaign",
+        "aut_connected_services_subscriptions": "Connected Services",
+        "aut_customers": "Customer",
+        "aut_customer_addresses": "Address",
+        "aut_customer_contacts": "Contacts",
+        "aut_households": "Household",
+        "aut_dealers": "Dealer",
+        "aut_dealer_staff": "Dealer",
+        "aut_dtc_events": "DTC Events",
+        "aut_insurance_claims": "Insurance",
+        "aut_insurance_policies": "Insurance",
+        "aut_loyalty_accounts": "Loyalty",
+        "aut_loyalty_transactions": "Loyalty",
+        "aut_mobile_app_sessions": "App",
+        "aut_nps_surveys": "Survey",
+        "aut_recalls": "Recall",
+        "aut_recall_responses": "Recall",
+        "aut_sales_transactions": "Sales",
+        "aut_service_appointments": "Service",
+        "aut_service_line_items": "Service",
+        "aut_service_orders": "Service",
+        "aut_support_cases": "Support",
+        "aut_telematics_monthly_summary": "Telematics",
+        "aut_trade_ins": "Trade-In",
+        "aut_vehicles": "Vehicle",
+        "aut_vehicle_health_reports": "Vehicle",
+        "aut_vehicle_models": "Vehicle",
+        "aut_vehicle_ownership": "Vehicle",
+        "aut_warranty_claims": "Warranty",
+        "aut_website_sessions": "Web",
+        "auto_service_history": "Service",
+        "auto_connected_vehicle_events": "Connected Vehicle",
+        "auto_telematics": "Telematics",
+        "auto_app_events": "App",
+        "auto_web_events": "Web",
+        "auto_campaign_events": "Campaign",
+        "auto_dealer_interactions": "Dealer",
+        "auto_nps_survey": "Survey",
+        "auto_recall_events": "Recall",
+        "auto_warranty_claims": "Warranty"
+      },
+      "telecom": {
+        "tel_customers": "Customer",
+        "tel_accounts": "Account",
+        "tel_subscriptions": "Subscription",
+        "tel_devices": "Device",
+        "tel_usage_monthly": "Usage",
+        "tel_billing": "Billing",
+        "tel_support_cases": "Support",
+        "tel_app_events": "App",
+        "tel_network_events": "Network",
+        "tel_campaign_interactions": "Campaign",
+        "tel_consent_preferences": "Consent",
+        "tel_households": "Household"
+      }
+    },
+    "SOURCE_VOLUME_PREFIX": {
+      "media": "med",
+      "sports": "spt",
+      "automotive": "aut",
+      "telecom": "tel"
+    },
+    "PIPELINE_STEPS": [
+      {
+        "id": "step1",
+        "name": "Semantic Tagging",
+        "script": "step1_semantic_tagging.py",
+        "outputs": [
+          "tag_mappings.json"
+        ]
+      },
+      {
+        "id": "step2",
+        "name": "Preprocessing",
+        "script": "step2_preprocess.py",
+        "outputs": [
+          "preprocessed_data/all_preprocessed"
+        ]
+      },
+      {
+        "id": "step2b",
+        "name": "Standardization",
+        "script": "step2b_standardize.py",
+        "outputs": [
+          "standardized_data/all_standardized"
+        ]
+      },
+      {
+        "id": "step3",
+        "name": "Blocking & Matching",
+        "script": "step3_blocking.py",
+        "outputs": [
+          "candidate_pairs"
+        ]
+      },
+      {
+        "id": "step4",
+        "name": "Clustering",
+        "script": "step4_clustering.py",
+        "outputs": [
+          "clustered_records",
+          "cluster_summary.json"
+        ]
+      },
+      {
+        "id": "step5",
+        "name": "Golden Record",
+        "script": "step5_golden_record.py",
+        "outputs": [
+          "golden_records",
+          "superseded_ids",
+          "golden_record_summary.json"
+        ]
+      },
+      {
+        "id": "step6",
+        "name": "Evaluation",
+        "script": "step6_evaluation.py",
+        "outputs": [
+          "evaluation_report.json"
+        ]
+      }
+    ],
+    "_ENRICHMENT_OVERRIDES": {
+      "2p_fan_scores": {
+        "party": "ML",
+        "source_type": "ML Scoring",
+        "owner": "Internal ML",
+        "use_for_identity": false,
+        "use_for_enrichment": true,
+        "description": "Fan engagement scores — internal ML model",
+        "match_key": "email"
+      },
+      "3p_ltv_propensity": {
+        "party": "ML",
+        "source_type": "ML Scoring",
+        "owner": "Internal ML",
+        "use_for_identity": false,
+        "use_for_enrichment": true,
+        "description": "LTV and propensity scores — internal ML model",
+        "match_key": "golden_id_ref"
+      },
+      "2p_location_data": {
+        "party": "3P",
+        "source_type": "Enrichment",
+        "owner": "GeoSignal",
+        "use_for_identity": false,
+        "use_for_enrichment": true,
+        "description": "Venue visit and location signals from GeoSignal",
+        "match_key": "device_id"
+      },
+      "3p_demographics": {
+        "party": "3P",
+        "source_type": "Enrichment",
+        "owner": "DataBridge",
+        "use_for_identity": false,
+        "use_for_enrichment": true,
+        "description": "Demographic attributes from DataBridge",
+        "match_key": "zip+phone_prefix"
+      }
+    },
+    "SOURCE_RECORD_PREFIXES": {
+      "media": "MED",
+      "sports": "SPT",
+      "automotive": "AUT",
+      "telecom": "TEL"
+    },
+    "SOURCE_RECORD_PREFIX_ALIASES": {
+      "sports": [
+        "SPO"
+      ]
+    },
+    "PREFIX_TO_SOURCE": {
+      "SB-": "subscription_billing",
+      "SA-": "streaming_activity",
+      "AE-": "app_events",
+      "CS-": "customer_support",
+      "EE-": "email_engagement"
+    },
+    "_IDENTITY_FIELDS": [
+      "record_id",
+      "source_file",
+      "email",
+      "full_name",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "zip",
+      "device_id",
+      "ip_address",
+      "subscription_tier"
+    ],
+    "CUSTOMER_PROFILE_EXPORT_FIELDS": [
+      "golden_id",
+      "cluster_id",
+      "email",
+      "full_name",
+      "first_name",
+      "last_name",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "zip",
+      "household_id",
+      "customer_id",
+      "account_id",
+      "loyalty_id",
+      "date_of_birth",
+      "subscription_tier",
+      "membership_tier",
+      "source_files",
+      "record_count",
+      "source_count",
+      "profile_scope",
+      "limited_attributes",
+      "ltv_score",
+      "ltv_tier",
+      "recency_days",
+      "recency_tier",
+      "engagement_rate",
+      "engagement_tier",
+      "primary_affinity",
+      "identity_strength",
+      "activity_timeline"
+    ],
+    "_ACTIVITY_TIMESTAMP_COLUMNS": [
+      "event_timestamp",
+      "event_time",
+      "session_start_time",
+      "session_start",
+      "session_date",
+      "stream_started_at",
+      "session_started_at",
+      "purchased_at",
+      "purchase_date",
+      "transaction_date",
+      "interaction_date",
+      "interaction_date_time",
+      "interaction_timestamp",
+      "open_date",
+      "opened_at",
+      "click_date",
+      "clicked_at",
+      "order_date",
+      "order_date_time",
+      "billing_date",
+      "billing_date_time",
+      "send_date",
+      "sent_at",
+      "delivered_at",
+      "message_timestamp",
+      "push_sent_at",
+      "sms_sent_at",
+      "last_login_at",
+      "signup_date",
+      "created_date",
+      "created_at",
+      "updated_at",
+      "event_date",
+      "activity_date",
+      "activity_timestamp",
+      "timestamp",
+      "date",
+      "enrolled_date",
+      "conversion_at",
+      "attendance_date",
+      "game_date",
+      "appointment_date",
+      "service_date",
+      "repair_order_date",
+      "opened_date",
+      "closed_date",
+      "completed_date",
+      "case_created_at",
+      "ticket_created_at",
+      "support_created_at",
+      "telematics_date",
+      "report_date",
+      "health_report_date",
+      "recall_date",
+      "claim_date",
+      "survey_date",
+      "response_date",
+      "start_time",
+      "end_time"
+    ],
+    "_SUBSCRIPTION_SOURCE_PATTERNS": {
+      "media": [
+        "subscription_billing",
+        "med_subscription_billing"
+      ],
+      "sports": [
+        "spt_fan_accounts",
+        "spt_loyalty_members",
+        "sports_loyalty_activity"
+      ],
+      "automotive": [
+        "aut_connected_services_subscriptions",
+        "auto_connected_services_subscriptions"
+      ],
+      "telecom": [
+        "tel_subscriptions"
+      ]
+    },
+    "_MARKETING_ENGINE_ACTIVITY_TIMESTAMP_COLUMNS": [
+      "event_timestamp",
+      "session_start_time",
+      "session_start",
+      "stream_started_at",
+      "session_started_at",
+      "purchased_at",
+      "interaction_date",
+      "interaction_date_time",
+      "open_date",
+      "click_date",
+      "order_date",
+      "billing_date",
+      "billing_date_time",
+      "send_date",
+      "last_login_at",
+      "signup_date",
+      "created_date",
+      "created_at",
+      "updated_at",
+      "event_date",
+      "enrolled_date",
+      "conversion_at"
+    ],
+    "_MARKETING_ENGINE_SUBSCRIPTION_SOURCE_PATTERNS": {
+      "media": [
+        "subscription_billing",
+        "med_subscription_billing"
+      ],
+      "sports": [
+        "spt_loyalty_members",
+        "spt_fan_accounts"
+      ],
+      "automotive": [
+        "aut_connected_services_subscriptions"
+      ],
+      "telecom": [
+        "tel_subscriptions"
+      ]
+    },
+    "SEGMENT_INDUSTRY_SOURCE": {
+      "Sports": "sports",
+      "Media & OTT": "media",
+      "Telecom": "telecom",
+      "Automotive": "automotive"
+    }
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "useCaseId": "free-to-paid-conversion",
+  "name": "Free-to-Paid Conversion Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Free-to-Paid Conversion",
+    "journeyGoal": "Convert high-intent free users into paid subscribers using paywall and content-led nudges",
+    "entryTrigger": "free_user_high_intent_detected",
+    "journeyCategory": "Conversion",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if user converts to paid subscription"
+  },
+  "entryCriteria": {
+    "event": "paywall_view",
+    "eventId": "evt_paywall_001",
+    "conditions": [
+      {
+        "field": "paywallHits",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 3
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Intent_Free_Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Value Reminder In-App",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "IN_APP",
+      "messageTheme": "You’re close to unlocking everything you love",
+      "cta": "Start Free Trial",
+      "tracking": {
+        "campaignId": "inapp_free_paid_1",
+        "deliveryId": "del_free_paid_1",
+        "trackingEvents": [
+          "inapp_view",
+          "trial_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Personalized Content Gap Email",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Here’s what you’re missing based on your activity",
+      "cta": "Unlock Now",
+      "tracking": {
+        "campaignId": "email_free_paid_2",
+        "deliveryId": "del_free_paid_2",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Discount Offer Email",
+      "timing": {
+        "offsetHours": 336
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Limited-time offer just for you",
+      "cta": "Get Discount",
+      "tracking": {
+        "campaignId": "email_free_paid_3",
+        "deliveryId": "del_free_paid_3",
+        "trackingEvents": [
+          "email_open",
+          "subscription_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "paywall_view",
+        "eventId": "evt_paywall_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_started",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_started",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_started",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 216
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_started",
+      "eventId": "evt_sub_start_001",
+      "condition": "started == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "subscription_start",
+      "content_click"
+    ],
+    "eventMapping": {
+      "subscription_start": "evt_sub_start_001",
+      "content_click": "evt_content_click_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "subscription_start",
+    "secondaryKPIs": [
+      "email_open",
+      "content_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

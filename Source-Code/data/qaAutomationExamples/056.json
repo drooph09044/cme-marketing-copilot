@@ -1,0 +1,189 @@
+{
+  "id": "056",
+  "matrix_row_id": 56,
+  "matrix_row_name": "Lapsed NHL streaming bundle win-back",
+  "template": "tpl_win_back",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a 30/60/90 win-back journey for lapsed ESPN+/NHL bundle subscribers.",
+    "Create a lapsed-subscriber win-back for the ESPN+/NHL streaming bundle. Three touches at 30, 60, and 90 days post-lapse, with email + push for opted-in fans. Storyline hooks rotate between fav-team playoff positioning, marquee rivalry games, and trade-deadline news depending on date. Suppress fans who have already re-subscribed.",
+    "Need to win back NHL streaming subscribers who lapsed. Use a standard three-touch cadence and lean on rivalry games, the playoff race, and trade-deadline storylines to drive renewal."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-bundle-winback-2026",
+    "metadata": {
+      "name": "Lapsed NHL Streaming Bundle Win-Back",
+      "internal_name": "NHL_ESPN_Bundle_WinBack_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "ESPN+ / NHL Streaming"},
+      "purpose": "Win back lapsed ESPN+/NHL bundle subscribers via a 30/60/90 cadence with rivalry, playoff-race, and trade-deadline storyline hooks.",
+      "archetype": "win_back",
+      "launch_date": "2025-12-01",
+      "end_date": "2026-06-30",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate lapsed ESPN+/NHL bundle subscribers.", "kpi": "Re-subscription rate among lapsed users", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Standard 30/60/90 cadence anchored on lapse date. Storyline at each touch is timed to the NHL calendar: rivalry games and Original Six matchups early-season, trade-deadline news in early March, Stanley Cup Playoffs from mid-April. Push reinforces email at Day 60 for opted-in fans.",
+        "timing_rationale": "Anchored to subscription lapse date with fixed 30/60/90 cadence.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_nhl_bundle",
+        "name": "Lapsed ESPN+/NHL bundle subscriber",
+        "description": "Subscriber whose ESPN+/NHL bundle lapsed 30-120 days ago with prior NHL streaming engagement.",
+        "criteria": {
+          "all_of": [
+            {"field": "espn_nhl_bundle.status", "op": "equals", "value": "churned"},
+            {"field": "espn_nhl_bundle.days_since_lapse", "op": "between", "value": [30, 120]},
+            {"field": "nhl.favorite_team", "op": "is_not_null"}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_resubscribed", "name": "Already re-subscribed", "scope": "global", "criteria": {"field": "espn_nhl_bundle.status", "op": "equals", "value": "active"}},
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nhl_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 30 days post-lapse",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {"field": "espn_nhl_bundle.days_since_lapse", "op": "equals", "value": 30}
+        }
+      },
+      {
+        "id": "email_d30_we_miss_you",
+        "type": "action",
+        "label": "Email Day 30 - We miss you",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FT}} is back on the ice - here's what you've missed",
+          "cta_label": "Come back to the bundle",
+          "modules": [
+            {"rank": "primary", "name": "Seasonal storyline (rivalry games / playoff race / trade deadline based on date)"},
+            {"rank": "secondary", "name": "Fav-team upcoming game schedule"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_30_days",
+        "type": "wait",
+        "label": "Wait 30 days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d30",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "espn_nhl_bundle.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d60_storyline",
+        "type": "action",
+        "label": "Email Day 60 - Storyline depth",
+        "channel": "ch_email",
+        "touch_id": "T60",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FT}} playoff race heating up",
+          "cta_label": "Restart your bundle"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NHL App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_d60_optin",
+        "type": "action",
+        "label": "Push Day 60 - Fav-team game tonight",
+        "channel": "ch_push",
+        "touch_id": "P60",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "{{FT}} drops the puck tonight - watch on ESPN+"}
+      },
+      {
+        "id": "wait_30_more",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d60",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "espn_nhl_bundle.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d90_incentive",
+        "type": "action",
+        "label": "Email Day 90 - Renewal incentive",
+        "channel": "ch_email",
+        "touch_id": "T90",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Final invite back: 30% off through the Stanley Cup Final",
+          "cta_label": "Renew at 30% off"
+        }
+      },
+      {"id": "end_converted", "type": "end", "label": "Journey End - Reactivated", "reason": "converted"},
+      {"id": "end_completed", "type": "end", "label": "Journey End - Completed", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_d30_we_miss_you"},
+      {"from": "email_d30_we_miss_you", "to": "wait_30_days"},
+      {"from": "wait_30_days", "to": "dec_back_after_d30"},
+      {"from": "dec_back_after_d30", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d30", "to": "email_d60_storyline", "branch_label": "no"},
+      {"from": "email_d60_storyline", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_d60_optin", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_30_more", "branch_label": "no"},
+      {"from": "push_d60_optin", "to": "wait_30_more"},
+      {"from": "wait_30_more", "to": "dec_back_after_d60"},
+      {"from": "dec_back_after_d60", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d60", "to": "email_d90_incentive", "branch_label": "no"},
+      {"from": "email_d90_incentive", "to": "end_completed"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Re-subscription rate among lapsed bundle users"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rates"}, {"name": "Push view rate at Day 60"}],
+      "tests": []
+    }
+  }
+}

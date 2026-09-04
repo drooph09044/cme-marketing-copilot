@@ -1,0 +1,148 @@
+{
+  "id": "053",
+  "matrix_row_id": 53,
+  "matrix_row_name": "Saturday Night Hockey Push",
+  "template": "tpl_game_day",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Saturday-night push journey for NHL fans of the playing teams.",
+    "Create a per-game Saturday-night NHL push, 1h before puck drop. Route US fans to ESPN+ and Canadian fans to Hockey Night in Canada (Sportsnet). Suppress fans whose fav team isn't playing that night.",
+    "Need a Saturday-night hockey push that geo-routes broadcast info (ESPN+ for US, Sportsnet HNIC for Canada)."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-saturday-night-push-2026",
+    "metadata": {
+      "name": "NHL Saturday Night Hockey Push",
+      "internal_name": "NHL_Saturday_Night_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "NHL App"},
+      "purpose": "Drive Saturday-night NHL tune-in with a T-1h push to fans of playing teams, geo-routing broadcast info to ESPN+ for US fans and Hockey Night in Canada on Sportsnet for Canadian fans.",
+      "archetype": "game_day",
+      "launch_date": "2025-10-11",
+      "end_date": "2026-04-15",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Saturday-night NHL game tune-in.", "kpi": "Saturday-night game viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Per-game push at T-1h to fans whose favorite team is playing. Decision node splits US vs Canada to choose broadcast partner messaging. Single-channel: push.",
+        "timing_rationale": "T-1h before puck drop is the canonical pre-game push window.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_fan_of_playing_team",
+        "name": "Fan of a Saturday-night playing team",
+        "description": "Fan whose favorite team is on the Saturday-night NHL slate.",
+        "criteria": {"field": "fav_team.in_saturday_night_slate", "op": "equals", "value": true}
+      }
+    ],
+    "suppressions": [],
+    "channels": [
+      {"id": "ch_push", "type": "push", "platform": "nhl_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 6, "unit": "day"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: Saturday-night slate exists",
+        "entry_criteria": {"trigger": "schedule"}
+      },
+      {
+        "id": "dec_fav_playing",
+        "type": "decision",
+        "label": "Fav team playing tonight?",
+        "decision_basis": "audience",
+        "condition": {"field": "fav_team.in_saturday_night_slate", "op": "equals", "value": true}
+      },
+      {
+        "id": "dec_geo",
+        "type": "decision",
+        "label": "US or Canada?",
+        "decision_basis": "pull",
+        "condition": {"field": "country", "op": "equals", "value": "US"}
+      },
+      {
+        "id": "dec_push_optin_us",
+        "type": "decision",
+        "label": "Push opted in (NHL App) - US?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_us_espn",
+        "type": "action",
+        "label": "Push - US fans: ESPN+ broadcast info",
+        "channel": "ch_push",
+        "touch_id": "P-US",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "saturday_puck_drop",
+          "direction": "before",
+          "offset": {"value": 1, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} {{MTC}} puck drop in 1h - watch on ESPN+"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin_ca",
+        "type": "decision",
+        "label": "Push opted in (NHL App) - Canada?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_ca_sportsnet",
+        "type": "action",
+        "label": "Push - Canadian fans: Hockey Night in Canada on Sportsnet",
+        "channel": "ch_push",
+        "touch_id": "P-CA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "saturday_puck_drop",
+          "direction": "before",
+          "offset": {"value": 1, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} {{MTC}} puck drop in 1h - Hockey Night in Canada on Sportsnet"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"},
+      {"id": "end_no_fav_playing", "type": "end", "label": "Journey End - No fav-team game", "reason": "suppressed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_fav_playing"},
+      {"from": "dec_fav_playing", "to": "dec_geo", "branch_label": "yes"},
+      {"from": "dec_fav_playing", "to": "end_no_fav_playing", "branch_label": "no"},
+      {"from": "dec_geo", "to": "dec_push_optin_us", "branch_label": "yes"},
+      {"from": "dec_geo", "to": "dec_push_optin_ca", "branch_label": "no"},
+      {"from": "dec_push_optin_us", "to": "push_us_espn", "branch_label": "yes"},
+      {"from": "dec_push_optin_us", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_us_espn", "to": "end_journey"},
+      {"from": "dec_push_optin_ca", "to": "push_ca_sportsnet", "branch_label": "yes"},
+      {"from": "dec_push_optin_ca", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_ca_sportsnet", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Saturday-night game viewership"}],
+      "secondary_kpis": [{"name": "Per-geo push click-through"}],
+      "tests": []
+    }
+  }
+}

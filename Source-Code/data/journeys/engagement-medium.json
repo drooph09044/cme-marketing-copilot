@@ -1,0 +1,130 @@
+{
+  "useCaseId": "engagement-medium",
+  "name": "Medium Engagement Fans Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Medium Engagement Fans",
+    "journeyGoal": "Increase engagement for moderately active fans",
+    "entryTrigger": "medium_engagement_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "10 days",
+    "exitClause": "Exit after reaching high engagement threshold"
+  },
+  "entryCriteria": {
+    "event": "engagement_event",
+    "eventId": "evt_engage_002",
+    "conditions": [
+      {
+        "field": "avgMinutesWatched",
+        "operator": "BETWEEN",
+        "value": [
+          11,
+          59
+        ]
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Medium_Engagement_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Content Recommendation",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "IN_APP",
+      "messageTheme": "More content you might enjoy",
+      "cta": "Watch Now",
+      "tracking": {
+        "campaignId": "inapp_eng_mid",
+        "deliveryId": "del_inapp_em1",
+        "trackingEvents": [
+          "inapp_view",
+          "video_watch"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "engagement_event",
+        "eventId": "evt_engage_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "video_watch",
+          "field": "engagementIncreased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "video_watch",
+      "eventId": "evt_video_001",
+      "condition": "engagementIncreased == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 240
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "video_watch"
+    ],
+    "eventMapping": {
+      "video_watch": "evt_video_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "video_watch",
+    "secondaryKPIs": [
+      "inapp_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 240
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

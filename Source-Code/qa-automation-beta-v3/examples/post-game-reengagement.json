@@ -1,0 +1,27 @@
+{
+  "categoryId": "fan-engagement",
+  "categoryName": "Fan Engagement",
+  "categoryDescription": "Journeys that reactivate app activity, content consumption, and post-event engagement.",
+  "subCategoryId": "engagements",
+  "subCategoryName": "Engagements",
+  "slug": "post-game-reengagement",
+  "name": "Post-game Re-engagement",
+  "brief": "Event attendees have not reopened the app or purchased merchandise in the last 30 days. Use email and push to re-engage them with recap content, recommendations, and return prompts.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-02",
+  "journeyOverrides": {
+    "name": "Post-game Re-engagement - 30 Day",
+    "objective": "Re-engage recent attendees with recap content and return prompts after an event.",
+    "audience": "Recent_Attendees_No_App_30d",
+    "variantA": "Standard re-engagement cadence",
+    "variantB": "Personalized merchandise follow-up"
+  },
+  "nodeOverrides": {
+    "n3": { "title": ["Email 1"], "subtitle": ["Event recap", "return CTA"] },
+    "n3b": { "title": ["Email 1B"], "subtitle": ["Personalized recap", "product CTA"] },
+    "n6": { "title": ["Push 1"], "subtitle": ["Return now", "featured content"] },
+    "n8": { "title": ["Wait 3d"], "subtitle": ["content watch", "session monitor"] },
+    "n9": { "title": ["Email 2"], "subtitle": ["Follow-up offer", "member perk"] },
+    "n11": { "title": ["Goal", "Achieved?"] }
+  }
+}

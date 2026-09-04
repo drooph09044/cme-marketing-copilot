@@ -1,0 +1,664 @@
+{
+  "id": "005",
+  "matrix_row_id": 5,
+  "matrix_row_name": "US Fanbase Reactivation - 2026 Season",
+  "template": "tpl_calendar_reactivation",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": true,
+  "prompts": [
+    "Build a US fanbase reactivation journey across the 2026 NFL season.",
+    "Reactivate inactive US fans across the 2026 NFL season using calendar-driven touchpoints. All-fans emails at preseason kickoff, Week 0, Thanksgiving, and Super Bowl. For fans with a favorite team, route to one additional rivalry/divisional week touch based on fav-team mapping.",
+    "Need a season-long reactivation backbone \u2014 major league moments for all inactive fans, plus a per-fav-team rivalry-week routing layer."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-us-fanbase-reactivation-2025",
+    "metadata": {
+      "name": "US Fanbase Reactivation - 2025 Season Timeline",
+      "internal_name": "NFL_FanbaseReactivation_2025_Season",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": null
+      },
+      "purpose": "Re-engage inactive US fans across the 2025 NFL season using a calendar-based cadence of touchpoints tied to league moments and team rivalries.",
+      "archetype": "reactivation",
+      "launch_date": "2025-08-01",
+      "end_date": "2026-02-15",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Reactivate inactive US fans across the 2025 season.",
+          "kpi": "Fans returning to NFL+ / NFL.com / NFL App with engagement after reactivation touch",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Calendar-driven touchpoint plan. All-fans touches at major league moments (Preseason, Kickoff, Thanksgiving, Superbowl). fav_team=null fans get the same major-moment touches. Fans with a fav_team receive one additional touch through the season at a team-specific divisional/rivalry moment.",
+        "timing_rationale": "Aligns reactivation outreach to high-salience NFL calendar moments for the maximum chance of re-engagement.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "GET PUMPED",
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_all_inactive_fans",
+        "name": "All inactive US fans",
+        "description": "US fans with no NFL engagement in the last year.",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "country",
+              "op": "equals",
+              "value": "US"
+            },
+            {
+              "field": "activity.last_active_within_days",
+              "op": "gt",
+              "value": 365
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_fav_team_null",
+        "name": "Inactive fans without a favorite team",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "country",
+              "op": "equals",
+              "value": "US"
+            },
+            {
+              "field": "activity.last_active_within_days",
+              "op": "gt",
+              "value": 365
+            },
+            {
+              "field": "favorite_team",
+              "op": "is_null"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_fav_team_not_null",
+        "name": "Inactive fans with a favorite team",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "country",
+              "op": "equals",
+              "value": "US"
+            },
+            {
+              "field": "activity.last_active_within_days",
+              "op": "gt",
+              "value": 365
+            },
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      }
+    ],
+    "suppressions": [],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Preseason kickoff",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "wait_to_preseason",
+        "type": "wait",
+        "label": "Wait to preseason kickoff window",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "preseason_all_inactive",
+        "type": "action",
+        "label": "Preseason - All inactive fans touchpoint",
+        "channel": "ch_email",
+        "touch_id": "WK0-PRE",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "preseason_kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "week"
+          }
+        },
+        "copy": {
+          "subject": "The 2025 NFL Season is coming"
+        }
+      },
+      {
+        "id": "wk0_kickoff",
+        "type": "action",
+        "label": "Week 0 - 2025 Kickoff touchpoint (all fans)",
+        "channel": "ch_email",
+        "touch_id": "WK0-KO",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_kickoff_2025",
+          "direction": "after",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "wk4_div",
+        "type": "action",
+        "label": "Week 4 Divisional/Rivalry - Vikings, Steelers",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 4"
+        }
+      },
+      {
+        "id": "wk5_div",
+        "type": "action",
+        "label": "Week 5 - Browns",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 5"
+        }
+      },
+      {
+        "id": "wk6_div",
+        "type": "action",
+        "label": "Week 6 - Broncos, Jets",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 6"
+        }
+      },
+      {
+        "id": "wk7_div",
+        "type": "action",
+        "label": "Week 7 - Rams, Jaguars",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 7"
+        }
+      },
+      {
+        "id": "wk8_div",
+        "type": "action",
+        "label": "Week 8 - Saints, Buccaneers",
+        "channel": "ch_email",
+        "touch_id": "WK8",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 8"
+        }
+      },
+      {
+        "id": "wk9_div",
+        "type": "action",
+        "label": "Week 9 Rivalry & Divisional - Bills, Chiefs",
+        "channel": "ch_email",
+        "touch_id": "WK9",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 9"
+        }
+      },
+      {
+        "id": "wk10_div",
+        "type": "action",
+        "label": "Week 10 - Falcons, Colts",
+        "channel": "ch_email",
+        "touch_id": "WK10",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 10"
+        }
+      },
+      {
+        "id": "wk11_div",
+        "type": "action",
+        "label": "Week 11 Divisional/Rivalry - Commanders, Dolphins",
+        "channel": "ch_email",
+        "touch_id": "WK11",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 11"
+        }
+      },
+      {
+        "id": "wk12_div",
+        "type": "action",
+        "label": "Week 12 Divisional/Rivalry - Cowboys, Eagles",
+        "channel": "ch_email",
+        "touch_id": "WK12",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 12"
+        }
+      },
+      {
+        "id": "wk13_thanksgiving",
+        "type": "action",
+        "label": "Week 13 Thanksgiving touchpoint (all fans) + Lions, Packers",
+        "channel": "ch_email",
+        "touch_id": "WK13-THX",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "thanksgiving",
+          "direction": "before",
+          "offset": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "wk14_div",
+        "type": "action",
+        "label": "Week 14 Divisional/Rivalry - Bengals (vs Ravens), Giants (vs Commanders), Bears (vs Green Bay), Ravens (vs Steelers)",
+        "channel": "ch_email",
+        "touch_id": "WK14",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 14"
+        }
+      },
+      {
+        "id": "wk15_div",
+        "type": "action",
+        "label": "Week 15 Divisional/Rivalry - Chargers, Raiders",
+        "channel": "ch_email",
+        "touch_id": "WK15",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 15"
+        }
+      },
+      {
+        "id": "wk16_div",
+        "type": "action",
+        "label": "Week 16 Divisional/Rivalry - Seahawks (vs Rams), Panthers (vs Buccaneers)",
+        "channel": "ch_email",
+        "touch_id": "WK16",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 16"
+        }
+      },
+      {
+        "id": "wk17_div",
+        "type": "action",
+        "label": "Week 17 Divisional/Rivalry - Raiders, Chiefs",
+        "channel": "ch_email",
+        "touch_id": "WK17",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 17"
+        }
+      },
+      {
+        "id": "wk18_div",
+        "type": "action",
+        "label": "Week 18 Divisional/Rivalry - Texans (vs Colts), Titans (vs Jaguars), Patriots (vs Jets)",
+        "channel": "ch_email",
+        "touch_id": "WK18",
+        "timing": {
+          "type": "scheduled",
+          "recurrence": "season week 18"
+        }
+      },
+      {
+        "id": "superbowl_all_fans",
+        "type": "action",
+        "label": "Superbowl touchpoint (all fans)",
+        "channel": "ch_email",
+        "touch_id": "SB",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "superbowl",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "week"
+          }
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "wait_to_preseason"
+      },
+      {
+        "from": "wait_to_preseason",
+        "to": "preseason_all_inactive"
+      },
+      {
+        "from": "preseason_all_inactive",
+        "to": "wk0_kickoff"
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk13_thanksgiving",
+        "to": "superbowl_all_fans"
+      },
+      {
+        "from": "superbowl_all_fans",
+        "to": "end_journey"
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk4_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "MIN",
+            "PIT"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk5_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "equals",
+          "value": "CLE"
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk6_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "DEN",
+            "NYJ"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk7_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "LAR",
+            "JAX"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk8_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "NO",
+            "TB"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk9_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "BUF",
+            "KC"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk10_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "ATL",
+            "IND"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk11_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "WAS",
+            "MIA"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk12_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "DAL",
+            "PHI"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk14_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "CIN",
+            "NYG",
+            "CHI",
+            "BAL"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk15_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "LAC",
+            "LV"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk16_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "SEA",
+            "CAR"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk17_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "LV",
+            "KC"
+          ]
+        }
+      },
+      {
+        "from": "wk0_kickoff",
+        "to": "wk18_div",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "HOU",
+            "TEN",
+            "NE"
+          ]
+        }
+      },
+      {
+        "from": "wk4_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk5_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk6_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk7_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk8_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk9_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk10_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk11_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk12_div",
+        "to": "wk13_thanksgiving"
+      },
+      {
+        "from": "wk14_div",
+        "to": "superbowl_all_fans"
+      },
+      {
+        "from": "wk15_div",
+        "to": "superbowl_all_fans"
+      },
+      {
+        "from": "wk16_div",
+        "to": "superbowl_all_fans"
+      },
+      {
+        "from": "wk17_div",
+        "to": "superbowl_all_fans"
+      },
+      {
+        "from": "wk18_div",
+        "to": "superbowl_all_fans"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Reactivated fan rate",
+          "definition": "Fans inactive at start of journey who engaged with at least one touchpoint."
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Touchpoint open / click rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,1177 @@
+[
+  {
+    "useCaseId": "fuel-fans-celebrate-anniversary",
+    "name": "Fan Birthday & Anniversary Celebration Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Fan Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Fan Milestone Celebration",
+      "journeyGoal": "Strengthen emotional loyalty by celebrating fan birthdays and fandom anniversaries",
+      "entryTrigger": "fan_birthday_or_membership_anniversary",
+      "journeyCategory": "Engagement",
+      "totalDuration": "7 days",
+      "exitClause": "No exit – journey completes for all eligible fans"
+    },
+    "entryCriteria": {
+      "event": "fan_profile_event",
+      "eventId": "evt_fan_milestone_001",
+      "conditions": [
+        {
+          "field": "isBirthdayOrAnniversary",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Fan_Milestone_Audience"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Birthday / Anniversary Wish Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Celebrating your fandom journey with us",
+        "cta": "View Your Fan Story",
+        "tracking": {
+          "campaignId": "email_fan_milestone_1",
+          "deliveryId": "del_fan_milestone_1",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Personalized Video / Highlight Push",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "PUSH",
+        "messageTheme": "Your best moments as a fan this year",
+        "cta": "Watch Highlights",
+        "tracking": {
+          "campaignId": "push_fan_milestone_2",
+          "deliveryId": "del_fan_milestone_2",
+          "trackingEvents": [
+            "push_open",
+            "video_view"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Exclusive Reward Offer Email",
+        "timing": {
+          "offsetHours": 72
+        },
+        "channel": "EMAIL",
+        "messageTheme": "A gift from us to celebrate your loyalty",
+        "cta": "Claim Your Reward",
+        "tracking": {
+          "campaignId": "email_fan_milestone_3",
+          "deliveryId": "del_fan_milestone_3",
+          "trackingEvents": [
+            "email_open",
+            "reward_claim"
+          ]
+        }
+      },
+      {
+        "tpId": "TP4",
+        "label": "Referral Invitation",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Share your fandom with friends and family",
+        "cta": "Invite Friends",
+        "tracking": {
+          "campaignId": "email_fan_milestone_4",
+          "deliveryId": "del_fan_milestone_4",
+          "trackingEvents": [
+            "email_open",
+            "referral_send"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_profile_event",
+          "eventId": "evt_fan_milestone_001"
+        },
+        {
+          "id": "n2",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n3",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n4",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n5",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n8",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n9",
+          "type": "MESSAGE",
+          "tpId": "TP4"
+        },
+        {
+          "id": "n10",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 4,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "email_open",
+        "push_open",
+        "reward_claim",
+        "referral_send"
+      ],
+      "eventMapping": {
+        "reward_claim": "evt_reward_claim_001",
+        "referral_send": "evt_referral_send_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "reward_claim",
+      "secondaryKPIs": [
+        "email_open",
+        "referral_send",
+        "video_view"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "fuel-fans-personalized-fandom-recap",
+    "name": "Personalized Fandom Recap Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Fan Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Fandom Recap Experience",
+      "journeyGoal": "Deepen emotional connection by summarizing fan engagement, attendance, and content consumption",
+      "entryTrigger": "season_or_monthly_fan_recap_ready",
+      "journeyCategory": "Engagement",
+      "totalDuration": "5 days",
+      "exitClause": "No exit – journey completes for all eligible fans"
+    },
+    "entryCriteria": {
+      "event": "fan_engagement_snapshot",
+      "eventId": "evt_fan_recap_001",
+      "conditions": [
+        {
+          "field": "recapEligible",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Fan_Engagement_Recap_Audience"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Personalized Fandom Recap Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Your fandom story this season",
+        "cta": "View My Recap",
+        "tracking": {
+          "campaignId": "email_fan_recap_1",
+          "deliveryId": "del_fan_recap_1",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Highlight Reel Push Notification",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "PUSH",
+        "messageTheme": "Your best moments in action",
+        "cta": "Watch Highlights",
+        "tracking": {
+          "campaignId": "push_fan_recap_2",
+          "deliveryId": "del_fan_recap_2",
+          "trackingEvents": [
+            "push_open",
+            "video_view"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Social Share Prompt Email",
+        "timing": {
+          "offsetHours": 72
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Share your fandom with friends",
+        "cta": "Share My Story",
+        "tracking": {
+          "campaignId": "email_fan_recap_3",
+          "deliveryId": "del_fan_recap_3",
+          "trackingEvents": [
+            "email_open",
+            "social_share"
+          ]
+        }
+      },
+      {
+        "tpId": "TP4",
+        "label": "Next Season Teaser Offer",
+        "timing": {
+          "offsetHours": 96
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Your next chapter starts soon",
+        "cta": "Explore Upcoming Season",
+        "tracking": {
+          "campaignId": "email_fan_recap_4",
+          "deliveryId": "del_fan_recap_4",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_engagement_snapshot",
+          "eventId": "evt_fan_recap_001"
+        },
+        {
+          "id": "n2",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n3",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n4",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n5",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n8",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n9",
+          "type": "MESSAGE",
+          "tpId": "TP4"
+        },
+        {
+          "id": "n10",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 4,
+        "timeWindowHours": 120
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "email_open",
+        "push_open",
+        "social_share"
+      ],
+      "eventMapping": {
+        "social_share": "evt_social_share_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "social_share",
+      "secondaryKPIs": [
+        "email_open",
+        "content_click",
+        "video_view"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 120
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "fuel-fans-insider-packages",
+    "name": "Insider Fan Packages Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Fan Monetization"
+    },
+    "journeyTable": {
+      "journeyName": "Insider Access & Packages",
+      "journeyGoal": "Increase fan spend by promoting exclusive insider experiences, VIP access, and premium packages",
+      "entryTrigger": "high_affinity_fan_detected",
+      "journeyCategory": "Upsell",
+      "totalDuration": "14 days",
+      "exitClause": "Exit if fan purchases insider package or VIP upgrade"
+    },
+    "entryCriteria": {
+      "event": "fan_affinity_score_update",
+      "eventId": "evt_fan_affinity_001",
+      "conditions": [
+        {
+          "field": "affinityScore",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 75
+        },
+        {
+          "field": "isActiveFan",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Affinity_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Insider Access Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Get closer to the action than ever before",
+        "cta": "Explore Insider Packages",
+        "tracking": {
+          "campaignId": "email_insider_1",
+          "deliveryId": "del_insider_1",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "VIP Experience Push Notification",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "PUSH",
+        "messageTheme": "Unlock VIP stadium experiences & backstage access",
+        "cta": "View VIP Options",
+        "tracking": {
+          "campaignId": "push_insider_2",
+          "deliveryId": "del_insider_2",
+          "trackingEvents": [
+            "push_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Personalized Package Comparison Email",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Choose your perfect fan experience",
+        "cta": "Compare Packages",
+        "tracking": {
+          "campaignId": "email_insider_3",
+          "deliveryId": "del_insider_3",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP4",
+        "label": "Limited-Time VIP Upgrade Offer",
+        "timing": {
+          "offsetHours": 240
+        },
+        "channel": "SMS",
+        "messageTheme": "Last chance to unlock exclusive access",
+        "cta": "Upgrade Now",
+        "tracking": {
+          "campaignId": "sms_insider_4",
+          "deliveryId": "del_insider_4",
+          "trackingEvents": [
+            "sms_click",
+            "purchase_start"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_affinity_score_update",
+          "eventId": "evt_fan_affinity_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "package_purchase",
+            "field": "purchased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "package_purchase",
+            "field": "purchased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "package_purchase",
+            "field": "purchased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n9"
+        },
+        {
+          "id": "n9",
+          "type": "WAIT",
+          "durationHours": 72
+        },
+        {
+          "id": "n10",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n11",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "package_purchase",
+            "field": "purchased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n12"
+        },
+        {
+          "id": "n12",
+          "type": "WAIT",
+          "durationHours": 120
+        },
+        {
+          "id": "n13",
+          "type": "MESSAGE",
+          "tpId": "TP4"
+        },
+        {
+          "id": "n14",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "package_purchase",
+        "eventId": "evt_package_purchase_001",
+        "condition": "purchased == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 4,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "email_open",
+        "push_open",
+        "content_click",
+        "purchase_start"
+      ],
+      "eventMapping": {
+        "package_purchase": "evt_package_purchase_001",
+        "purchase_start": "evt_purchase_start_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "package_purchase",
+      "secondaryKPIs": [
+        "content_click",
+        "email_open",
+        "push_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "fuel-fans-at-risk-engagement-rescue",
+    "name": "At-Risk Fan Engagement Rescue Journey",
+    "category": {
+      "categoryId": "retention",
+      "categoryName": "Fan Retention"
+    },
+    "journeyTable": {
+      "journeyName": "Engagement Rescue",
+      "journeyGoal": "Re-engage fans showing declining enthusiasm before they disengage or churn",
+      "entryTrigger": "fan_engagement_score_decline",
+      "journeyCategory": "Retention",
+      "totalDuration": "10 days",
+      "exitClause": "Exit if fan shows renewed engagement (viewing, attendance, or interaction)"
+    },
+    "entryCriteria": {
+      "event": "fan_engagement_monitoring",
+      "eventId": "evt_fan_engagement_002",
+      "conditions": [
+        {
+          "field": "engagementScoreChange",
+          "operator": "LESS_THAN_EQUALS",
+          "value": -30
+        },
+        {
+          "field": "lastInteractionDays",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 7
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "At_Risk_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "We Miss You Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Your team has missed you",
+        "cta": "Catch Up Now",
+        "tracking": {
+          "campaignId": "email_atrisk_1",
+          "deliveryId": "del_atrisk_1",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Personalized Highlight Push",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "PUSH",
+        "messageTheme": "Relive your favorite moments",
+        "cta": "Watch Highlights",
+        "tracking": {
+          "campaignId": "push_atrisk_2",
+          "deliveryId": "del_atrisk_2",
+          "trackingEvents": [
+            "push_open",
+            "video_view"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Comeback Incentive Email",
+        "timing": {
+          "offsetHours": 96
+        },
+        "channel": "EMAIL",
+        "messageTheme": "We’ve got something special for your return",
+        "cta": "Unlock Offer",
+        "tracking": {
+          "campaignId": "email_atrisk_3",
+          "deliveryId": "del_atrisk_3",
+          "trackingEvents": [
+            "email_open",
+            "offer_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP4",
+        "label": "Last Chance SMS",
+        "timing": {
+          "offsetHours": 192
+        },
+        "channel": "SMS",
+        "messageTheme": "Final chance to reconnect with your team",
+        "cta": "Come Back Now",
+        "tracking": {
+          "campaignId": "sms_atrisk_4",
+          "deliveryId": "del_atrisk_4",
+          "trackingEvents": [
+            "sms_click",
+            "content_click"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_engagement_monitoring",
+          "eventId": "evt_fan_engagement_002"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "fan_reengagement_event",
+            "field": "engaged",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "fan_reengagement_event",
+            "field": "engaged",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "fan_reengagement_event",
+            "field": "engaged",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n9"
+        },
+        {
+          "id": "n9",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n10",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n11",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "fan_reengagement_event",
+            "field": "engaged",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n12"
+        },
+        {
+          "id": "n12",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n13",
+          "type": "MESSAGE",
+          "tpId": "TP4"
+        },
+        {
+          "id": "n14",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "fan_reengagement_event",
+        "eventId": "evt_fan_reengage_001",
+        "condition": "engaged == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 4,
+        "timeWindowHours": 192
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "email_open",
+        "push_open",
+        "video_view",
+        "offer_click"
+      ],
+      "eventMapping": {
+        "fan_reengagement_event": "evt_fan_reengage_001",
+        "offer_click": "evt_offer_click_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "fan_reengagement_event",
+      "secondaryKPIs": [
+        "video_view",
+        "email_open",
+        "offer_click"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 192
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "fuel-fans-family-inclusion",
+    "name": "Family Inclusion & Shared Fandom Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Fan Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Family & Shared Fandom Activation",
+      "journeyGoal": "Encourage fans to involve family members in the fandom ecosystem to increase engagement and household-level loyalty",
+      "entryTrigger": "fan_high_engagement_detected",
+      "journeyCategory": "Engagement",
+      "totalDuration": "14 days",
+      "exitClause": "Exit if referral or family account creation occurs"
+    },
+    "entryCriteria": {
+      "event": "fan_engagement_score_update",
+      "eventId": "evt_fan_family_001",
+      "conditions": [
+        {
+          "field": "engagementScore",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 80
+        },
+        {
+          "field": "isHouseholdLead",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Engagement_Household_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Family Fandom Invitation Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Share your passion with your family",
+        "cta": "Invite Family Members",
+        "tracking": {
+          "campaignId": "email_family_1",
+          "deliveryId": "del_family_1",
+          "trackingEvents": [
+            "email_open",
+            "referral_send"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Family Watch Experience Push",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "PUSH",
+        "messageTheme": "Make game day a family moment",
+        "cta": "Plan Family Viewing",
+        "tracking": {
+          "campaignId": "push_family_2",
+          "deliveryId": "del_family_2",
+          "trackingEvents": [
+            "push_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Family Bundle Offer Email",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Get more value with a family plan",
+        "cta": "Explore Family Plans",
+        "tracking": {
+          "campaignId": "email_family_3",
+          "deliveryId": "del_family_3",
+          "trackingEvents": [
+            "email_open",
+            "offer_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP4",
+        "label": "Limited-Time Family Bonus SMS",
+        "timing": {
+          "offsetHours": 240
+        },
+        "channel": "SMS",
+        "messageTheme": "Bring your family onboard and unlock rewards",
+        "cta": "Add Family Now",
+        "tracking": {
+          "campaignId": "sms_family_4",
+          "deliveryId": "del_family_4",
+          "trackingEvents": [
+            "sms_click",
+            "family_add"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_engagement_score_update",
+          "eventId": "evt_fan_family_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "family_account_created",
+            "field": "created",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "family_account_created",
+            "field": "created",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "family_account_created",
+            "field": "created",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n9"
+        },
+        {
+          "id": "n9",
+          "type": "WAIT",
+          "durationHours": 72
+        },
+        {
+          "id": "n10",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n11",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "family_account_created",
+            "field": "created",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n12"
+        },
+        {
+          "id": "n12",
+          "type": "WAIT",
+          "durationHours": 120
+        },
+        {
+          "id": "n13",
+          "type": "MESSAGE",
+          "tpId": "TP4"
+        },
+        {
+          "id": "n14",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "family_account_created",
+        "eventId": "evt_family_account_001",
+        "condition": "created == true",
+        "action": "EXIT"
+      },
+      {
+        "event": "referral_completed",
+        "eventId": "evt_referral_family_001",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 4,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "email_open",
+        "push_open",
+        "offer_click",
+        "family_add",
+        "referral_send"
+      ],
+      "eventMapping": {
+        "family_account_created": "evt_family_account_001",
+        "referral_completed": "evt_referral_family_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "family_account_created",
+      "secondaryKPIs": [
+        "referral_send",
+        "offer_click",
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  }
+]

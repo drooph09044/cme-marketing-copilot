@@ -1,0 +1,264 @@
+{
+  "reports": {
+    "sports": {
+      "status": "success",
+      "source_system": "sports",
+      "date_range": { "label": "Last 15 days", "from": "2025-06-01", "to": "2025-06-15" },
+      "filters": { "channel": "all", "journey_status": "all", "sort_by": "revenue_desc" },
+      "summary": {
+        "total_sent": 2400000,
+        "delivery_rate": 94.2,
+        "open_rate": 38.7,
+        "click_rate": 12.3,
+        "revenue": 847000,
+        "bounce_rate": 3.1,
+        "total_journeys": 6,
+        "total_campaigns": 6
+      },
+      "deltas": { "total_sent": 12, "delivery_rate": 1.4, "open_rate": -2.1, "click_rate": 0.8, "revenue": 18, "bounce_rate": -0.5 },
+      "delivery_funnel": [
+        { "stage": "Sent", "value": 2400000 },
+        { "stage": "Delivered", "value": 2260800 },
+        { "stage": "Opened", "value": 875000 },
+        { "stage": "Clicked", "value": 278000 },
+        { "stage": "Converted", "value": 92000 }
+      ],
+      "channel_mix": [
+        { "channel": "Email", "value": 52, "count": 1248000, "color": "#3b82f6" },
+        { "channel": "SMS", "value": 28, "count": 672000, "color": "#10b981" },
+        { "channel": "Push", "value": 14, "count": 336000, "color": "#8b5cf6" },
+        { "channel": "WhatsApp", "value": 6, "count": 144000, "color": "#65a30d" }
+      ],
+      "performance_trend": [
+        { "date": "Jun 1", "delivered": 148000, "opened": 56000, "clicked": 17000 },
+        { "date": "Jun 5", "delivered": 171000, "opened": 65000, "clicked": 20000 },
+        { "date": "Jun 10", "delivered": 175000, "opened": 68000, "clicked": 22000 },
+        { "date": "Jun 15", "delivered": 169000, "opened": 64000, "clicked": 20000 }
+      ],
+      "campaign_performance": [
+        { "campaign_id": "cmp_season_ticket_renewal", "campaign": "Season Ticket Renewal", "journey": "Season ticket renewal", "channel": "Email", "sent": 480000, "delivered": 456000, "delivered_rate": 95, "open_rate": 42.1, "click_rate": 15.2, "revenue": 198000, "bounce_rate": 2.4, "status": "Live" },
+        { "campaign_id": "cmp_cart_abandonment", "campaign": "Cart Abandonment Recovery", "journey": "Cart abandonment recovery", "channel": "Email", "sent": 320000, "delivered": 300800, "delivered_rate": 94, "open_rate": 51.3, "click_rate": 22.8, "revenue": 241000, "bounce_rate": 1.8, "status": "Live" },
+        { "campaign_id": "cmp_new_fan_welcome", "campaign": "New Fan Welcome", "journey": "New fan onboarding", "channel": "Push", "sent": 275000, "delivered": 261250, "delivered_rate": 95, "open_rate": 64.2, "click_rate": 18.5, "revenue": 87000, "bounce_rate": 1.2, "status": "Live" },
+        { "campaign_id": "cmp_lapsed_fan_winback", "campaign": "Lapsed Fan Win-Back", "journey": "Lapsed fan winback", "channel": "Email", "sent": 410000, "delivered": 381300, "delivered_rate": 93, "open_rate": 28.4, "click_rate": 8.1, "revenue": 132000, "bounce_rate": 5.3, "status": "Paused" }
+      ],
+      "journey_performance": [
+        { "journey_id": "season-ticket-renewal", "journey": "Season ticket renewal", "profiles": 48200, "open_rate": 42.1, "revenue": 198000, "status": "Pass", "score": 82 },
+        { "journey_id": "cart-abandonment-recovery", "journey": "Cart abandonment recovery", "profiles": 32100, "open_rate": 51.3, "revenue": 241000, "status": "Pass", "score": 98 },
+        { "journey_id": "lapsed-fan-winback", "journey": "Lapsed fan winback", "profiles": 41000, "open_rate": 28.4, "revenue": 132000, "status": "Warn", "score": 55 }
+      ],
+      "device_geography": {
+        "device": [{ "name": "Mobile", "value": 64 }, { "name": "Desktop", "value": 28 }, { "name": "Tablet", "value": 8 }],
+        "countries": [{ "name": "US", "value": 54 }, { "name": "CA", "value": 18 }, { "name": "UK", "value": 16 }, { "name": "AU", "value": 12 }]
+      },
+      "bounce_classification": [
+        { "type": "Soft bounce", "value": 41, "color": "#f59e0b" },
+        { "type": "Hard bounce", "value": 38, "color": "#ef4444" },
+        { "type": "Block", "value": 14, "color": "#8b5cf6" },
+        { "type": "Other", "value": 7, "color": "#a3a29b" }
+      ],
+      "suppression_summary": { "profiles_suppressed": 88100 },
+      "suppression_reasons": [
+        { "reason": "Global consent off", "value": 48 },
+        { "reason": "Email channel opted out", "value": 21 },
+        { "reason": "Frequency cap reached", "value": 17 },
+        { "reason": "Holdout - control group", "value": 10 },
+        { "reason": "Segment ineligible", "value": 4 }
+      ]
+    },
+    "media": {
+      "status": "success",
+      "source_system": "media",
+      "date_range": { "label": "Last 15 days", "from": "2025-06-01", "to": "2025-06-15" },
+      "filters": { "channel": "all", "journey_status": "all", "sort_by": "revenue_desc" },
+      "summary": {
+        "total_sent": 1875000,
+        "delivery_rate": 95.1,
+        "open_rate": 41.8,
+        "click_rate": 13.9,
+        "revenue": 694000,
+        "bounce_rate": 2.7,
+        "total_journeys": 5,
+        "total_campaigns": 5
+      },
+      "deltas": { "total_sent": 9, "delivery_rate": 0.9, "open_rate": 2.6, "click_rate": 1.1, "revenue": 14, "bounce_rate": -0.3 },
+      "delivery_funnel": [
+        { "stage": "Sent", "value": 1875000 },
+        { "stage": "Delivered", "value": 1783125 },
+        { "stage": "Opened", "value": 745350 },
+        { "stage": "Clicked", "value": 247900 },
+        { "stage": "Converted", "value": 76800 }
+      ],
+      "channel_mix": [
+        { "channel": "Email", "value": 45, "count": 843750, "color": "#3b82f6" },
+        { "channel": "Push", "value": 31, "count": 581250, "color": "#8b5cf6" },
+        { "channel": "In-App", "value": 16, "count": 300000, "color": "#10b981" },
+        { "channel": "SMS", "value": 8, "count": 150000, "color": "#f59e0b" }
+      ],
+      "performance_trend": [
+        { "date": "Jun 1", "delivered": 111000, "opened": 46000, "clicked": 15000 },
+        { "date": "Jun 5", "delivered": 122000, "opened": 52000, "clicked": 17000 },
+        { "date": "Jun 10", "delivered": 129000, "opened": 54000, "clicked": 18000 },
+        { "date": "Jun 15", "delivered": 118000, "opened": 49000, "clicked": 16000 }
+      ],
+      "campaign_performance": [
+        { "campaign_id": "cmp_content_onboarding", "campaign": "Content Platform Onboarding", "journey": "Content platform onboarding", "channel": "Email", "sent": 390000, "delivered": 372450, "delivered_rate": 95.5, "open_rate": 44.6, "click_rate": 13.4, "revenue": 136000, "bounce_rate": 2.3, "status": "Live" },
+        { "campaign_id": "cmp_free_to_paid", "campaign": "Free-to-Paid Conversion", "journey": "Free-to-paid conversion", "channel": "Push", "sent": 435000, "delivered": 413250, "delivered_rate": 95, "open_rate": 49.1, "click_rate": 18.7, "revenue": 242000, "bounce_rate": 1.9, "status": "Live" },
+        { "campaign_id": "cmp_subscription_renewal", "campaign": "Subscription Renewal", "journey": "Subscription renewal", "channel": "Email", "sent": 355000, "delivered": 337250, "delivered_rate": 95, "open_rate": 38.9, "click_rate": 12.1, "revenue": 186000, "bounce_rate": 2.8, "status": "Live" },
+        { "campaign_id": "cmp_streaming_winback", "campaign": "Streaming Win-Back", "journey": "Streaming win-back", "channel": "In-App", "sent": 285000, "delivered": 270750, "delivered_rate": 95, "open_rate": 34.2, "click_rate": 10.2, "revenue": 87000, "bounce_rate": 3.4, "status": "Paused" }
+      ],
+      "journey_performance": [
+        { "journey_id": "free-to-paid-conversion", "journey": "Free-to-paid conversion", "profiles": 43500, "open_rate": 49.1, "revenue": 242000, "status": "Pass", "score": 91 },
+        { "journey_id": "subscription-renewal", "journey": "Subscription renewal", "profiles": 35500, "open_rate": 38.9, "revenue": 186000, "status": "Pass", "score": 84 },
+        { "journey_id": "streaming-winback", "journey": "Streaming win-back", "profiles": 28500, "open_rate": 34.2, "revenue": 87000, "status": "Warn", "score": 63 }
+      ],
+      "device_geography": {
+        "device": [{ "name": "Mobile", "value": 71 }, { "name": "Desktop", "value": 21 }, { "name": "Tablet", "value": 8 }],
+        "countries": [{ "name": "US", "value": 47 }, { "name": "UK", "value": 21 }, { "name": "DE", "value": 17 }, { "name": "FR", "value": 15 }]
+      },
+      "bounce_classification": [
+        { "type": "Soft bounce", "value": 45, "color": "#f59e0b" },
+        { "type": "Hard bounce", "value": 33, "color": "#ef4444" },
+        { "type": "Block", "value": 15, "color": "#8b5cf6" },
+        { "type": "Other", "value": 7, "color": "#a3a29b" }
+      ],
+      "suppression_summary": { "profiles_suppressed": 64200 },
+      "suppression_reasons": [
+        { "reason": "Streaming consent off", "value": 42 },
+        { "reason": "Frequency cap reached", "value": 24 },
+        { "reason": "Trial ineligible", "value": 16 },
+        { "reason": "Holdout - control group", "value": 11 },
+        { "reason": "Recent cancellation", "value": 7 }
+      ]
+    },
+    "automotive": {
+      "status": "success",
+      "source_system": "automotive",
+      "date_range": { "label": "Last 15 days", "from": "2025-06-01", "to": "2025-06-15" },
+      "filters": { "channel": "all", "journey_status": "all", "sort_by": "revenue_desc" },
+      "summary": {
+        "total_sent": 1325000,
+        "delivery_rate": 93.8,
+        "open_rate": 36.5,
+        "click_rate": 10.8,
+        "revenue": 512000,
+        "bounce_rate": 3.6,
+        "total_journeys": 6,
+        "total_campaigns": 6
+      },
+      "deltas": { "total_sent": 7, "delivery_rate": 0.5, "open_rate": 1.2, "click_rate": 0.6, "revenue": 11, "bounce_rate": -0.2 },
+      "delivery_funnel": [
+        { "stage": "Sent", "value": 1325000 },
+        { "stage": "Delivered", "value": 1242850 },
+        { "stage": "Opened", "value": 453950 },
+        { "stage": "Clicked", "value": 134100 },
+        { "stage": "Converted", "value": 38600 }
+      ],
+      "channel_mix": [
+        { "channel": "Email", "value": 48, "count": 636000, "color": "#3b82f6" },
+        { "channel": "SMS", "value": 30, "count": 397500, "color": "#10b981" },
+        { "channel": "Push", "value": 14, "count": 185500, "color": "#8b5cf6" },
+        { "channel": "Call", "value": 8, "count": 106000, "color": "#f59e0b" }
+      ],
+      "performance_trend": [
+        { "date": "Jun 1", "delivered": 76000, "opened": 27000, "clicked": 8000 },
+        { "date": "Jun 5", "delivered": 85000, "opened": 31000, "clicked": 9000 },
+        { "date": "Jun 10", "delivered": 89000, "opened": 33000, "clicked": 10000 },
+        { "date": "Jun 15", "delivered": 82000, "opened": 30000, "clicked": 9000 }
+      ],
+      "campaign_performance": [
+        { "campaign_id": "cmp_vehicle_service_lapse", "campaign": "Vehicle Service Lapse Recovery", "journey": "Vehicle service lapse recovery", "channel": "Email", "sent": 295000, "delivered": 277300, "delivered_rate": 94, "open_rate": 39.8, "click_rate": 12.5, "revenue": 174000, "bounce_rate": 3.1, "status": "Live" },
+        { "campaign_id": "cmp_high_mileage_tire", "campaign": "High Mileage Tire Change", "journey": "High-mileage tire change", "channel": "SMS", "sent": 238000, "delivered": 221340, "delivered_rate": 93, "open_rate": 34.4, "click_rate": 10.9, "revenue": 128000, "bounce_rate": 3.8, "status": "Live" },
+        { "campaign_id": "cmp_battery_lifecycle", "campaign": "Battery Replacement Lifecycle", "journey": "Battery replacement lifecycle", "channel": "Email", "sent": 210000, "delivered": 197400, "delivered_rate": 94, "open_rate": 37.1, "click_rate": 10.4, "revenue": 93000, "bounce_rate": 3.4, "status": "Live" },
+        { "campaign_id": "cmp_premium_service", "campaign": "Premium Service Upsell", "journey": "Premium service upsell", "channel": "Call", "sent": 162000, "delivered": 151740, "delivered_rate": 93.7, "open_rate": 31.5, "click_rate": 8.8, "revenue": 72000, "bounce_rate": 4.2, "status": "Paused" }
+      ],
+      "journey_performance": [
+        { "journey_id": "vehicle-service-lapse-recovery", "journey": "Vehicle service lapse recovery", "profiles": 29500, "open_rate": 39.8, "revenue": 174000, "status": "Pass", "score": 86 },
+        { "journey_id": "high-mileage-tire-change", "journey": "High-mileage tire change", "profiles": 23800, "open_rate": 34.4, "revenue": 128000, "status": "Pass", "score": 79 },
+        { "journey_id": "premium-service-upsell", "journey": "Premium service upsell", "profiles": 16200, "open_rate": 31.5, "revenue": 72000, "status": "Warn", "score": 61 }
+      ],
+      "device_geography": {
+        "device": [{ "name": "Mobile", "value": 58 }, { "name": "Desktop", "value": 35 }, { "name": "Tablet", "value": 7 }],
+        "countries": [{ "name": "US", "value": 62 }, { "name": "CA", "value": 16 }, { "name": "DE", "value": 12 }, { "name": "UK", "value": 10 }]
+      },
+      "bounce_classification": [
+        { "type": "Soft bounce", "value": 39, "color": "#f59e0b" },
+        { "type": "Hard bounce", "value": 41, "color": "#ef4444" },
+        { "type": "Block", "value": 13, "color": "#8b5cf6" },
+        { "type": "Other", "value": 7, "color": "#a3a29b" }
+      ],
+      "suppression_summary": { "profiles_suppressed": 52300 },
+      "suppression_reasons": [
+        { "reason": "Service consent off", "value": 44 },
+        { "reason": "Dealer do-not-contact", "value": 22 },
+        { "reason": "Recent appointment booked", "value": 18 },
+        { "reason": "Frequency cap reached", "value": 10 },
+        { "reason": "Warranty ineligible", "value": 6 }
+      ]
+    },
+    "telecom": {
+      "status": "success",
+      "source_system": "telecom",
+      "date_range": { "label": "Last 15 days", "from": "2025-06-01", "to": "2025-06-15" },
+      "filters": { "channel": "all", "journey_status": "all", "sort_by": "revenue_desc" },
+      "summary": {
+        "total_sent": 2160000,
+        "delivery_rate": 94.7,
+        "open_rate": 34.9,
+        "click_rate": 11.6,
+        "revenue": 731000,
+        "bounce_rate": 3.0,
+        "total_journeys": 3,
+        "total_campaigns": 5
+      },
+      "deltas": { "total_sent": 15, "delivery_rate": 1.1, "open_rate": 0.7, "click_rate": 0.9, "revenue": 16, "bounce_rate": -0.4 },
+      "delivery_funnel": [
+        { "stage": "Sent", "value": 2160000 },
+        { "stage": "Delivered", "value": 2045520 },
+        { "stage": "Opened", "value": 713880 },
+        { "stage": "Clicked", "value": 237300 },
+        { "stage": "Converted", "value": 86400 }
+      ],
+      "channel_mix": [
+        { "channel": "SMS", "value": 39, "count": 842400, "color": "#10b981" },
+        { "channel": "Email", "value": 34, "count": 734400, "color": "#3b82f6" },
+        { "channel": "Push", "value": 18, "count": 388800, "color": "#8b5cf6" },
+        { "channel": "WhatsApp", "value": 9, "count": 194400, "color": "#65a30d" }
+      ],
+      "performance_trend": [
+        { "date": "Jun 1", "delivered": 128000, "opened": 43000, "clicked": 14000 },
+        { "date": "Jun 5", "delivered": 139000, "opened": 48000, "clicked": 16000 },
+        { "date": "Jun 10", "delivered": 146000, "opened": 51000, "clicked": 17000 },
+        { "date": "Jun 15", "delivered": 141000, "opened": 49000, "clicked": 16000 }
+      ],
+      "campaign_performance": [
+        { "campaign_id": "cmp_telco_onboarding", "campaign": "Telco Onboarding Value Realisation", "journey": "Telco onboarding value realisation", "channel": "SMS", "sent": 520000, "delivered": 492960, "delivered_rate": 94.8, "open_rate": 36.4, "click_rate": 11.7, "revenue": 156000, "bounce_rate": 2.6, "status": "Live" },
+        { "campaign_id": "cmp_cross_sell_bundle", "campaign": "Cross-Sell Bundle Expansion", "journey": "Cross-sell bundle expansion", "channel": "Email", "sent": 470000, "delivered": 445090, "delivered_rate": 94.7, "open_rate": 35.8, "click_rate": 13.1, "revenue": 248000, "bounce_rate": 2.9, "status": "Live" },
+        { "campaign_id": "cmp_service_recovery", "campaign": "Customer Service Recovery Save", "journey": "Customer service recovery save", "channel": "WhatsApp", "sent": 365000, "delivered": 344560, "delivered_rate": 94.4, "open_rate": 42.2, "click_rate": 15.3, "revenue": 187000, "bounce_rate": 3.2, "status": "Live" },
+        { "campaign_id": "cmp_plan_upgrade", "campaign": "Plan Upgrade Nudge", "journey": "Cross-sell bundle expansion", "channel": "Push", "sent": 330000, "delivered": 312840, "delivered_rate": 94.8, "open_rate": 29.6, "click_rate": 8.4, "revenue": 89000, "bounce_rate": 3.3, "status": "Paused" }
+      ],
+      "journey_performance": [
+        { "journey_id": "telco-onboarding-value-realisation", "journey": "Telco onboarding value realisation", "profiles": 52000, "open_rate": 36.4, "revenue": 156000, "status": "Pass", "score": 83 },
+        { "journey_id": "cross-sell-bundle-expansion", "journey": "Cross-sell bundle expansion", "profiles": 47000, "open_rate": 35.8, "revenue": 248000, "status": "Pass", "score": 88 },
+        { "journey_id": "customer-service-recovery-save", "journey": "Customer service recovery save", "profiles": 36500, "open_rate": 42.2, "revenue": 187000, "status": "Pass", "score": 80 }
+      ],
+      "device_geography": {
+        "device": [{ "name": "Mobile", "value": 76 }, { "name": "Desktop", "value": 18 }, { "name": "Tablet", "value": 6 }],
+        "countries": [{ "name": "US", "value": 43 }, { "name": "IN", "value": 24 }, { "name": "UK", "value": 18 }, { "name": "AU", "value": 15 }]
+      },
+      "bounce_classification": [
+        { "type": "Soft bounce", "value": 47, "color": "#f59e0b" },
+        { "type": "Hard bounce", "value": 31, "color": "#ef4444" },
+        { "type": "Block", "value": 16, "color": "#8b5cf6" },
+        { "type": "Other", "value": 6, "color": "#a3a29b" }
+      ],
+      "suppression_summary": { "profiles_suppressed": 73500 },
+      "suppression_reasons": [
+        { "reason": "Marketing consent off", "value": 46 },
+        { "reason": "Care case active", "value": 19 },
+        { "reason": "Frequency cap reached", "value": 18 },
+        { "reason": "Plan ineligible", "value": 11 },
+        { "reason": "Holdout - control group", "value": 6 }
+      ]
+    }
+  }
+}

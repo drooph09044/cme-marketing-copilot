@@ -1,0 +1,127 @@
+{
+  "useCaseId": "engagement-low",
+  "name": "Low Engagement Fans Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Low Engagement Fans",
+    "journeyGoal": "Activate low-engaged fans into active viewers",
+    "entryTrigger": "low_engagement_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after first meaningful engagement"
+  },
+  "entryCriteria": {
+    "event": "engagement_event",
+    "eventId": "evt_engage_003",
+    "conditions": [
+      {
+        "field": "avgMinutesWatched",
+        "operator": "LESS_THAN",
+        "value": 10
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Low_Engagement_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Reactivation Content Push",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "Catch today’s highlights",
+      "cta": "Watch Highlights",
+      "tracking": {
+        "campaignId": "push_eng_low",
+        "deliveryId": "del_push_el1",
+        "trackingEvents": [
+          "push_open",
+          "video_watch"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "engagement_event",
+        "eventId": "evt_engage_003"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "video_watch",
+          "field": "firstEngagement",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "video_watch",
+      "eventId": "evt_video_002",
+      "condition": "firstEngagement == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "video_watch"
+    ],
+    "eventMapping": {
+      "video_watch": "evt_video_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "video_watch",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "single_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

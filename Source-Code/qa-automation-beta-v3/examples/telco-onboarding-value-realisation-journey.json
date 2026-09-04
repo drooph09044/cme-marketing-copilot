@@ -1,0 +1,268 @@
+{
+  "useCaseId": "telco-onboarding-value-realisation-journey",
+  "name": "Telco Onboarding & Value Realisation Journey",
+  "active": false,
+  "category": {
+    "categoryId": "customer-onboarding",
+    "categoryName": "Customer Onboarding & Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Telco Onboarding & Value Realisation Journey",
+    "journeyGoal": "Drive early product adoption, reduce early churn risk, and increase perceived value of the plan through education and personalization",
+    "entryTrigger": "account_activated",
+    "journeyCategory": "Customer Onboarding & Engagement",
+    "totalDuration": "90 days",
+    "exitClause": "Exit when churn_flagged OR plan_cancelled"
+  },
+  "entryCriteria": {
+    "event": "account_activated",
+    "eventId": "evt_account_activated_001",
+    "conditions": [
+      {
+        "field": "serviceType",
+        "operator": "EQUALS",
+        "value": "TELCO_PLAN"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "New_Telco_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 0",
+      "timing": {
+        "relativeDay": 0,
+        "description": "Immediately after account activation"
+      },
+      "channel": [
+        "EMAIL",
+        "SMS"
+      ],
+      "messageTheme": "Welcome to [Network] – account confirmed, app link, first bill date, support contacts",
+      "cta": "Download the App",
+      "tracking": {
+        "campaignId": "telco_welcome_activation",
+        "deliveryId": "del_email_sms_1601",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click",
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "planType",
+        "firstBillDate",
+        "supportContacts"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 3",
+      "timing": {
+        "relativeDay": 3,
+        "description": "3 days after activation"
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Get more from your plan – visual feature guide (hotspot, voicemail, international calling)",
+      "cta": "Explore My Plan",
+      "tracking": {
+        "campaignId": "plan_feature_education",
+        "deliveryId": "del_push_email_1602",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "planFeatures",
+        "usageTips"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 14",
+      "timing": {
+        "relativeDay": 14,
+        "description": "14 days after activation"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "How are we doing? – NPS satisfaction check-in + top tip for their plan type",
+      "cta": "Share Feedback",
+      "tracking": {
+        "campaignId": "nps_checkin",
+        "deliveryId": "del_email_1603",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click",
+          "nps_response"
+        ]
+      },
+      "personalization": [
+        "planUsageInsight",
+        "npsSurveyLink",
+        "usageTip"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 45",
+      "timing": {
+        "relativeDay": 45,
+        "description": "45 days after activation"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You might like this – personalised add-on recommendation based on usage (data, roaming)",
+      "cta": "Add to My Plan",
+      "tracking": {
+        "campaignId": "addon_recommendation",
+        "deliveryId": "del_email_1604",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "usageBasedAddons",
+        "dataConsumption",
+        "roamingPatterns"
+      ]
+    },
+    {
+      "tpId": "TP5",
+      "label": "Day 90",
+      "timing": {
+        "relativeDay": 90,
+        "description": "90 days after activation"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "3 months in – loyalty milestone + referral programme invite",
+      "cta": "Refer a Friend",
+      "tracking": {
+        "campaignId": "loyalty_milestone_referral",
+        "deliveryId": "del_email_1605",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click",
+          "referral_submitted"
+        ]
+      },
+      "personalization": [
+        "loyaltyTenure",
+        "referralReward",
+        "usageSummary"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "activationDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "account_activated",
+        "eventId": "evt_account_activated_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP5"
+      },
+      {
+        "id": "n7",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "plan_cancelled",
+      "eventId": "evt_plan_cancelled_001",
+      "action": "IMMEDIATE_EXIT"
+    },
+    {
+      "event": "churn_flagged",
+      "eventId": "evt_churn_flagged_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 5,
+      "timeWindowDays": 90
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "cancelled_user",
+        "condition": "plan_cancelled == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "plan_cancelled",
+      "referral_submitted"
+    ],
+    "eventMapping": {
+      "account_activated": "evt_account_activated_001",
+      "plan_cancelled": "evt_plan_cancelled_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "addon_purchase",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "nps_response",
+      "referral_submitted"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 90
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

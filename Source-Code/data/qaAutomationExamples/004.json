@@ -1,0 +1,622 @@
+{
+  "id": "004",
+  "matrix_row_id": 4,
+  "matrix_row_name": "Draft Tune-In - 2026",
+  "template": "tpl_event_tune_in",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": true,
+  "prompts": [
+    "Build a national tune-in journey for the 2026 NFL Draft.",
+    "Create a Draft tune-in flow for fans nationally. 10% control holdout, then SMS-first for opted-in fans, email-first for others. Split paths based on whether the fan is a paid NFL+ subscriber: subscribers see retention messaging, non-subscribers see acquisition. Daily Draft-week emails T-3d through Day 3 with a post-draft recap +2 days. Push and SMS sequencing on Day 1 conditional on consent and subscription state.",
+    "Need a Draft tune-in cadence \u2014 drive clicks on ways-to-watch and Draft viewership on NFL+. Two paths split by NFL+ subscription with a 10% holdout for measurement."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-draft-tunein-2024",
+    "metadata": {
+      "name": "2024 NFL Draft - Tune-In",
+      "internal_name": "NFL_Multi_DraftTuneIn_Q1_2024_AJO",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Drive fans to click ways to watch Draft content and watch the Draft on NFL+/NFL Network.",
+      "archetype": "content_engagement",
+      "launch_date": "2024-04-01",
+      "end_date": "2024-04-29",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive clicks on ways to watch content.",
+          "kpi": "# of fans who click ways to watch content"
+        },
+        {
+          "rank": "primary",
+          "description": "Drive fans to watch the Draft and Draft content on NFL+.",
+          "kpi": "# of fans who watch Draft and/or Draft content on NFL+"
+        },
+        {
+          "rank": "secondary",
+          "description": "Reactivate fans with no activity in the last year.",
+          "kpi": "# of fans with no activity in last year who engaged with this journey"
+        },
+        {
+          "rank": "secondary",
+          "description": "Drive purchase of Draft merch on NFLShop.com.",
+          "kpi": "# of fans who purchase Draft merch from NFLShop.com"
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Audience layered by activity recency + NFL+ subscription state + viewing history. Tune-In emphasizes how to watch, what content to expect, and post-draft recap content. Day-of touchpoints vary by subscription state.",
+        "timing_rationale": "3-week ramp from 4/1 launch to 4/22 (Draft Week begins). Per-day messaging Draft Days 1-3 (4/25-4/27). Recap touch 4/29.",
+        "notes": null
+      },
+      "considerations": [
+        "Limited insight on Draft viewership outside of watching from NFL+."
+      ],
+      "capabilities_used": [
+        "sms_via_attentive",
+        "real_time_connections",
+        "triggered_campaigns"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "GET PUMPED",
+        "GET READY",
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_tunein_layered",
+        "name": "Tune-In layered audience",
+        "description": "All 1 Year Active OR All 2 Year Active OR All 2023 viewers on NFL+ who watched at least once OR All Combine registrants & engagers OR All fans received from Peacock in 2023.",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "activity.last_active_within_days",
+              "op": "lte",
+              "value": 365
+            },
+            {
+              "field": "activity.last_active_within_days",
+              "op": "lte",
+              "value": 730
+            },
+            {
+              "all_of": [
+                {
+                  "field": "nfl_plus.has_watched_2023",
+                  "op": "equals",
+                  "value": true
+                },
+                {
+                  "field": "nfl_plus.watch_count_2023",
+                  "op": "gte",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "field": "combine.registered_or_engaged",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "peacock.received_2023",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_onepass_app_for_draft",
+        "name": "Fans that have OnePass app downloaded for Draft OR registrants for Draft",
+        "scope": "global",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "onepass.downloaded_for_draft",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "draft.registered",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_sms",
+        "type": "sms",
+        "vendor": "Attentive"
+      },
+      {
+        "id": "ch_push_nfl",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_web_target",
+        "type": "web_target_banner"
+      },
+      {
+        "id": "ch_app_target",
+        "type": "app_target_banner"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "T",
+        "name": "Tier"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 4/1 launch"
+      },
+      {
+        "id": "test_control_split",
+        "type": "decision",
+        "label": "Test/Control split (10% holdout)",
+        "decision_basis": "test_split",
+        "condition": {
+          "field": "_random_pct",
+          "op": "lt",
+          "value": 10
+        }
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "Opted-in for SMS?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.sms",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_ta_prospects_signup",
+        "type": "action",
+        "label": "Email TA - Think you know the 2024 Prospects? With a respective college info, etc. (SMS signup secondary, NFL App download tertiary)",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-04"
+        },
+        "copy": {
+          "subject": "Think you know the 2024 Prospects?",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Player stories / college info"
+            },
+            {
+              "rank": "secondary",
+              "name": "SMS signup"
+            },
+            {
+              "rank": "tertiary",
+              "name": "NFL App download"
+            }
+          ]
+        }
+      },
+      {
+        "id": "sms_tb_prospects",
+        "type": "action",
+        "label": "SMS TB - Think you know the 2024 Prospects? Engagement experience (link to player quiz later)",
+        "channel": "ch_sms",
+        "touch_id": "TB",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-04"
+        }
+      },
+      {
+        "id": "dec_paid_nfl_plus_subscriber",
+        "type": "decision",
+        "label": "Is current PAID NFL+ Subscriber AND watched anything on NFL+?",
+        "decision_basis": "pull",
+        "condition": {
+          "all_of": [
+            {
+              "field": "nfl_plus.subscription_paid",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "nfl_plus.has_watched_any",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "email_tc_nfl_plus_promotion",
+        "type": "action",
+        "label": "Email TC - NFL+ Promotion: NFL+ is your home for the 2024 Draft w/ exclusive draft room streams (Secondary: Shop for Draft caps / team merch)",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-11"
+        },
+        "copy": {
+          "subject": "NFL+ is your home for the 2024 Draft",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "NFL+ Sign-up CTA"
+            },
+            {
+              "rank": "secondary",
+              "name": "Shop for Draft caps and team merch"
+            }
+          ]
+        }
+      },
+      {
+        "id": "email_td_nfl_plus_retention",
+        "type": "action",
+        "label": "Email TD - NFL+ Retention: NFL+ is your home for the 2024 Draft (Secondary: Shop merch)",
+        "channel": "ch_email",
+        "touch_id": "TD",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-11"
+        },
+        "copy": {
+          "subject": "NFL+ is your home for the 2024 Draft",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Retention module"
+            },
+            {
+              "rank": "secondary",
+              "name": "Shop for Draft caps and team merch"
+            }
+          ]
+        }
+      },
+      {
+        "id": "email_te_general_ways_to_watch",
+        "type": "action",
+        "label": "Email TE - Draft General: Storytelling about Detroit / pre-draft content available on NFL Network/NFL+ before Day 1 (Secondary: Mock Draft content)",
+        "channel": "ch_email",
+        "touch_id": "TE",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-17"
+        }
+      },
+      {
+        "id": "email_tf_day1_general_ways",
+        "type": "action",
+        "label": "Email TF - General Ways to Watch (3 Days Before Draft, 4/22)",
+        "channel": "ch_email",
+        "touch_id": "TF",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-22"
+        }
+      },
+      {
+        "id": "dec_email_opened_day1",
+        "type": "decision",
+        "label": "Opened Day 1 email?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "engagement.email_opened.tf",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_tg_day1_ways_to_watch",
+        "type": "action",
+        "label": "Email TG - Day 1 Ways to Watch (NFL+ Spotlight, Pre-Show, paid vs non-subs different messaging, Draft Order Bingo Reminder)",
+        "channel": "ch_email",
+        "touch_id": "TG",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "email_th_day2_top_picks",
+        "type": "action",
+        "label": "Email TH - Day 2 Top Picks (NFL+ Spotlight, Pre-Show, Draft Order Bingo Reminder)",
+        "channel": "ch_email",
+        "touch_id": "TH",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-26"
+        }
+      },
+      {
+        "id": "email_ti_day3_recap_bingo",
+        "type": "action",
+        "label": "Email TI - Day 3 Top Picks (round 2 / Ways to Watch / last chance for Grid Iron Bingo)",
+        "channel": "ch_email",
+        "touch_id": "TI",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-27"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted-in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "dec_current_paid_subscriber",
+        "type": "decision",
+        "label": "Current Paid NFL+ Subscriber?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "nfl_plus.subscription_paid",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_pa_day1_tune_in",
+        "type": "action",
+        "label": "Push - Draft Day 1 Tune-In: Ways to Watch PUSH",
+        "channel": "ch_push_nfl",
+        "touch_id": "PA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "push_pb_day1_acquisition",
+        "type": "action",
+        "label": "Push - Draft Day 1 NFL+ Acquisition: Subscribe for NFL+ to watch the 2024 Draft!",
+        "channel": "ch_push_nfl",
+        "touch_id": "PB",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "sms_sd_day1_ways_to_watch",
+        "type": "action",
+        "label": "SMS - Draft Day 1 Ways to Watch",
+        "channel": "ch_sms",
+        "touch_id": "SD",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-25"
+        }
+      },
+      {
+        "id": "email_tj_post_draft_recap",
+        "type": "action",
+        "label": "Email TJ - NFL Daily Takeover w/ Draft Recap (2 Days After Draft 4/29, plus Draft fan reactions / Class of 2024 / Schedule Release teaser)",
+        "channel": "ch_email",
+        "touch_id": "TJ",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2024-04-29"
+        }
+      },
+      {
+        "id": "target_th_app_target_bingo",
+        "type": "action",
+        "label": "Target Banner - NFL.com and App Target Banner engagement experience (Bingo)",
+        "channel": "ch_web_target",
+        "touch_id": "TH-banner",
+        "timing": {
+          "type": "realtime"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "test_control_split"
+      },
+      {
+        "from": "test_control_split",
+        "to": "end_journey",
+        "branch_label": "control"
+      },
+      {
+        "from": "test_control_split",
+        "to": "dec_sms_optin",
+        "branch_label": "test"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "sms_tb_prospects",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "email_ta_prospects_signup",
+        "branch_label": "no"
+      },
+      {
+        "from": "sms_tb_prospects",
+        "to": "email_ta_prospects_signup"
+      },
+      {
+        "from": "email_ta_prospects_signup",
+        "to": "dec_paid_nfl_plus_subscriber"
+      },
+      {
+        "from": "dec_paid_nfl_plus_subscriber",
+        "to": "email_td_nfl_plus_retention",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_paid_nfl_plus_subscriber",
+        "to": "email_tc_nfl_plus_promotion",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_tc_nfl_plus_promotion",
+        "to": "email_te_general_ways_to_watch"
+      },
+      {
+        "from": "email_td_nfl_plus_retention",
+        "to": "email_te_general_ways_to_watch"
+      },
+      {
+        "from": "email_te_general_ways_to_watch",
+        "to": "email_tf_day1_general_ways"
+      },
+      {
+        "from": "email_tf_day1_general_ways",
+        "to": "dec_email_opened_day1"
+      },
+      {
+        "from": "dec_email_opened_day1",
+        "to": "email_tg_day1_ways_to_watch",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_email_opened_day1",
+        "to": "email_tg_day1_ways_to_watch",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_tg_day1_ways_to_watch",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "dec_current_paid_subscriber",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "sms_sd_day1_ways_to_watch",
+        "branch_label": "no"
+      },
+      {
+        "from": "dec_current_paid_subscriber",
+        "to": "push_pa_day1_tune_in",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_current_paid_subscriber",
+        "to": "push_pb_day1_acquisition",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_pa_day1_tune_in",
+        "to": "email_th_day2_top_picks"
+      },
+      {
+        "from": "push_pb_day1_acquisition",
+        "to": "email_th_day2_top_picks"
+      },
+      {
+        "from": "sms_sd_day1_ways_to_watch",
+        "to": "email_th_day2_top_picks"
+      },
+      {
+        "from": "email_th_day2_top_picks",
+        "to": "email_ti_day3_recap_bingo"
+      },
+      {
+        "from": "email_ti_day3_recap_bingo",
+        "to": "email_tj_post_draft_recap"
+      },
+      {
+        "from": "email_tj_post_draft_recap",
+        "to": "end_journey"
+      },
+      {
+        "from": "start",
+        "to": "target_th_app_target_bingo"
+      },
+      {
+        "from": "target_th_app_target_bingo",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "# of fans who click ways to watch content"
+        },
+        {
+          "name": "# of fans who watch Draft and/or Draft content on NFL+"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Reactivated fans engaged with journey"
+        },
+        {
+          "name": "Draft merch purchases on NFLShop.com"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Overall Test/Control",
+          "hypothesis": "Journey lifts ways-to-watch clicks and NFL+ Draft viewership above no-journey baseline.",
+          "design": "10% overall holdout.",
+          "control_holdout_pct": 10.0
+        }
+      ]
+    }
+  }
+}

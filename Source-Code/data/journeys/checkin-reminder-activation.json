@@ -1,0 +1,173 @@
+{
+  "useCaseId": "checkin-reminder-activation",
+  "name": "Check-in Reminder – Activation Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Check-in Reminder – Activation",
+    "journeyGoal": "Activate users who have not completed check-in via app download or app engagement",
+    "entryTrigger": "user_checkin_pending",
+    "journeyCategory": "Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after check-in completion or app download"
+  },
+  "entryCriteria": {
+    "event": "user_checkin_pending",
+    "eventId": "evt_checkin_006",
+    "conditions": [
+      {
+        "field": "appInstalled",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      },
+      {
+        "field": "checkinCompleted",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Pending Check-in Users – Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Check-in Activation Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "Complete your check-in now – download the app to get started!",
+      "cta": "Check-in Now",
+      "tracking": {
+        "campaignId": "push_checkin_activation",
+        "deliveryId": "del_push_43",
+        "trackingEvents": [
+          "push_open",
+          "app_download"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Check-in Activation Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your check-in is pending – complete it now via our app!",
+      "cta": "Check-in Now",
+      "tracking": {
+        "campaignId": "email_checkin_activation",
+        "deliveryId": "del_email_43",
+        "trackingEvents": [
+          "email_open",
+          "app_download"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_checkin_pending",
+        "eventId": "evt_checkin_006"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_download",
+          "field": "appDownloaded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_download",
+          "field": "appDownloaded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "app_download",
+      "eventId": "evt_app_006",
+      "condition": "appDownloaded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "app_download"
+    ],
+    "eventMapping": {
+      "app_download": "evt_app_006"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "app_download",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

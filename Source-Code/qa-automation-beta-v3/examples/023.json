@@ -1,0 +1,297 @@
+{
+  "id": "023",
+  "matrix_row_id": 23,
+  "matrix_row_name": "Fantasy Lineup Deadline Push",
+  "template": "tpl_fantasy_engagement",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Fantasy lineup deadline push reminder.",
+    "Send a T-2h push to fans with unset lineups across any of their leagues, then a T-15min SMS for opted-in users as a last-chance alert. Suppress fans whose lineups are already locked or fully set for the upcoming game window.",
+    "Need a lineup-deadline reminder for Fantasy \u2014 push at T-2h, SMS at T-15min for SMS opted-in fans."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-fantasy-lineup-deadline",
+    "metadata": {
+      "name": "Fantasy Lineup Deadline Push",
+      "internal_name": "NFL_Fantasy_Lineup_Deadline_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL Fantasy"
+      },
+      "purpose": "Remind fans with unset Fantasy lineups before kickoff with T-2h push and T-15min SMS for opted-in users.",
+      "archetype": "game_day",
+      "launch_date": "2026-09-06",
+      "end_date": "2027-01-11",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive lineup-set rate before kickoff.",
+          "kpi": "Lineup-set rate among reminded fans",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "T-2h push then T-15min SMS for opted-in fans. Suppress fans whose lineups are already locked or fully set.",
+        "timing_rationale": "Last 2h drives most lineup-set behavior.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "push",
+        "sms"
+      ],
+      "moments_that_matter": [
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_unset_lineup",
+        "name": "Fantasy users with unset lineup",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "fantasy.has_active_league",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "fantasy.lineup_set_for_current_window",
+              "op": "equals",
+              "value": false
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_already_set",
+        "name": "Lineup already set or locked",
+        "scope": "global",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "fantasy.lineup_set_for_current_window",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "fantasy.lineup_locked",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_sms",
+        "type": "sms",
+        "vendor": "Attentive"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 6,
+        "unit": "day"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Game window approaches",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "fantasy_lineup_window_open"
+        }
+      },
+      {
+        "id": "wait_t2h",
+        "type": "wait",
+        "label": "Wait to T-2h before kickoff",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fantasy_lineup_lock",
+          "direction": "before",
+          "offset": {
+            "value": 2,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_t2h",
+        "type": "action",
+        "label": "Push T-2h - Set your lineup",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Set your lineup - 2 hours to kickoff"
+        }
+      },
+      {
+        "id": "wait_t15min",
+        "type": "wait",
+        "label": "Wait to T-15min",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fantasy_lineup_lock",
+          "direction": "before",
+          "offset": {
+            "value": 15,
+            "unit": "minute"
+          }
+        }
+      },
+      {
+        "id": "dec_now_set",
+        "type": "decision",
+        "label": "Lineup set now?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "fantasy.lineup_set_for_current_window",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.sms",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "sms_t15",
+        "type": "action",
+        "label": "SMS T-15min - Last chance",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "body": "Last chance: set your Fantasy lineup before kickoff"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "wait_t2h"
+      },
+      {
+        "from": "wait_t2h",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_t2h",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_t15min",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t2h",
+        "to": "wait_t15min"
+      },
+      {
+        "from": "wait_t15min",
+        "to": "dec_now_set"
+      },
+      {
+        "from": "dec_now_set",
+        "to": "end_journey",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_now_set",
+        "to": "dec_sms_optin",
+        "branch_label": "no"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "sms_t15",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "sms_t15",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Lineup-set rate among reminded fans"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Push CTR"
+        },
+        {
+          "name": "SMS reply rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

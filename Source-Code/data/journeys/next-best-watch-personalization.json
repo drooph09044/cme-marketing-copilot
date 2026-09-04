@@ -1,0 +1,172 @@
+{
+  "useCaseId": "next-best-watch-personalization",
+  "name": "Streaming Next Best Watch Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Next Best Watch",
+    "journeyGoal": "Improve content discovery and viewing frequency",
+    "entryTrigger": "session_end_no_next_content",
+    "journeyCategory": "Engagement",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after video start"
+  },
+  "entryCriteria": {
+    "event": "session_end",
+    "eventId": "evt_session_001",
+    "conditions": [
+      {
+        "field": "queueEmpty",
+        "operator": "EQUALS",
+        "value": true
+      },
+      {
+        "field": "viewingFrequencyWeekly",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 4
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Next_Best_Watch_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Recommendation Push",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "PUSH",
+      "messageTheme": "Something you’ll love next",
+      "cta": "Watch Now",
+      "tracking": {
+        "campaignId": "push_nbw",
+        "deliveryId": "del_nbw_1",
+        "trackingEvents": [
+          "push_open",
+          "video_watch"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Email Recommendation Digest",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Top picks for you this week",
+      "cta": "Discover More",
+      "tracking": {
+        "campaignId": "email_nbw_digest",
+        "deliveryId": "del_nbw_2",
+        "trackingEvents": [
+          "email_open",
+          "video_watch"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "session_end",
+        "eventId": "evt_session_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "video_watch",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "video_watch",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 46
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "video_watch",
+      "eventId": "evt_video_002",
+      "condition": "started == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "video_watch"
+    ],
+    "eventMapping": {
+      "video_watch": "evt_video_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "video_watch",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "single_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

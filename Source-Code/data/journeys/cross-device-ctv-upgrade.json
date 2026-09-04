@@ -1,0 +1,172 @@
+{
+  "useCaseId": "cross-device-ctv-upgrade",
+  "name": "Cross-Device CTV Upgrade Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Cross-Device CTV Upgrade",
+    "journeyGoal": "Drive CTV app installation and multi-device usage",
+    "entryTrigger": "mobile_web_heavy_usage_no_ctv",
+    "journeyCategory": "Engagement",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after CTV install"
+  },
+  "entryCriteria": {
+    "event": "device_usage",
+    "eventId": "evt_device_001",
+    "conditions": [
+      {
+        "field": "monthlyWatchHours",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 20
+      },
+      {
+        "field": "ctvInstalled",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "CTV_Upgrade_Candidates"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "In-App Upgrade Prompt",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "IN_APP",
+      "messageTheme": "Watch on the big screen for a better experience",
+      "cta": "Install CTV App",
+      "tracking": {
+        "campaignId": "inapp_ctv_upgrade",
+        "deliveryId": "del_ctv_1",
+        "trackingEvents": [
+          "inapp_view",
+          "app_install"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Email CTV Reminder",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Take your viewing to the big screen",
+      "cta": "Get CTV App",
+      "tracking": {
+        "campaignId": "email_ctv_reminder",
+        "deliveryId": "del_ctv_2",
+        "trackingEvents": [
+          "email_open",
+          "app_install"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "device_usage",
+        "eventId": "evt_device_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_install",
+          "field": "installed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_install",
+          "field": "installed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "app_install",
+      "eventId": "evt_install_001",
+      "condition": "installed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "app_install"
+    ],
+    "eventMapping": {
+      "app_install": "evt_install_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "app_install",
+    "secondaryKPIs": [
+      "inapp_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

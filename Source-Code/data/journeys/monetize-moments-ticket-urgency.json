@@ -1,0 +1,168 @@
+{
+  "useCaseId": "monetize-moments-ticket-urgency",
+  "name": "Ticket Urgency Monetization Journey",
+  "category": {
+    "categoryId": "revenue",
+    "categoryName": "Monetization"
+  },
+  "journeyTable": {
+    "journeyName": "Key Ticket Urgency Campaign",
+    "journeyGoal": "Drive immediate ticket purchases during high-demand and limited availability moments",
+    "entryTrigger": "high_demand_ticket_event_detected",
+    "journeyCategory": "Revenue Growth",
+    "totalDuration": "7 days",
+    "exitClause": "Exit if ticket purchase is completed"
+  },
+  "entryCriteria": {
+    "event": "ticket_inventory_update",
+    "eventId": "evt_ticket_001",
+    "conditions": [
+      {
+        "field": "availabilityLevel",
+        "operator": "LESS_THAN_EQUALS",
+        "value": 20
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Intent_Ticket_Seekers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Low Availability Alert Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Seats are running out for your favorite match",
+      "cta": "Book Now",
+      "tracking": {
+        "campaignId": "email_ticket_urgency_1",
+        "deliveryId": "del_ticket_urgency_1",
+        "trackingEvents": [
+          "email_open",
+          "purchase_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Push Notification Reminder",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "PUSH",
+      "messageTheme": "Only a few seats left!",
+      "cta": "Secure My Seat",
+      "tracking": {
+        "campaignId": "push_ticket_urgency_2",
+        "deliveryId": "del_ticket_urgency_2",
+        "trackingEvents": [
+          "push_open",
+          "purchase_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "ticket_inventory_update",
+        "eventId": "evt_ticket_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_purchase",
+      "eventId": "evt_ticket_purchase_001",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 72
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "ticket_purchase"
+    ],
+    "eventMapping": {
+      "ticket_purchase": "evt_ticket_purchase_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_purchase",
+    "secondaryKPIs": [
+      "email_open",
+      "purchase_start"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 72
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

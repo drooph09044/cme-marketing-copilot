@@ -1,0 +1,191 @@
+{
+  "useCaseId": "attendance-recovery-journey",
+  "name": "Attendance Recovery Journey",
+  "category": {
+    "categoryId": "reengagement",
+    "categoryName": "Re-Engagement & Attendance Recovery"
+  },
+  "journeyTable": {
+    "journeyName": "Attendance Recovery Journey",
+    "journeyGoal": "Re-engage fans who missed recent games and drive ticket purchases for upcoming matches",
+    "entryTrigger": "missed_recent_games",
+    "journeyCategory": "Re-Engagement & Attendance Recovery",
+    "totalDuration": "14 days",
+    "exitClause": "Exit when ticket_purchased OR journey completed"
+  },
+  "entryCriteria": {
+    "event": "missed_recent_games",
+    "eventId": "evt_missed_games_001",
+    "conditions": [
+      {
+        "field": "gamesMissed",
+        "operator": "GREATER_THAN",
+        "value": 1
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Fans_Missed_Recent_Games"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 1",
+      "timing": {
+        "relativeDay": 1,
+        "description": "1 day after missing recent games trigger"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Miss you at the stadium – personalised recap of recent games missed; upcoming matchup highlight",
+      "cta": "Get Tickets",
+      "tracking": {
+        "campaignId": "email_attendance_recovery",
+        "deliveryId": "del_email_1001",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "missedGamesSummary",
+        "upcomingMatch"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 7",
+      "timing": {
+        "relativeDay": 7,
+        "description": "7 days after journey entry"
+      },
+      "channel": [
+        "PUSH",
+        "SMS"
+      ],
+      "messageTheme": "Flash offer: this week only – discounted ticket for this weekend's game",
+      "cta": "Grab My Ticket",
+      "tracking": {
+        "campaignId": "flash_offer_ticket",
+        "deliveryId": "del_push_sms_1002",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "discountCode",
+        "upcomingMatch"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 14",
+      "timing": {
+        "relativeDay": 14,
+        "description": "14 days after journey entry"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Bring someone new – two-for-one offer for next home game; friend referral angle",
+      "cta": "Get 2 Tickets",
+      "tracking": {
+        "campaignId": "email_referral_ticket_offer",
+        "deliveryId": "del_email_1003",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "referralCode",
+        "nextHomeGame"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "lastMissedGameDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "missed_recent_games",
+        "eventId": "evt_missed_games_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_purchased",
+      "eventId": "evt_ticket_purchased_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowDays": 14
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "ticket_purchased == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "ticket_purchased"
+    ],
+    "eventMapping": {
+      "missed_recent_games": "evt_missed_games_001",
+      "ticket_purchased": "evt_ticket_purchased_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_purchased",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 14
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

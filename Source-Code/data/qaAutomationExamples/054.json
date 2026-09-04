@@ -1,0 +1,168 @@
+{
+  "id": "054",
+  "matrix_row_id": 54,
+  "matrix_row_name": "NHL fan birthday wish",
+  "template": "tpl_anniversary_milestone",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NHL fan birthday journey themed to fav team with an NHL Shop offer.",
+    "Create a birthday wish journey for NHL fans. Birthday-morning email in fan's favorite team's voice and colors with an NHL Shop jersey or apparel offer, plus a push later in the day driving to next fav-team game with broadcast info.",
+    "Need an NHL birthday touch — fav-team wish, NHL Shop jersey coupon, and a push CTA into the next game."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-fan-birthday",
+    "metadata": {
+      "name": "NHL Fan Birthday",
+      "internal_name": "NHL_Fan_Birthday_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "NHL"},
+      "purpose": "Wish NHL fans a happy birthday with fav-team-themed content and an NHL Shop jersey or apparel discount.",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive birthday engagement and fav-team connection.", "kpi": "Birthday email open / click rate", "forecast": null},
+        {"rank": "secondary", "description": "Drive NHL Shop conversions.", "kpi": "NHL Shop conversions from birthday code", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Birthday-morning email themed to fan's favorite team with a 15% NHL Shop jersey/apparel code valid 7 days. Push later that day with a tune-in CTA to the next fav-team game.",
+        "timing_rationale": "Birthday-morning sends maximize relevance.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nhl_fan_with_birthdate",
+        "name": "NHL fan with birthdate on file",
+        "criteria": {
+          "all_of": [
+            {"field": "nhl.profile_active", "op": "equals", "value": true},
+            {"field": "profile.birthdate", "op": "is_not_null"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nhl_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "month"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Birthday trigger",
+        "entry_criteria": {"trigger": "event", "event_name": "fan_birthday_today"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_fav_team_wish",
+        "type": "action",
+        "label": "Email - Fav-team birthday wish with NHL Shop offer",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from your {{FT}}",
+          "preview": "A gift in your team's colors",
+          "modules": [
+            {"rank": "primary", "name": "Fav-team-themed birthday card"},
+            {"rank": "secondary", "name": "15% off NHL Shop jersey/apparel (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_generic_wish",
+        "type": "action",
+        "label": "Email - Generic NHL birthday wish",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from the NHL",
+          "modules": [
+            {"rank": "primary", "name": "Generic NHL birthday card"},
+            {"rank": "secondary", "name": "15% off NHL Shop (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NHL App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_next_game",
+        "type": "action",
+        "label": "Push - Next fav-team game tune-in",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 4, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} on the ice soon - tune in for your birthday"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "email_fav_team_wish", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_generic_wish", "branch_label": "no"},
+      {"from": "email_fav_team_wish", "to": "dec_push_optin"},
+      {"from": "email_generic_wish", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_next_game", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_next_game", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Birthday email open and click rate"}],
+      "secondary_kpis": [{"name": "NHL Shop conversions from birthday code"}],
+      "tests": []
+    }
+  }
+}

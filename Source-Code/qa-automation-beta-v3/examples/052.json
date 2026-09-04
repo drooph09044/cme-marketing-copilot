@@ -1,0 +1,229 @@
+{
+  "id": "052",
+  "matrix_row_id": 52,
+  "matrix_row_name": "Winter Classic Tune-In (Panthers vs Rangers, Miami)",
+  "template": "tpl_event_tune_in",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "matchup",
+  "teams_referenced": "FLA,NYR",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the 2026 Winter Classic, Panthers vs Rangers at loanDepot Park in Miami on Jan 2.",
+    "Create a Winter Classic 2026 tune-in journey. Geo-split: Florida fans within 100mi of Miami get an in-person ticket-buy CTA, all other fans get a national tune-in CTA for ESPN+. Per-fav-team variants for Panthers and Rangers supporters. 10% holdout for A/B test.",
+    "Need a hockey tune-in for the Winter Classic. Two audiences split by geography — Miami-area fans see ticket-buy messaging, everyone else sees tune-in on ESPN+. Pull fav-team variants for Panthers and Rangers fans."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-winter-classic-2026",
+    "metadata": {
+      "name": "Winter Classic 2026 Tune-In",
+      "internal_name": "NHL_Winter_Classic_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "ESPN+"},
+      "purpose": "Drive tune-in to the 2026 NHL Winter Classic on Jan 2 at loanDepot Park in Miami, with a geo-split journey that routes Miami-area fans to in-person ticket purchase and all other fans to ESPN+ tune-in.",
+      "archetype": "event_promotion",
+      "launch_date": "2025-12-15",
+      "end_date": "2026-01-03",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the Winter Classic on ESPN+ and linear broadcast.", "kpi": "Tune-in viewership lift", "forecast": null},
+        {"rank": "secondary", "description": "Drive in-person ticket sales for Miami-area fans.", "kpi": "Ticket sales from journey-engaged Florida fans", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Two-week cadence with geo and team-affinity routing. Miami-area fans (within 100mi of loanDepot Park) see ticket-buy as primary CTA; all other fans see ESPN+ tune-in. Per-fav-team variants for Panthers and Rangers supporters use team-specific imagery. 10% control holdout to test whether the journey lifts viewership and ticket sales above baseline.",
+        "timing_rationale": "Winter Classic kicks off Jan 2, 2026 at 5pm ET; cadence works backward from there.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "geo_filtering", "ab_test_holdout"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nhl_fan",
+        "name": "Active NHL fan",
+        "description": "Any fan with NHL app activity or NHL streaming engagement in the last 180 days.",
+        "criteria": {"field": "nhl.activity_within_days", "op": "lte", "value": 180},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_miami_geo",
+        "name": "Miami-area fan (within 100mi)",
+        "description": "Fan whose location is within 100 miles of loanDepot Park.",
+        "criteria": {
+          "all_of": [
+            {"field": "geolocation.miles_from", "op": "lte", "value": 100, "unit": "loanDepot Park"},
+            {"field": "country", "op": "equals", "value": "US"}
+          ]
+        }
+      },
+      {
+        "id": "aud_panthers_fan",
+        "name": "Florida Panthers fan",
+        "criteria": {"field": "favorite_team", "op": "equals", "value": "FLA"}
+      },
+      {
+        "id": "aud_rangers_fan",
+        "name": "New York Rangers fan",
+        "criteria": {"field": "favorite_team", "op": "equals", "value": "NYR"}
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {"field": "consent.email", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nhl_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "LO", "name": "Location"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Winter Classic cadence opens (T-18d)",
+        "entry_criteria": {"trigger": "schedule"}
+      },
+      {
+        "id": "dec_test_control",
+        "type": "decision",
+        "label": "10% control holdout",
+        "decision_basis": "test_split",
+        "condition": {"field": "_random_pct", "op": "lt", "value": 10}
+      },
+      {
+        "id": "end_control",
+        "type": "end",
+        "label": "Journey End (control)",
+        "reason": "completed"
+      },
+      {
+        "id": "email_announce",
+        "type": "action",
+        "label": "Email T-18d - Winter Classic announcement",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2025-12-15"},
+        "copy": {
+          "subject": "The 2026 Winter Classic is set: Panthers vs Rangers, Miami, Jan 2",
+          "cta_label": "Watch the trailer"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_miami_geo",
+        "type": "decision",
+        "label": "Miami-area fan (within 100mi)?",
+        "decision_basis": "pull",
+        "condition": {"field": "geolocation.miles_from_loanDepot_Park", "op": "lte", "value": 100}
+      },
+      {
+        "id": "email_miami_tickets",
+        "type": "action",
+        "label": "Email T-10d - Miami fans: in-person ticket-buy",
+        "channel": "ch_email",
+        "touch_id": "TB1",
+        "timing": {"type": "scheduled", "calendar_date": "2025-12-23"},
+        "copy": {
+          "subject": "Be there: Winter Classic tickets at loanDepot Park",
+          "cta_label": "Buy tickets"
+        },
+        "personalization_used": ["FN", "LO"]
+      },
+      {
+        "id": "email_national_tunein",
+        "type": "action",
+        "label": "Email T-10d - National fans: ESPN+ tune-in",
+        "channel": "ch_email",
+        "touch_id": "TB2",
+        "timing": {"type": "scheduled", "calendar_date": "2025-12-23"},
+        "copy": {
+          "subject": "Watch the Winter Classic on ESPN+",
+          "cta_label": "Set a reminder"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_team_affinity",
+        "type": "decision",
+        "label": "Fav team Panthers or Rangers?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "in", "value": ["FLA", "NYR"]}
+      },
+      {
+        "id": "email_team_specific",
+        "type": "action",
+        "label": "Email T-3d - Team-specific preview (FLA or NYR variant)",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "scheduled", "calendar_date": "2025-12-30"},
+        "copy": {
+          "subject": "{{FT}} takes the ice at the Winter Classic",
+          "cta_label": "Read the preview"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NHL App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_dayof",
+        "type": "action",
+        "label": "Push Day-of - Puck drop in 1h",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-02", "time_local": "16:00 ET"},
+        "copy": {"headline": "Puck drops in 1h at the Winter Classic"}
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_test_control"},
+      {"from": "dec_test_control", "to": "end_control", "branch_label": "control"},
+      {"from": "dec_test_control", "to": "email_announce", "branch_label": "test"},
+      {"from": "email_announce", "to": "dec_miami_geo"},
+      {"from": "dec_miami_geo", "to": "email_miami_tickets", "branch_label": "yes"},
+      {"from": "dec_miami_geo", "to": "email_national_tunein", "branch_label": "no"},
+      {"from": "email_miami_tickets", "to": "dec_team_affinity"},
+      {"from": "email_national_tunein", "to": "dec_team_affinity"},
+      {"from": "dec_team_affinity", "to": "email_team_specific", "branch_label": "yes"},
+      {"from": "dec_team_affinity", "to": "dec_push_optin", "branch_label": "no"},
+      {"from": "email_team_specific", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_dayof", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_dayof", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Winter Classic tune-in lift vs control"}, {"name": "Miami ticket sales from journey-engaged"}],
+      "secondary_kpis": [{"name": "Email engagement by audience segment"}, {"name": "Per-team-variant click rate"}],
+      "tests": [{
+        "name": "Overall journey lift",
+        "hypothesis": "Multi-touch geo+team-personalized cadence lifts viewership and ticket sales vs no-touch baseline.",
+        "design": "10% control holdout receives no journey touches.",
+        "control_holdout_pct": 10.0
+      }]
+    }
+  }
+}

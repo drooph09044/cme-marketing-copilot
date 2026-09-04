@@ -1,0 +1,2 @@
+# Used for both MODEL_PROVIDER=openai and MODEL_PROVIDER=azure_openai
+langchain-openai>=0.2

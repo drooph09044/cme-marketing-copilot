@@ -1,0 +1,127 @@
+{
+  "id": "095",
+  "matrix_row_id": 95,
+  "matrix_row_name": "Kit Launch Cross-Sell",
+  "template": "tpl_merch_cross_sell",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a merch cross-sell journey triggered when fan's favorite EPL club launches a new kit.",
+    "Create a kit-launch cross-sell journey. Triggered by fan's favorite EPL club announcing a new home or away kit (May-July depending on club). Same-day push to opted-in supporters with kit imagery. Follow-up email Day +2 with pre-order CTA and the kit story (designer, color inspiration, supporter feedback). Premier League Shop product.",
+    "Need a kit-launch send — push when fan's club drops the new kit, email two days later with the full story and pre-order link."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "epl-kit-launch-cross-sell-2026",
+    "metadata": {
+      "name": "EPL Kit Launch Cross-Sell",
+      "internal_name": "EPL_Kit_Launch_2026",
+      "brand": {"vertical": "ecommerce", "league": "EPL", "team": null, "product": "Premier League Shop"},
+      "purpose": "Drive kit pre-orders on Premier League Shop when fan's favorite club launches a new home or away kit.",
+      "archetype": "cross_sell",
+      "launch_date": "2026-05-01",
+      "end_date": "2026-08-15",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive new-kit pre-orders.", "kpi": "Pre-order conversion rate from journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Triggered the day a fan's favorite EPL club announces a new kit. Same-day push for opted-in supporters within 1 hour of announcement; follow-up email Day +2 with the full kit story and pre-order CTA. Suppresses fans without a favorite club on profile.",
+        "timing_rationale": "Kit launch windows typically run May-July across the 20 EPL clubs.",
+        "notes": null
+      },
+      "considerations": ["Premier League Shop creative templates must support per-club kit imagery."],
+      "capabilities_used": ["push", "email", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_club_kit_supporter",
+        "name": "Supporter of club launching a new kit",
+        "criteria": {
+          "all_of": [
+            {"field": "favorite_club", "op": "is_not_null"},
+            {"field": "favorite_club.kit_launch_today", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "premier_league_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"},
+      {"key": "KIT", "name": "Kit Name"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 30, "unit": "day"}, "max_entries": 3},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Kit-launch trigger", "entry_criteria": {"trigger": "event", "event_name": "favorite_club_kit_launched"}},
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_premier_league", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_kit_launch",
+        "type": "action",
+        "label": "Push - Kit-launch reveal",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "realtime", "refresh_minutes": 10},
+        "copy": {"headline": "{{FT}}'s new {{KIT}} just dropped - tap to see it"},
+        "personalization_used": ["FT", "KIT"]
+      },
+      {
+        "id": "wait_2d",
+        "type": "wait",
+        "label": "Wait 2 days",
+        "timing": {"type": "wait", "duration": {"value": 2, "unit": "day"}}
+      },
+      {
+        "id": "email_kit_story",
+        "type": "action",
+        "label": "Email Day +2 - Kit story + pre-order CTA",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "favorite_club_kit_launched", "direction": "after", "offset": {"value": 2, "unit": "day"}},
+        "copy": {
+          "subject": "The story behind {{FT}}'s new {{KIT}}",
+          "cta_label": "Pre-order the kit",
+          "modules": [
+            {"rank": "primary", "name": "Kit imagery and pre-order CTA"},
+            {"rank": "secondary", "name": "Designer notes, color inspiration, supporter reactions"}
+          ]
+        },
+        "personalization_used": ["FN", "FT", "KIT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "converted"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_kit_launch", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_2d", "branch_label": "no"},
+      {"from": "push_kit_launch", "to": "wait_2d"},
+      {"from": "wait_2d", "to": "email_kit_story"},
+      {"from": "email_kit_story", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Kit pre-order conversion rate"}],
+      "secondary_kpis": [{"name": "Push open rate"}, {"name": "Email click-through rate"}],
+      "tests": []
+    }
+  }
+}

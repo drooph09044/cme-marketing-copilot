@@ -1,0 +1,2563 @@
+[
+  {
+    "useCaseId": "trial-to-paid-conversion",
+    "name": "Free Trial to Paid Conversion Journey",
+    "category": {
+      "categoryId": "acquisition",
+      "categoryName": "Acquisition"
+    },
+    "journeyTable": {
+      "journeyName": "Trial to Paid Conversion",
+      "journeyGoal": "Convert active trial users into paid subscribers",
+      "entryTrigger": "trial_active",
+      "journeyCategory": "Conversion",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after subscription purchase"
+    },
+    "entryCriteria": {
+      "event": "trial_started",
+      "eventId": "evt_trial_001",
+      "conditions": [
+        {
+          "field": "daysToTrialExpiry",
+          "operator": "LESS_THAN_EQUALS",
+          "value": 7
+        },
+        {
+          "field": "sessionsLast7Days",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 3
+        }
+      ],
+      "identity": {
+        "primaryId": "subscriberId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Trial_Users_Near_Expiry"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Upgrade Reminder",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Your trial is ending soon—keep watching",
+        "cta": "Go Premium",
+        "tracking": {
+          "campaignId": "email_trial_convert",
+          "deliveryId": "del_trial_1",
+          "trackingEvents": [
+            "email_open",
+            "conversion"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Final Offer Push",
+        "timing": {
+          "offsetHours": 96
+        },
+        "channel": "PUSH",
+        "messageTheme": "Last chance to upgrade with 20% off",
+        "cta": "Claim Offer",
+        "tracking": {
+          "campaignId": "push_trial_final",
+          "deliveryId": "del_trial_2",
+          "trackingEvents": [
+            "push_open",
+            "conversion"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "trial_started",
+          "eventId": "evt_trial_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_active",
+            "field": "converted",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_active",
+            "field": "converted",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 72
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "subscription_active",
+        "eventId": "evt_sub_001",
+        "condition": "converted == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "conversion"
+      ],
+      "eventMapping": {
+        "conversion": "evt_sub_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "conversion",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "subscription-abandonment",
+    "name": "Subscription Sign-up Abandonment Journey",
+    "category": {
+      "categoryId": "conversion",
+      "categoryName": "Conversion"
+    },
+    "journeyTable": {
+      "journeyName": "Subscription Abandonment",
+      "journeyGoal": "Recover users who abandoned subscription signup",
+      "entryTrigger": "signup_abandonment",
+      "journeyCategory": "Conversion",
+      "totalDuration": "48 hours",
+      "exitClause": "Exit after subscription completion"
+    },
+    "entryCriteria": {
+      "event": "signup_started",
+      "eventId": "evt_signup_001",
+      "conditions": [
+        {
+          "field": "checkoutCompleted",
+          "operator": "EQUALS",
+          "value": false
+        },
+        {
+          "field": "authStatus",
+          "operator": "EQUALS",
+          "value": false
+        }
+      ],
+      "identity": {
+        "primaryId": "visitorId",
+        "namespace": "COOKIE"
+      },
+      "audienceName": "Signup_Abandoners"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Reminder Email",
+        "timing": {
+          "offsetHours": 6
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Finish your subscription in seconds",
+        "cta": "Complete Signup",
+        "tracking": {
+          "campaignId": "email_signup_recover",
+          "deliveryId": "del_signup_1",
+          "trackingEvents": [
+            "email_open",
+            "signup_complete"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "SMS Reminder",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "SMS",
+        "messageTheme": "Your signup is waiting – complete now",
+        "cta": "Resume Signup",
+        "tracking": {
+          "campaignId": "sms_signup_recover",
+          "deliveryId": "del_signup_2",
+          "trackingEvents": [
+            "sms_click",
+            "signup_complete"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "signup_started",
+          "eventId": "evt_signup_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "signup_complete",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 6
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "signup_complete",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 18
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "signup_complete",
+        "eventId": "evt_signup_002",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 48
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "signup_complete"
+      ],
+      "eventMapping": {
+        "signup_complete": "evt_signup_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "signup_complete",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "single_touch",
+        "lookbackHours": 48
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "mvpd-audience-acquisition",
+    "name": "MVPD Partner Audience Acquisition Journey",
+    "category": {
+      "categoryId": "acquisition",
+      "categoryName": "Acquisition"
+    },
+    "journeyTable": {
+      "journeyName": "MVPD Audience Acquisition",
+      "journeyGoal": "Acquire new subscribers via MVPD partner audiences",
+      "entryTrigger": "partner_match_detected",
+      "journeyCategory": "Acquisition",
+      "totalDuration": "21 days",
+      "exitClause": "Exit after subscription creation"
+    },
+    "entryCriteria": {
+      "event": "partner_data_match",
+      "eventId": "evt_mvpd_001",
+      "conditions": [
+        {
+          "field": "hashedMatch",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "hashedEmail",
+        "namespace": "PARTNER"
+      },
+      "audienceName": "MVPD_Lookalike_Audience"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Personalized Offer",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "DISPLAY_AD",
+        "messageTheme": "Watch premium content now",
+        "cta": "Start Watching",
+        "tracking": {
+          "campaignId": "display_mvpd_acq",
+          "deliveryId": "del_mvpd_1",
+          "trackingEvents": [
+            "ad_click",
+            "subscription_start"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Follow-up Email",
+        "timing": {
+          "offsetHours": 72
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Still interested? Exclusive partner offer",
+        "cta": "Claim Offer",
+        "tracking": {
+          "campaignId": "email_mvpd_followup",
+          "deliveryId": "del_mvpd_2",
+          "trackingEvents": [
+            "email_open",
+            "subscription_start"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "partner_data_match",
+          "eventId": "evt_mvpd_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_start",
+            "field": "active",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_start",
+            "field": "active",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 72
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "subscription_start",
+        "eventId": "evt_sub_001",
+        "condition": "active == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 720
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "subscription_start"
+      ],
+      "eventMapping": {
+        "subscription_start": "evt_sub_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "subscription_start",
+      "secondaryKPIs": [
+        "ad_click"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 720
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "next-best-watch-personalization",
+    "name": "Streaming Next Best Watch Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Next Best Watch",
+      "journeyGoal": "Improve content discovery and viewing frequency",
+      "entryTrigger": "session_end_no_next_content",
+      "journeyCategory": "Engagement",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after video start"
+    },
+    "entryCriteria": {
+      "event": "session_end",
+      "eventId": "evt_session_001",
+      "conditions": [
+        {
+          "field": "queueEmpty",
+          "operator": "EQUALS",
+          "value": true
+        },
+        {
+          "field": "viewingFrequencyWeekly",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 4
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Next_Best_Watch_Audience"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Recommendation Push",
+        "timing": {
+          "offsetHours": 2
+        },
+        "channel": "PUSH",
+        "messageTheme": "Something you’ll love next",
+        "cta": "Watch Now",
+        "tracking": {
+          "campaignId": "push_nbw",
+          "deliveryId": "del_nbw_1",
+          "trackingEvents": [
+            "push_open",
+            "video_watch"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Email Recommendation Digest",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Top picks for you this week",
+        "cta": "Discover More",
+        "tracking": {
+          "campaignId": "email_nbw_digest",
+          "deliveryId": "del_nbw_2",
+          "trackingEvents": [
+            "email_open",
+            "video_watch"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "session_end",
+          "eventId": "evt_session_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "video_watch",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 2
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "video_watch",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 46
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "video_watch",
+        "eventId": "evt_video_002",
+        "condition": "started == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "video_watch"
+      ],
+      "eventMapping": {
+        "video_watch": "evt_video_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "video_watch",
+      "secondaryKPIs": [
+        "push_open"
+      ],
+      "attribution": {
+        "model": "single_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "sports-upsell",
+    "name": "Sports Content Upsell Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Revenue Growth"
+    },
+    "journeyTable": {
+      "journeyName": "Sports Upsell",
+      "journeyGoal": "Upgrade users to sports premium tier",
+      "entryTrigger": "sports_engagement_detected",
+      "journeyCategory": "Upsell",
+      "totalDuration": "10 days",
+      "exitClause": "Exit after tier upgrade"
+    },
+    "entryCriteria": {
+      "event": "sports_view",
+      "eventId": "evt_sports_001",
+      "conditions": [
+        {
+          "field": "sportsEventsWatched",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 3
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Sports_Enthusiasts"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Sports Bundle Offer",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Unlock full sports access",
+        "cta": "Upgrade Now",
+        "tracking": {
+          "campaignId": "email_sports_upgrade",
+          "deliveryId": "del_sports_1",
+          "trackingEvents": [
+            "email_open",
+            "upgrade"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "In-App Reminder",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "IN_APP",
+        "messageTheme": "Don't miss live games – upgrade your sports plan",
+        "cta": "Upgrade",
+        "tracking": {
+          "campaignId": "inapp_sports_reminder",
+          "deliveryId": "del_sports_2",
+          "trackingEvents": [
+            "inapp_view",
+            "upgrade"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "sports_view",
+          "eventId": "evt_sports_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "upgrade",
+            "field": "upgraded",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "upgrade",
+            "field": "upgraded",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "upgrade",
+        "eventId": "evt_upgrade_001",
+        "condition": "upgraded == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 240
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "upgrade"
+      ],
+      "eventMapping": {
+        "upgrade": "evt_upgrade_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "upgrade",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 240
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "ad-tier-upgrade",
+    "name": "Ad Tier to Premium Upgrade Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Revenue Growth"
+    },
+    "journeyTable": {
+      "journeyName": "Ad Tier Upgrade",
+      "journeyGoal": "Convert ad-supported users to premium tier",
+      "entryTrigger": "ad_engagement_high",
+      "journeyCategory": "Upsell",
+      "totalDuration": "30 days",
+      "exitClause": "Exit after upgrade"
+    },
+    "entryCriteria": {
+      "event": "ad_usage",
+      "eventId": "evt_ad_001",
+      "conditions": [
+        {
+          "field": "watchHoursWeekly",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 15
+        },
+        {
+          "field": "adSkipRate",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 60
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Ad_Supported_High_Engagers"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Premium Upgrade Offer",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Watch without interruptions",
+        "cta": "Go Premium",
+        "tracking": {
+          "campaignId": "email_ad_upgrade",
+          "deliveryId": "del_ad_1",
+          "trackingEvents": [
+            "email_open",
+            "upgrade"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Discount Push Notification",
+        "timing": {
+          "offsetHours": 168
+        },
+        "channel": "PUSH",
+        "messageTheme": "Limited time: 30% off premium",
+        "cta": "Claim Discount",
+        "tracking": {
+          "campaignId": "push_ad_discount",
+          "deliveryId": "del_ad_2",
+          "trackingEvents": [
+            "push_open",
+            "upgrade"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ad_usage",
+          "eventId": "evt_ad_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "upgrade",
+            "field": "converted",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "upgrade",
+            "field": "converted",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 120
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "upgrade",
+        "eventId": "evt_upgrade_002",
+        "condition": "converted == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 720
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "upgrade"
+      ],
+      "eventMapping": {
+        "upgrade": "evt_upgrade_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "upgrade",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 720
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "bundle-cross-sell",
+    "name": "Bundle & Add-on Cross Sell Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Revenue Growth"
+    },
+    "journeyTable": {
+      "journeyName": "Bundle Cross Sell",
+      "journeyGoal": "Increase add-on attachment rate",
+      "entryTrigger": "subscription_active_90d",
+      "journeyCategory": "Cross-sell",
+      "totalDuration": "14 days",
+      "exitClause": "Exit after add-on purchase"
+    },
+    "entryCriteria": {
+      "event": "subscription_active",
+      "eventId": "evt_sub_003",
+      "conditions": [
+        {
+          "field": "subscriptionAgeDays",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 90
+        },
+        {
+          "field": "addonPurchased",
+          "operator": "EQUALS",
+          "value": false
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Core_Subs_No_Addons"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Bundle Offer",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Enhance your subscription",
+        "cta": "Add Now",
+        "tracking": {
+          "campaignId": "email_bundle",
+          "deliveryId": "del_bundle_1",
+          "trackingEvents": [
+            "email_open",
+            "addon_purchase"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "In-App Cross-sell",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "IN_APP",
+        "messageTheme": "Get more with our add-on bundle",
+        "cta": "View Add-ons",
+        "tracking": {
+          "campaignId": "inapp_cross_sell",
+          "deliveryId": "del_bundle_2",
+          "trackingEvents": [
+            "inapp_view",
+            "addon_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "subscription_active",
+          "eventId": "evt_sub_003"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "addon_purchase",
+            "field": "purchased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "addon_purchase",
+            "field": "purchased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "addon_purchase",
+        "eventId": "evt_addon_001",
+        "condition": "purchased == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "addon_purchase"
+      ],
+      "eventMapping": {
+        "addon_purchase": "evt_addon_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "addon_purchase",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "addressable-audience",
+    "name": "Addressable Advertising Audience Journey",
+    "category": {
+      "categoryId": "advertising",
+      "categoryName": "Revenue Growth"
+    },
+    "journeyTable": {
+      "journeyName": "Addressable Audience Activation",
+      "journeyGoal": "Increase CPM and ad targeting efficiency",
+      "entryTrigger": "addressable_segment_ready",
+      "journeyCategory": "Monetization",
+      "totalDuration": "30 days",
+      "exitClause": "Exit after campaign exposure"
+    },
+    "entryCriteria": {
+      "event": "ad_profile_ready",
+      "eventId": "evt_adprof_001",
+      "conditions": [
+        {
+          "field": "consentFlag",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Addressable_Audience"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Programmatic Ad Exposure",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "DISPLAY_AD",
+        "messageTheme": "Personalized ad based on your interests",
+        "cta": "Learn More",
+        "tracking": {
+          "campaignId": "prog_ad_addressable",
+          "deliveryId": "del_addr_1",
+          "trackingEvents": [
+            "ad_impression",
+            "ad_click"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ad_profile_ready",
+          "eventId": "evt_adprof_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "consent_revoked",
+            "field": "consentFlag",
+            "operator": "EQUALS",
+            "value": false
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": false,
+        "maxMessagesPerUser": 0,
+        "timeWindowHours": 0
+      },
+      "prioritization": {
+        "priority": "LOW"
+      }
+    },
+    "tracking": {
+      "globalEvents": [],
+      "eventMapping": {}
+    },
+    "analytics": {
+      "primaryKPI": "CPM_uplift",
+      "secondaryKPIs": [],
+      "attribution": {
+        "model": "none",
+        "lookbackHours": 0
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "content-performance-insights",
+    "name": "Content Performance & Commissioning Insights Journey",
+    "category": {
+      "categoryId": "content-intelligence",
+      "categoryName": "Content Strategy"
+    },
+    "journeyTable": {
+      "journeyName": "Content Performance Insights",
+      "journeyGoal": "Optimize content commissioning decisions",
+      "entryTrigger": "content_engagement_signal",
+      "journeyCategory": "Analytics",
+      "totalDuration": "Ongoing",
+      "exitClause": "Continuous evaluation"
+    },
+    "entryCriteria": {
+      "event": "content_watch",
+      "eventId": "evt_content_002",
+      "conditions": [
+        {
+          "field": "completionRate",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 80
+        }
+      ],
+      "identity": {
+        "primaryId": "contentId",
+        "namespace": "CONTENT"
+      },
+      "audienceName": "High_Performing_Content"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Dashboard Alert",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "INTERNAL",
+        "messageTheme": "High performing content detected – review for commissioning",
+        "cta": "View Insights",
+        "tracking": {
+          "campaignId": "internal_content_alert",
+          "deliveryId": "del_content_1",
+          "trackingEvents": [
+            "alert_view",
+            "commissioning_action"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "data-driven",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "content_watch",
+          "eventId": "evt_content_002"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "commissioning_action",
+            "field": "reviewed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": false,
+        "maxMessagesPerUser": 0,
+        "timeWindowHours": 0
+      },
+      "prioritization": {
+        "priority": "LOW"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "content_watch"
+      ],
+      "eventMapping": {
+        "content_watch": "evt_content_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "content_roi",
+      "secondaryKPIs": [
+        "share_rate"
+      ],
+      "attribution": {
+        "model": "none",
+        "lookbackHours": 0
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "brand-collaboration",
+    "name": "Brand Publisher Data Collaboration Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Audience Monetisation"
+    },
+    "journeyTable": {
+      "journeyName": "Brand Collaboration Audience",
+      "journeyGoal": "Enable monetization via brand partnerships",
+      "entryTrigger": "brand_collaboration_ready",
+      "journeyCategory": "Monetization",
+      "totalDuration": "Ongoing",
+      "exitClause": "Exit after campaign completion"
+    },
+    "entryCriteria": {
+      "event": "consent_verified",
+      "eventId": "evt_consent_001",
+      "conditions": [
+        {
+          "field": "optIn",
+          "operator": "EQUALS",
+          "value": true
+        },
+        {
+          "field": "brandSafetyFlag",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Brand_Safe_Audience"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Branded Content Delivery",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "DISPLAY_AD",
+        "messageTheme": "Exclusive partner offers",
+        "cta": "Explore",
+        "tracking": {
+          "campaignId": "brand_collab",
+          "deliveryId": "del_brand_1",
+          "trackingEvents": [
+            "ad_impression",
+            "conversion"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Follow-up Email",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "EMAIL",
+        "messageTheme": "More from our brand partners",
+        "cta": "Shop Now",
+        "tracking": {
+          "campaignId": "email_brand_followup",
+          "deliveryId": "del_brand_2",
+          "trackingEvents": [
+            "email_open",
+            "conversion"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "consent_verified",
+          "eventId": "evt_consent_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "conversion",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "conversion",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "conversion",
+        "eventId": "evt_conv_001",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 720
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "conversion"
+      ],
+      "eventMapping": {
+        "conversion": "evt_conv_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "revenue_uplift",
+      "secondaryKPIs": [
+        "ad_impression"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 720
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "cross-device-ctv-upgrade",
+    "name": "Cross-Device CTV Upgrade Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Cross-Device CTV Upgrade",
+      "journeyGoal": "Drive CTV app installation and multi-device usage",
+      "entryTrigger": "mobile_web_heavy_usage_no_ctv",
+      "journeyCategory": "Engagement",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after CTV install"
+    },
+    "entryCriteria": {
+      "event": "device_usage",
+      "eventId": "evt_device_001",
+      "conditions": [
+        {
+          "field": "monthlyWatchHours",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 20
+        },
+        {
+          "field": "ctvInstalled",
+          "operator": "EQUALS",
+          "value": false
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "CTV_Upgrade_Candidates"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "In-App Upgrade Prompt",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "IN_APP",
+        "messageTheme": "Watch on the big screen for a better experience",
+        "cta": "Install CTV App",
+        "tracking": {
+          "campaignId": "inapp_ctv_upgrade",
+          "deliveryId": "del_ctv_1",
+          "trackingEvents": [
+            "inapp_view",
+            "app_install"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Email CTV Reminder",
+        "timing": {
+          "offsetHours": 72
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Take your viewing to the big screen",
+        "cta": "Get CTV App",
+        "tracking": {
+          "campaignId": "email_ctv_reminder",
+          "deliveryId": "del_ctv_2",
+          "trackingEvents": [
+            "email_open",
+            "app_install"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "device_usage",
+          "eventId": "evt_device_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "app_install",
+            "field": "installed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "app_install",
+            "field": "installed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 72
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "app_install",
+        "eventId": "evt_install_001",
+        "condition": "installed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "app_install"
+      ],
+      "eventMapping": {
+        "app_install": "evt_install_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "app_install",
+      "secondaryKPIs": [
+        "inapp_view"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "fast-to-svod-conversion",
+    "name": "FAST to SVOD Conversion Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "FAST to SVOD Conversion",
+      "journeyGoal": "Convert FAST viewers into SVOD subscribers",
+      "entryTrigger": "fast_auth_viewer_detected",
+      "journeyCategory": "Conversion",
+      "totalDuration": "10 days",
+      "exitClause": "Exit after SVOD subscription"
+    },
+    "entryCriteria": {
+      "event": "fast_session",
+      "eventId": "evt_fast_001",
+      "conditions": [
+        {
+          "field": "sessionsCount",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 5
+        },
+        {
+          "field": "isAuthenticated",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "FAST_Authenticated_Users"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "In-App SVOD Offer",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "IN_APP",
+        "messageTheme": "Unlock premium content you’re missing",
+        "cta": "Start Free Trial",
+        "tracking": {
+          "campaignId": "inapp_fast_svod",
+          "deliveryId": "del_fast_1",
+          "trackingEvents": [
+            "inapp_view",
+            "trial_start"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Email SVOD Upgrade",
+        "timing": {
+          "offsetHours": 96
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Upgrade to SVOD and watch ad-free",
+        "cta": "Upgrade Now",
+        "tracking": {
+          "campaignId": "email_fast_svod",
+          "deliveryId": "del_fast_2",
+          "trackingEvents": [
+            "email_open",
+            "trial_start"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fast_session",
+          "eventId": "evt_fast_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "trial_start",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "trial_start",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "trial_start",
+        "eventId": "evt_trial_001",
+        "condition": "started == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 240
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "trial_start"
+      ],
+      "eventMapping": {
+        "trial_start": "evt_trial_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "trial_start",
+      "secondaryKPIs": [
+        "inapp_view"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 240
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "subscriber-onboarding",
+    "name": "Subscriber Onboarding Journey",
+    "category": {
+      "categoryId": "onboarding",
+      "categoryName": "Onboarding"
+    },
+    "journeyTable": {
+      "journeyName": "Subscriber Onboarding",
+      "journeyGoal": "Welcome new subscribers and drive early content engagement to reduce churn",
+      "entryTrigger": "subscription_activated",
+      "journeyCategory": "Onboarding",
+      "totalDuration": "7 days",
+      "exitClause": "No exit - full cadence delivered regardless of engagement"
+    },
+    "entryCriteria": {
+      "event": "subscription_activation",
+      "eventId": "evt_sub_onb_001",
+      "conditions": [
+        {
+          "field": "subscriptionStatus",
+          "operator": "EQUALS",
+          "value": "active"
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "New_Subscribers"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Welcome Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Welcome – your subscription is live with personalized recommendations",
+        "cta": "Start Watching",
+        "tracking": {
+          "campaignId": "email_sub_onboarding_1",
+          "deliveryId": "del_onb_1",
+          "trackingEvents": [
+            "email_open",
+            "content_start"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Trending Push",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "PUSH",
+        "messageTheme": "Trending now based on your early viewing",
+        "cta": "Keep Watching",
+        "tracking": {
+          "campaignId": "push_sub_onboarding_2",
+          "deliveryId": "del_onb_2",
+          "trackingEvents": [
+            "push_open",
+            "content_view"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Feature Discovery Email",
+        "timing": {
+          "offsetHours": 72
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Discover features that enhance your experience",
+        "cta": "Explore Features",
+        "tracking": {
+          "campaignId": "email_sub_onboarding_3",
+          "deliveryId": "del_onb_3",
+          "trackingEvents": [
+            "email_open",
+            "feature_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP4",
+        "label": "Week 1 Recap Email",
+        "timing": {
+          "offsetHours": 168
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Your first week recap and next recommendations",
+        "cta": "Rate & Discover More",
+        "tracking": {
+          "campaignId": "email_sub_onboarding_4",
+          "deliveryId": "del_onb_4",
+          "trackingEvents": [
+            "email_open",
+            "rating_submit"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "subscription_activation",
+          "eventId": "evt_sub_onb_001"
+        },
+        {
+          "id": "n2",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n3",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n4",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n5",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n8",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n9",
+          "type": "MESSAGE",
+          "tpId": "TP4"
+        },
+        {
+          "id": "n10",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 4,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "content_start",
+        "feature_click",
+        "rating_submit"
+      ],
+      "eventMapping": {
+        "content_start": "evt_content_start_001",
+        "feature_click": "evt_feature_click_001",
+        "rating_submit": "evt_rating_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "content_start",
+      "secondaryKPIs": [
+        "email_open",
+        "feature_click"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "churn-prevention",
+    "name": "Churn Prevention Journey",
+    "category": {
+      "categoryId": "retention",
+      "categoryName": "Retention"
+    },
+    "journeyTable": {
+      "journeyName": "Churn Prevention",
+      "journeyGoal": "Re-engage at-risk subscribers before cancellation through content-led and incentive-based interventions",
+      "entryTrigger": "churn_risk_detected",
+      "journeyCategory": "Retention",
+      "totalDuration": "14 days",
+      "exitClause": "Exit if subscriber logs in and plays content within journey window"
+    },
+    "entryCriteria": {
+      "event": "engagement_score_update",
+      "eventId": "evt_eng_score_001",
+      "conditions": [
+        {
+          "field": "engagementScore",
+          "operator": "LESS_THAN_EQUALS",
+          "value": 40
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "At_Risk_Subscribers"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Re-engagement Push",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "PUSH",
+        "messageTheme": "We noticed you’ve been away — here’s something you might like",
+        "cta": "Resume Watching",
+        "tracking": {
+          "campaignId": "push_churn_prevent_1",
+          "deliveryId": "del_churn_1",
+          "trackingEvents": [
+            "push_open",
+            "content_view"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "New Content Email",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Fresh releases picked just for you",
+        "cta": "See What’s New",
+        "tracking": {
+          "campaignId": "email_churn_prevent_2",
+          "deliveryId": "del_churn_2",
+          "trackingEvents": [
+            "email_open",
+            "content_view"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Retention Offer Email",
+        "timing": {
+          "offsetHours": 336
+        },
+        "channel": "EMAIL",
+        "messageTheme": "A special offer to keep you watching",
+        "cta": "Stay & Save",
+        "tracking": {
+          "campaignId": "email_churn_prevent_3",
+          "deliveryId": "del_churn_3",
+          "trackingEvents": [
+            "email_open",
+            "offer_redeem"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "engagement_score_update",
+          "eventId": "evt_eng_score_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "content_play",
+            "field": "played",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "content_play",
+            "field": "played",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "content_play",
+            "field": "played",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n9"
+        },
+        {
+          "id": "n9",
+          "type": "WAIT",
+          "durationHours": 216
+        },
+        {
+          "id": "n10",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n11",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "content_play",
+        "eventId": "evt_content_play_001",
+        "condition": "played == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "content_play",
+        "offer_redeem"
+      ],
+      "eventMapping": {
+        "content_play": "evt_content_play_001",
+        "offer_redeem": "evt_offer_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "content_play",
+      "secondaryKPIs": [
+        "email_open",
+        "offer_redeem"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "free-to-paid-conversion",
+    "name": "Free-to-Paid Conversion Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Revenue Growth"
+    },
+    "journeyTable": {
+      "journeyName": "Free-to-Paid Conversion",
+      "journeyGoal": "Convert high-intent free users into paid subscribers using paywall and content-led nudges",
+      "entryTrigger": "free_user_high_intent_detected",
+      "journeyCategory": "Conversion",
+      "totalDuration": "14 days",
+      "exitClause": "Exit if user converts to paid subscription"
+    },
+    "entryCriteria": {
+      "event": "paywall_view",
+      "eventId": "evt_paywall_001",
+      "conditions": [
+        {
+          "field": "paywallHits",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 3
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Intent_Free_Users"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Value Reminder In-App",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "IN_APP",
+        "messageTheme": "You’re close to unlocking everything you love",
+        "cta": "Start Free Trial",
+        "tracking": {
+          "campaignId": "inapp_free_paid_1",
+          "deliveryId": "del_free_paid_1",
+          "trackingEvents": [
+            "inapp_view",
+            "trial_start"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Personalized Content Gap Email",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Here’s what you’re missing based on your activity",
+        "cta": "Unlock Now",
+        "tracking": {
+          "campaignId": "email_free_paid_2",
+          "deliveryId": "del_free_paid_2",
+          "trackingEvents": [
+            "email_open",
+            "content_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP3",
+        "label": "Discount Offer Email",
+        "timing": {
+          "offsetHours": 336
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Limited-time offer just for you",
+        "cta": "Get Discount",
+        "tracking": {
+          "campaignId": "email_free_paid_3",
+          "deliveryId": "del_free_paid_3",
+          "trackingEvents": [
+            "email_open",
+            "subscription_start"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "paywall_view",
+          "eventId": "evt_paywall_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_started",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_started",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 120
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "subscription_started",
+            "field": "started",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n9"
+        },
+        {
+          "id": "n9",
+          "type": "WAIT",
+          "durationHours": 216
+        },
+        {
+          "id": "n10",
+          "type": "MESSAGE",
+          "tpId": "TP3"
+        },
+        {
+          "id": "n11",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "subscription_started",
+        "eventId": "evt_sub_start_001",
+        "condition": "started == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "subscription_start",
+        "content_click"
+      ],
+      "eventMapping": {
+        "subscription_start": "evt_sub_start_001",
+        "content_click": "evt_content_click_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "subscription_start",
+      "secondaryKPIs": [
+        "email_open",
+        "content_click"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  }
+]

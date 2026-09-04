@@ -1,0 +1,12 @@
+{
+  "name": "@workflow-test/api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FastAPI backend (Python). package.json exists so pnpm workspace + Turbo can drive `pnpm dev:api`.",
+  "scripts": {
+    "dev": "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "start": "uvicorn app.main:app --host 0.0.0.0 --port 8000",
+    "lint": "ruff check .",
+    "typecheck": "mypy app"
+  }
+}

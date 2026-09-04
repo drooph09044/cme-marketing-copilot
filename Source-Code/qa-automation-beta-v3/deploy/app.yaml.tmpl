@@ -1,0 +1,36 @@
+# Databricks App manifest — used by Databricks Apps to run this service.
+# Generated to deploy/build/app.yaml by scripts/deploy-databricks.sh
+# (__APP_NAME__ is substituted with the --app-name value).
+
+name: __APP_NAME__
+description: Journey QA Test Console — segment + journey QA automation
+
+# Databricks Apps assigns a port via $DATABRICKS_APP_PORT — bind to it explicitly.
+command:
+  - "uvicorn"
+  - "app.main:app"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "$DATABRICKS_APP_PORT"
+
+env:
+  # Provider selector consumed by app.llm.router.current_provider()
+  - name: MODEL_PROVIDER
+    value: "databricks"
+
+  # Auto-injected by the Databricks Apps runtime:
+  - name: DATABRICKS_HOST
+    valueFrom: "databricks-host"
+  - name: DATABRICKS_TOKEN
+    valueFrom: "databricks-app-token"
+
+  # Point loaders.py at the bundled examples/ folder.
+  - name: EXAMPLES_DIR
+    value: "/app/examples"
+
+  # Optional: mix in OpenAI / Anthropic via secrets (uncomment + create scope first).
+  # - name: OPENAI_API_KEY
+  #   valueFrom: { secretScope: "qa-secrets", secretKey: "openai-api-key" }
+  # - name: ANTHROPIC_API_KEY
+  #   valueFrom: { secretScope: "qa-secrets", secretKey: "anthropic-api-key" }

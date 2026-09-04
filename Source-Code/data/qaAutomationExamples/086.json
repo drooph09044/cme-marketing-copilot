@@ -1,0 +1,163 @@
+{
+  "id": "086",
+  "matrix_row_id": 86,
+  "matrix_row_name": "March Madness Selection Sunday Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NCAA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Selection Sunday tune-in journey with real-time bracket-reveal push and first-round routing.",
+    "Create a March Madness Selection Sunday journey for Mar 15. Real-time bracket reveal push at announcement (~6pm ET). Same evening, drive fans to the bracket-fill experience on NCAA.com. Then per-fav-school First Four / Round of 64 tune-in push Mar 17-20. Broadcast on CBS, TBS, TNT, truTV.",
+    "Need a Selection Sunday journey — reveal push, bracket-fill push, then first-round tune-in cadence routed by fan's favorite school."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cbb-selection-sunday-2026",
+    "metadata": {
+      "name": "March Madness Selection Sunday Tune-In - Mar 15",
+      "internal_name": "NCAA_Selection_Sunday_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": "CBS / TBS"},
+      "purpose": "Drive Selection Sunday bracket awareness, bracket-fill engagement, and First Four / Round of 64 tune-in.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-03-15",
+      "end_date": "2026-03-21",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive first-round tune-in across CBS, TBS, TNT, truTV.", "kpi": "First-round tune-in lift", "forecast": null},
+        {"rank": "secondary", "description": "Drive bracket-fill engagement on NCAA.com.", "kpi": "Bracket-fill completion rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Real-time push at 6pm ET when the bracket is revealed, same-evening bracket-fill experience promo, then per-fav-school first-round tune-in push aligned to that school's first game.",
+        "timing_rationale": "Selection Sunday Mar 15, 2026. First Four Mar 17-18, Round of 64 Mar 19-20.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "realtime_signal"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_cbb_fan_us",
+        "name": "US college basketball fan",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "equals", "value": "US"},
+            {"field": "ncaa.basketball_affinity", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_tournament_school_fan",
+        "name": "Fan of a school in the tournament",
+        "description": "Fan whose favorite school is one of the 68 teams in the bracket.",
+        "criteria": {"field": "ncaa.favorite_school_in_basketball_tournament", "op": "equals", "value": true}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "ncaa_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"},
+      {"key": "SEED", "name": "Seed Number"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Selection Sunday trigger", "entry_criteria": {"trigger": "external_signal", "event_name": "ncaa_basketball_bracket_announced"}},
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_ncaa", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_bracket_reveal",
+        "type": "action",
+        "label": "Push - Real-time bracket reveal",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "realtime", "refresh_minutes": 5},
+        "copy": {"headline": "The 2026 March Madness bracket is in - see who made it"}
+      },
+      {
+        "id": "email_bracket_fill",
+        "type": "action",
+        "label": "Email Sun evening - Bracket-fill experience",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-15", "time_local": "20:00 ET"},
+        "copy": {
+          "subject": "Your bracket awaits: fill it before the First Four",
+          "cta_label": "Fill the bracket"
+        }
+      },
+      {
+        "id": "wait_to_first_four",
+        "type": "wait",
+        "label": "Wait until First Four (Tue)",
+        "timing": {"type": "wait", "duration": {"value": 2, "unit": "day"}}
+      },
+      {
+        "id": "dec_school_in_tournament",
+        "type": "decision",
+        "label": "Fav school in tournament?",
+        "decision_basis": "audience",
+        "condition": {"field": "ncaa.favorite_school_in_basketball_tournament", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_first_round_school",
+        "type": "action",
+        "label": "Push - Per-fav-school first-round game alert",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_school_first_round_game",
+          "direction": "before",
+          "offset": {"value": 1, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} tips off in 1 hour - tune in on CBS / TBS / TNT / truTV"},
+        "personalization_used": ["FN", "FT", "SEED"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_neutral_round_of_64",
+        "type": "action",
+        "label": "Email - Round of 64 slate (neutral)",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-19"},
+        "copy": {"subject": "32 games over two days: the Round of 64 starts Thursday"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_bracket_reveal", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "email_bracket_fill", "branch_label": "no"},
+      {"from": "push_bracket_reveal", "to": "email_bracket_fill"},
+      {"from": "email_bracket_fill", "to": "wait_to_first_four"},
+      {"from": "wait_to_first_four", "to": "dec_school_in_tournament"},
+      {"from": "dec_school_in_tournament", "to": "push_first_round_school", "branch_label": "yes"},
+      {"from": "dec_school_in_tournament", "to": "email_neutral_round_of_64", "branch_label": "no"},
+      {"from": "push_first_round_school", "to": "email_neutral_round_of_64"},
+      {"from": "email_neutral_round_of_64", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "First-round tune-in lift"}, {"name": "Bracket-fill completion rate"}],
+      "secondary_kpis": [{"name": "Bracket reveal push open rate"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "useCaseId": "reservation-promotion-activation",
+  "name": "Reservation Promotion – Activation Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Reservation Promotion – Activation",
+    "journeyGoal": "Activate users who showed interest in reservations but did not complete engagement",
+    "entryTrigger": "user_added_reservation",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after reservation completed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_reservation",
+    "eventId": "evt_add_reservation_001",
+    "conditions": [
+      {
+        "field": "reservationStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Reservation Users – Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Reservation Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Complete your reservation now and secure your spot!",
+      "cta": "Complete Reservation",
+      "tracking": {
+        "campaignId": "email_reservation_activation",
+        "deliveryId": "del_email_32",
+        "trackingEvents": [
+          "email_open",
+          "reservation_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Reservation Activation Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your reservation is waiting – activate now and don’t miss out!",
+      "cta": "View Reservation",
+      "tracking": {
+        "campaignId": "push_reservation_activation",
+        "deliveryId": "del_push_32",
+        "trackingEvents": [
+          "push_open",
+          "reservation_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_reservation",
+        "eventId": "evt_add_reservation_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "reservation_complete",
+      "eventId": "evt_reservation_005",
+      "condition": "reservationCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "reservation_complete"
+    ],
+    "eventMapping": {
+      "reservation_complete": "evt_reservation_005"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "reservation_complete",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,174 @@
+{
+  "id": "102",
+  "matrix_row_id": 102,
+  "matrix_row_name": "Lapsed F1 TV Pro subscriber win-back",
+  "template": "tpl_win_back",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a 30/60/90-day win-back journey for lapsed F1 TV Pro subscribers.",
+    "Create a win-back journey for lapsed F1 TV Pro subscribers. Day 30: 'we miss you' email tied to fan's favorite driver or team's championship standings. Day 60: email tied to an upcoming marquee Grand Prix or driver-move news. Day 90: incentive email with a discounted resubscribe offer. Add a push at Day 30 for opted-in fans.",
+    "Need a lapsed-subscriber win-back for F1 TV Pro — three emails over 90 days, with the middle touch tied to the next marquee race or silly-season storyline."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-tv-pro-winback-2026",
+    "metadata": {
+      "name": "Lapsed F1 TV Pro Win-back",
+      "internal_name": "F1_TV_Pro_Winback_2026",
+      "brand": {"vertical": "streaming", "league": "F1", "team": null, "product": "F1 TV Pro"},
+      "purpose": "Win back lapsed F1 TV Pro subscribers with a 30/60/90-day cadence anchored to championship standings, marquee races, and driver-move news.",
+      "archetype": "win_back",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate lapsed F1 TV Pro subscribers.", "kpi": "Reactivation rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Day 30 'we miss you' touch tied to championship standings. Day 60 routed by whether a marquee GP (Monaco, Silverstone, Monza, Las Vegas, Abu Dhabi) is within 21 days, otherwise driver-move silly-season news. Day 90 incentive email with discounted resub offer.",
+        "timing_rationale": "30/60/90-day cadence matches streaming win-back industry norms.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_f1_tv",
+        "name": "Lapsed F1 TV Pro subscriber",
+        "criteria": {
+          "all_of": [
+            {"field": "f1_tv_pro.status", "op": "equals", "value": "lapsed"},
+            {"field": "f1_tv_pro.days_since_lapse", "op": "lte", "value": 90}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Driver or Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Lapse Day 0 trigger", "entry_criteria": {"trigger": "event", "event_name": "f1_tv_pro_subscription_lapsed"}},
+      {
+        "id": "wait_30d",
+        "type": "wait",
+        "label": "Wait 30 days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "email_day_30",
+        "type": "action",
+        "label": "Email Day 30 - 'we miss you' with championship standings",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "subscription_lapsed", "direction": "after", "offset": {"value": 30, "unit": "day"}},
+        "copy": {"subject": "We miss you - here's where {{FT}} sits in the championship"},
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_f1", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_day_30",
+        "type": "action",
+        "label": "Push Day 30 - Come back nudge",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "relative_to_event", "event": "subscription_lapsed", "direction": "after", "offset": {"value": 30, "unit": "day"}},
+        "copy": {"headline": "Tap to see {{FT}} championship position"}
+      },
+      {
+        "id": "wait_30d_more",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_marquee_gp_soon",
+        "type": "decision",
+        "label": "Marquee GP within 21 days?",
+        "decision_basis": "behavior",
+        "condition": {"field": "next_marquee_gp_within_days", "op": "lte", "value": 21}
+      },
+      {
+        "id": "email_day_60_marquee",
+        "type": "action",
+        "label": "Email Day 60 - Marquee GP hook",
+        "channel": "ch_email",
+        "touch_id": "TB1",
+        "timing": {"type": "relative_to_event", "event": "subscription_lapsed", "direction": "after", "offset": {"value": 60, "unit": "day"}},
+        "copy": {"subject": "The next Grand Prix is coming - watch every session on F1 TV Pro"}
+      },
+      {
+        "id": "email_day_60_silly_season",
+        "type": "action",
+        "label": "Email Day 60 - Silly-season driver moves",
+        "channel": "ch_email",
+        "touch_id": "TB2",
+        "timing": {"type": "relative_to_event", "event": "subscription_lapsed", "direction": "after", "offset": {"value": 60, "unit": "day"}},
+        "copy": {"subject": "Silly season is in full swing - the latest driver moves"}
+      },
+      {
+        "id": "wait_30d_again",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "email_day_90_incentive",
+        "type": "action",
+        "label": "Email Day 90 - Discounted resub offer",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "relative_to_event", "event": "subscription_lapsed", "direction": "after", "offset": {"value": 90, "unit": "day"}},
+        "copy": {
+          "subject": "Come back for 50% off your first 3 months",
+          "cta_label": "Resubscribe"
+        }
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "wait_30d"},
+      {"from": "wait_30d", "to": "email_day_30"},
+      {"from": "email_day_30", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_day_30", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_30d_more", "branch_label": "no"},
+      {"from": "push_day_30", "to": "wait_30d_more"},
+      {"from": "wait_30d_more", "to": "dec_marquee_gp_soon"},
+      {"from": "dec_marquee_gp_soon", "to": "email_day_60_marquee", "branch_label": "yes"},
+      {"from": "dec_marquee_gp_soon", "to": "email_day_60_silly_season", "branch_label": "no"},
+      {"from": "email_day_60_marquee", "to": "wait_30d_again"},
+      {"from": "email_day_60_silly_season", "to": "wait_30d_again"},
+      {"from": "wait_30d_again", "to": "email_day_90_incentive"},
+      {"from": "email_day_90_incentive", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivation rate"}],
+      "secondary_kpis": [{"name": "Day-60 marquee vs silly-season engagement lift"}, {"name": "Discount-code redemption rate"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,11 @@
+pyspark>=3.5,<4.0
+delta-spark>=3.2,<4.0
+databricks-sdk>=0.40.0
+databricks-sql-connector[pyarrow]>=4.0,<5.0
+PyYAML>=6.0
+faker>=20.0
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.4,<2.0
+sdv>=1.12,<2.0
+

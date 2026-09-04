@@ -1,0 +1,322 @@
+{
+  "id": "016",
+  "matrix_row_id": 16,
+  "matrix_row_name": "Season Ticket Renewal (Lions)",
+  "template": "tpl_renewal",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "team",
+  "teams_referenced": "DET",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Lions season ticket renewal journey with email, direct mail, and account-manager phone outreach.",
+    "We need a season ticket renewal flow for the Detroit Lions. Window opens about six months before the season. Use direct mail packet first at T-60 days, then renewal-deadline emails at T-30, T-14, and T-3 days. For renewals not yet completed by T-30, route highest-LTV holders to an account-manager phone call before the T-14 email goes out. Suppress holders who have already renewed or opted out.",
+    "Create a multi-channel season ticket renewal journey for the Lions. Mix of email, physical direct mail, and AM phone outreach, with the AM call prioritized for top-LTV holders."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "det-lions-season-ticket-renewal",
+    "metadata": {
+      "name": "Detroit Lions Season Ticket Renewal",
+      "internal_name": "DET_SeasonTicket_Renewal_2026",
+      "brand": {
+        "vertical": "sports_team",
+        "league": "NFL",
+        "team": "DET",
+        "product": "Season Tickets"
+      },
+      "purpose": "Renew Detroit Lions season ticket holders for the upcoming season via a multi-channel cadence with high-LTV holders prioritized for AM phone outreach.",
+      "archetype": "renewal",
+      "launch_date": "2026-03-01",
+      "end_date": "2026-07-31",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Renew season ticket holders for the upcoming season.",
+          "kpi": "Season ticket renewal rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Lead with a physical direct mail packet at T-60 days to signal intent and value, then layer email reminders at T-30/T-14/T-3 days. Route highest-LTV holders to an account-manager phone call for renewals not yet completed by T-30 to maximize retention on the most valuable accounts.",
+        "timing_rationale": "Renewal window opens approximately six months before the season starts. Direct mail is timed early to allow lead time; email cadence escalates as the deadline approaches.",
+        "notes": "AM call routing rules send top-quartile LTV holders to a phone call before the T-14 email; remaining holdouts get the AM call after T-3 as a final touch."
+      },
+      "considerations": [
+        "Direct mail requires a print lead time of 2-3 weeks; trigger the print run before T-60."
+      ],
+      "capabilities_used": ["email", "direct_mail", "agent_outbound_routing"],
+      "moments_that_matter": ["PLAN & COMMIT"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lions_season_holder",
+        "name": "Detroit Lions season ticket holder",
+        "description": "Current season ticket holder for the Detroit Lions for the prior season.",
+        "criteria": {
+          "all_of": [
+            {"field": "team_affiliation", "op": "equals", "value": "DET"},
+            {"field": "season_ticket.status", "op": "equals", "value": "active_prior_season"}
+          ]
+        },
+        "refresh": "dynamic",
+        "refresh_cadence": "weekly"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_already_renewed",
+        "name": "Already renewed for upcoming season",
+        "scope": "global",
+        "criteria": {"field": "season_ticket.renewed_for_upcoming_season", "op": "equals", "value": true}
+      },
+      {
+        "id": "supp_opted_out_team_comms",
+        "name": "Opted out of Lions communications",
+        "scope": "global",
+        "criteria": {"field": "consent.team_marketing.DET", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_direct_mail", "type": "direct_mail"},
+      {"id": "ch_am_call", "type": "other", "platform": "account_manager_phone"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "LTV", "name": "Lifetime Value"},
+      {"key": "PR", "name": "Product (seat package)"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Renewal window opens (T-180d before season)",
+        "entry_criteria": {
+          "trigger": "schedule",
+          "event_name": null,
+          "criteria": {"field": "season_ticket.status", "op": "equals", "value": "active_prior_season"}
+        }
+      },
+      {
+        "id": "wait_until_t60",
+        "type": "wait",
+        "label": "Wait until T-60d before season opener",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 60, "unit": "day"}
+        }
+      },
+      {
+        "id": "send_direct_mail_packet",
+        "type": "action",
+        "label": "Direct Mail - Lions Renewal Packet",
+        "channel": "ch_direct_mail",
+        "touch_id": "DM1",
+        "asset_ref": "Lions Renewal Packet",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 60, "unit": "day"}
+        },
+        "copy": {
+          "headline": "Your seat is waiting at Ford Field",
+          "body": "Renew your Detroit Lions season tickets for the upcoming season."
+        },
+        "personalization_used": ["FN", "PR"]
+      },
+      {
+        "id": "wait_until_t30",
+        "type": "wait",
+        "label": "Wait until T-30d",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 30, "unit": "day"}
+        }
+      },
+      {
+        "id": "email_t30_deadline",
+        "type": "action",
+        "label": "Email T-30 - Renewal deadline approaching",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 30, "unit": "day"}
+        },
+        "copy": {
+          "subject": "30 days left to renew your Lions season tickets",
+          "cta_label": "Renew now"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_renewed_after_t30",
+        "type": "decision",
+        "label": "Has renewed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "season_ticket.renewed_for_upcoming_season", "op": "equals", "value": true}
+      },
+      {
+        "id": "end_converted_early",
+        "type": "end",
+        "label": "Journey End - Renewed",
+        "reason": "converted"
+      },
+      {
+        "id": "dec_high_ltv",
+        "type": "decision",
+        "label": "Is high LTV (top quartile of season ticket holders)?",
+        "decision_basis": "pull",
+        "condition": {"field": "season_ticket.ltv_quartile", "op": "equals", "value": 4}
+      },
+      {
+        "id": "am_call_priority",
+        "type": "action",
+        "label": "AM Call - High-LTV priority outreach",
+        "channel": "ch_am_call",
+        "touch_id": "AM1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 25, "unit": "day"}
+        },
+        "copy": {
+          "body": "Account manager calls top-LTV holder to discuss renewal options, seat upgrades, and answer questions."
+        },
+        "personalization_used": ["FN", "LTV", "PR"]
+      },
+      {
+        "id": "wait_until_t14",
+        "type": "wait",
+        "label": "Wait until T-14d",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 14, "unit": "day"}
+        }
+      },
+      {
+        "id": "email_t14_reminder",
+        "type": "action",
+        "label": "Email T-14 - Two weeks left",
+        "channel": "ch_email",
+        "touch_id": "T14",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 14, "unit": "day"}
+        },
+        "copy": {"subject": "Two weeks left to renew", "cta_label": "Renew now"},
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_renewed_after_t14",
+        "type": "decision",
+        "label": "Has renewed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "season_ticket.renewed_for_upcoming_season", "op": "equals", "value": true}
+      },
+      {
+        "id": "wait_until_t3",
+        "type": "wait",
+        "label": "Wait until T-3d",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "day"}
+        }
+      },
+      {
+        "id": "email_t3_final",
+        "type": "action",
+        "label": "Email T-3 - Final reminder",
+        "channel": "ch_email",
+        "touch_id": "T3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "day"}
+        },
+        "copy": {"subject": "Last chance: renew before kickoff", "cta_label": "Renew now"},
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_renewed_final",
+        "type": "decision",
+        "label": "Has renewed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "season_ticket.renewed_for_upcoming_season", "op": "equals", "value": true}
+      },
+      {
+        "id": "am_call_holdout",
+        "type": "action",
+        "label": "AM Call - Holdout final outreach",
+        "channel": "ch_am_call",
+        "touch_id": "AM2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "season_opener",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "day"}
+        },
+        "copy": {
+          "body": "Account manager calls non-high-LTV holders who haven't renewed by T-3 as a final outreach."
+        }
+      },
+      {
+        "id": "end_completed",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {"from": "start", "to": "wait_until_t60"},
+      {"from": "wait_until_t60", "to": "send_direct_mail_packet"},
+      {"from": "send_direct_mail_packet", "to": "wait_until_t30"},
+      {"from": "wait_until_t30", "to": "email_t30_deadline"},
+      {"from": "email_t30_deadline", "to": "dec_renewed_after_t30"},
+      {"from": "dec_renewed_after_t30", "to": "end_converted_early", "branch_label": "yes"},
+      {"from": "dec_renewed_after_t30", "to": "dec_high_ltv", "branch_label": "no"},
+      {"from": "dec_high_ltv", "to": "am_call_priority", "branch_label": "yes"},
+      {"from": "dec_high_ltv", "to": "wait_until_t14", "branch_label": "no"},
+      {"from": "am_call_priority", "to": "wait_until_t14"},
+      {"from": "wait_until_t14", "to": "email_t14_reminder"},
+      {"from": "email_t14_reminder", "to": "dec_renewed_after_t14"},
+      {"from": "dec_renewed_after_t14", "to": "end_converted_early", "branch_label": "yes"},
+      {"from": "dec_renewed_after_t14", "to": "wait_until_t3", "branch_label": "no"},
+      {"from": "wait_until_t3", "to": "email_t3_final"},
+      {"from": "email_t3_final", "to": "dec_renewed_final"},
+      {"from": "dec_renewed_final", "to": "end_converted_early", "branch_label": "yes"},
+      {"from": "dec_renewed_final", "to": "am_call_holdout", "branch_label": "no"},
+      {"from": "am_call_holdout", "to": "end_completed"}
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {"name": "Season ticket renewal rate", "definition": "% of prior-season holders who renew for the upcoming season."}
+      ],
+      "secondary_kpis": [
+        {"name": "AM call conversion rate (high-LTV)"},
+        {"name": "Email open and click rates by touch"}
+      ],
+      "tests": []
+    }
+  }
+}

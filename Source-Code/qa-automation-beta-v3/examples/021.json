@@ -1,0 +1,257 @@
+{
+  "id": "021",
+  "matrix_row_id": 21,
+  "matrix_row_name": "Post-Sunday Recap & Standings",
+  "template": "tpl_post_game",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Monday morning Sunday game recap email.",
+    "Deploy Monday at 6am ET with fav-team Sunday game stat highlights, key plays, two-minute video recap, and updated division standings. Suppress fans whose fav-team had a bye week. Two variants: won vs lost.",
+    "Need a Monday-morning game recap email for fav-team Sunday games \u2014 won and lost variants."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-post-sunday-recap",
+    "metadata": {
+      "name": "Post-Sunday Recap & Standings",
+      "internal_name": "NFL_PostSunday_Recap_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Monday-morning recap email for fans whose fav-team played on Sunday: stat highlights, key plays, two-minute video recap, and updated standings.",
+      "archetype": "post_game",
+      "launch_date": "2026-09-07",
+      "end_date": "2027-01-12",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive Monday-morning post-game engagement with NFL+.",
+          "kpi": "Open / click rate on recap email",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Deploy 6am ET Monday. Pull stat highlights, plays, video, and standings for fav-team's Sunday game.",
+        "timing_rationale": "6am ET captures Monday-morning commute reading.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "dynamic_content"
+      ],
+      "moments_that_matter": [
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_fans_with_sunday_game",
+        "name": "Fans whose fav-team played Sunday",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            },
+            {
+              "field": "game.fav_team_played_yesterday",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_bye",
+        "name": "Fav-team had bye",
+        "scope": "global",
+        "criteria": {
+          "field": "game.fav_team_bye_last_week",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 6,
+        "unit": "day"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Monday 6am ET",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "dec_won_lost",
+        "type": "decision",
+        "label": "Fav-team won?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "game.fav_team_won_last_game",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_won",
+        "type": "action",
+        "label": "Email - Recap (won)",
+        "channel": "ch_email",
+        "touch_id": "TA-won",
+        "timing": {
+          "type": "scheduled",
+          "time_local": "06:00 ET",
+          "tz": "America/New_York",
+          "recurrence": "weekly Monday"
+        },
+        "copy": {
+          "subject": "{{FT}} win: stat highlights and key plays",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Stat highlights"
+            },
+            {
+              "rank": "secondary",
+              "name": "2-min video recap"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Division standings"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FT",
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_lost",
+        "type": "action",
+        "label": "Email - Recap (lost)",
+        "channel": "ch_email",
+        "touch_id": "TA-lost",
+        "timing": {
+          "type": "scheduled",
+          "time_local": "06:00 ET",
+          "tz": "America/New_York",
+          "recurrence": "weekly Monday"
+        },
+        "copy": {
+          "subject": "{{FT}}: stat highlights and what's next",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Stat highlights and key plays"
+            },
+            {
+              "rank": "secondary",
+              "name": "Looking ahead to next week"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Division standings"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FT",
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_won_lost"
+      },
+      {
+        "from": "dec_won_lost",
+        "to": "email_won",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_won_lost",
+        "to": "email_lost",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_won",
+        "to": "end_journey"
+      },
+      {
+        "from": "email_lost",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Recap email open / click rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Video play rate from email"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

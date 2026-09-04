@@ -1,0 +1,26 @@
+{
+  "categoryId": "ticketing-sales",
+  "categoryName": "Ticketing & Sales",
+  "categoryDescription": "Journeys focused on ticket conversion, renewals, and premium inventory monetization.",
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "slug": "season-ticket-renewal-sprint",
+  "name": "Season Ticket Renewal Sprint",
+  "brief": "Subscribers are inside the final renewal window. Use benefits-led reminders, deadline messaging, and a premium-value variant to improve renewal completion while preserving a small holdout.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-04-26",
+  "journeyOverrides": {
+    "name": "Season Ticket Renewal Sprint",
+    "objective": "Increase renewal completion before the renewal deadline with a measured multi-touch journey.",
+    "audience": "Subscription_Renewal_Window_10d",
+    "variantA": "Benefits reminder cadence",
+    "variantB": "Price lock plus premium benefit framing"
+  },
+  "nodeOverrides": {
+    "n3": { "title": ["Email 1"], "subtitle": ["Renew now", "benefits recap"] },
+    "n3b": { "title": ["Email 1B"], "subtitle": ["Premium renewal", "price lock"] },
+    "n6": { "title": ["Push 1"], "subtitle": ["Renewal window", "10 days left"] },
+    "n9": { "title": ["Email 2"], "subtitle": ["Deadline soon", "renew today"] },
+    "n11": { "title": ["Renewal", "Completed?"] }
+  }
+}

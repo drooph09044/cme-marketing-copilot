@@ -1,0 +1,110 @@
+environment:
+  mode: databricks
+  timezone: Asia/Kolkata
+  random_seed: 20260722
+
+databricks:
+  host_env: DATABRICKS_HOST
+  token_env: DATABRICKS_TOKEN
+  warehouse_id_env: DATABRICKS_WAREHOUSE_ID
+  catalog_include_patterns:
+    - "cmegtmdev"
+  schema_include_patterns:
+    - "marketing_sources"
+    - "marketing_cdp"
+  table_include_patterns:
+    - "*"
+  table_exclude_patterns:
+    - "*telecom*"
+    - "*telco*"
+    - "*tel_*"
+    - "*_tel_*"
+  catalog: cmegtmdev
+  metadata_schema: c360_ops
+  checkpoint_volume: /Volumes/cmegtmdev/c360_ops/incremental_c360/checkpoints
+  log_volume: /Volumes/cmegtmdev/c360_ops/incremental_c360/logs
+
+campaign:
+  name: c360_incremental_45_day_campaign
+  duration_days: 45
+  start_date: "2026-07-22"
+  schedule_time: "08:00"
+  include_weekends: true
+  holiday_calendar_table: null
+  backfill_enabled: true
+
+domains:
+  media:
+    enabled: true
+    daily_insert_count: 1000
+    update_percentage: 50
+    aliases: ["media", "med", "ott", "stream", "subscriber", "content", "viewer"]
+    namespace_aliases: ["media", "med", "ott"]
+  sports:
+    enabled: true
+    daily_insert_count: 1000
+    update_percentage: 50
+    aliases: ["sports", "sport", "spt", "fan", "ticket", "team", "fantasy", "merch"]
+    namespace_aliases: ["sports", "sport", "spt"]
+  automotive:
+    enabled: true
+    daily_insert_count: 1000
+    update_percentage: 50
+    aliases: ["automotive", "auto", "aut", "vehicle", "service", "dealer", "telematics"]
+    namespace_aliases: ["automotive", "auto", "aut"]
+  telecom:
+    enabled: false
+    daily_insert_count: 0
+    update_percentage: 0
+    aliases: ["telecom", "telco", "tel", "wireless"]
+    namespace_aliases: ["telecom", "telco", "tel", "wireless"]
+
+domain_detection:
+  minimum_column_alias_matches: 2
+
+dataset_categories:
+  master: ["customer", "profile", "golden", "account", "member"]
+  transaction: ["event", "activity", "transaction", "order", "purchase", "view", "service"]
+  identity: ["identity", "graph", "node", "email", "device", "signal"]
+  relationship: ["link", "relationship", "household", "xref", "bridge"]
+  metric: ["metric", "score", "kpi", "measure", "summary"]
+  reference: ["ref", "lookup", "dim", "calendar"]
+
+generation:
+  write_schema_include_patterns: ["marketing_sources"]
+  insert_target_categories: ["master", "transaction"]
+  update_target_categories: ["master", "transaction", "metric"]
+  profile_sample_fraction: 0.1
+  max_profile_rows_per_table: 100000
+  update_history_table: incremental_update_history
+  generated_batch_table: incremental_generated_batches
+  prefer_unupdated_records: true
+  max_repeat_updates_per_key: 3
+  schema_evolution: true
+  unchanged_detection: true
+
+quality_rules:
+  fail_on_duplicate_keys: true
+  fail_on_missing_keys: true
+  fail_on_referential_integrity: true
+  fail_on_schema_drift: false
+
+optimization:
+  optimize_after_merge: true
+  zorder_key_limit: 4
+  vacuum_retention_hours: 168
+  target_file_size_mb: 256
+  repartition_before_merge: true
+
+audit:
+  pipeline_name: c360_incremental_generator
+  audit_table: incremental_audit_log
+  job_control_table: incremental_job_control
+  quality_table: incremental_quality_results
+  watermark_table: incremental_watermarks
+
+scheduler:
+  local_cron: "0 8 * * *"
+  databricks_quartz_cron: "0 0 8 * * ?"
+  pause_status: UNPAUSED
+

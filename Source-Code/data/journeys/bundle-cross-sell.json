@@ -1,0 +1,172 @@
+{
+  "useCaseId": "bundle-cross-sell",
+  "name": "Bundle & Add-on Cross Sell Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Bundle Cross Sell",
+    "journeyGoal": "Increase add-on attachment rate",
+    "entryTrigger": "subscription_active_90d",
+    "journeyCategory": "Cross-sell",
+    "totalDuration": "14 days",
+    "exitClause": "Exit after add-on purchase"
+  },
+  "entryCriteria": {
+    "event": "subscription_active",
+    "eventId": "evt_sub_003",
+    "conditions": [
+      {
+        "field": "subscriptionAgeDays",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 90
+      },
+      {
+        "field": "addonPurchased",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Core_Subs_No_Addons"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Bundle Offer",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Enhance your subscription",
+      "cta": "Add Now",
+      "tracking": {
+        "campaignId": "email_bundle",
+        "deliveryId": "del_bundle_1",
+        "trackingEvents": [
+          "email_open",
+          "addon_purchase"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "In-App Cross-sell",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "IN_APP",
+      "messageTheme": "Get more with our add-on bundle",
+      "cta": "View Add-ons",
+      "tracking": {
+        "campaignId": "inapp_cross_sell",
+        "deliveryId": "del_bundle_2",
+        "trackingEvents": [
+          "inapp_view",
+          "addon_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "subscription_active",
+        "eventId": "evt_sub_003"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "addon_purchase",
+          "field": "purchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "addon_purchase",
+          "field": "purchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "addon_purchase",
+      "eventId": "evt_addon_001",
+      "condition": "purchased == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "addon_purchase"
+    ],
+    "eventMapping": {
+      "addon_purchase": "evt_addon_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "addon_purchase",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

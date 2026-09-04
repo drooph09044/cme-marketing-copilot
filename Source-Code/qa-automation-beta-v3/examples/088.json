@@ -1,0 +1,211 @@
+{
+  "id": "088",
+  "matrix_row_id": 88,
+  "matrix_row_name": "UCL Final Tune-In - May 30 Budapest",
+  "template": "tpl_event_tune_in",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the UEFA Champions League Final on May 30 in Budapest.",
+    "Create a UCL Final 2026 tune-in journey for Paramount+. Per-fav-club routing for supporters of the two competing clubs with club-specific tune-in CTAs and pre-match content. Non-subscriber acquisition push driving Paramount+ trial signups. 10% holdout for A/B test.",
+    "Need a soccer tune-in for the Champions League Final at Puskás Aréna. Two paths — subscribers see club-specific pre-match content, non-subs see Paramount+ trial offer. Hold out 10% as control."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ucl-final-2026-tune-in",
+    "metadata": {
+      "name": "UCL Final 2026 Tune-In - May 30 Budapest",
+      "internal_name": "UCL_Final_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "EPL", "team": null, "product": "Paramount+"},
+      "purpose": "Drive tune-in to the 2026 UEFA Champions League Final on May 30 at Puskás Aréna, Budapest, with per-fav-club routing for supporters of the competing clubs and non-subscriber acquisition for Paramount+.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-05-23",
+      "end_date": "2026-05-31",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the UCL Final on Paramount+ and CBS.", "kpi": "Tune-in viewership lift", "forecast": null},
+        {"rank": "secondary", "description": "Drive Paramount+ trial signups from non-subscribers.", "kpi": "Paramount+ trial signups attributable to journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "One-week cadence: T-7d announcement, T-3d preview with club-specific content for supporters of the two finalists, T-1d ways-to-watch, day-of kickoff push. Subscribers see club-specific pre-match programming; non-subscribers see Paramount+ trial CTA with a free trial covering the final. 10% control holdout to measure incremental viewership and trial conversion.",
+        "timing_rationale": "Final kicks off May 30 at 3pm ET; cadence works backward from there.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "ab_test_holdout"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_soccer_fan_us",
+        "name": "US soccer fan",
+        "description": "US-based fan with EPL or UCL engagement in the last 12 months.",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "equals", "value": "US"},
+            {"field": "soccer.epl_or_ucl_engagement_last_year", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_paramount_subscriber",
+        "name": "Current Paramount+ subscriber",
+        "criteria": {"field": "paramount_plus.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "aud_competing_club_supporter",
+        "name": "Supporter of competing club",
+        "description": "Fan whose favorite club is one of the two UCL finalists.",
+        "criteria": {"field": "favorite_club", "op": "in", "value": ["<finalist_1>", "<finalist_2>"]}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "paramount_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "UCL Final cadence opens (T-7d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_test_control",
+        "type": "decision",
+        "label": "10% control holdout",
+        "decision_basis": "test_split",
+        "condition": {"field": "_random_pct", "op": "lt", "value": 10}
+      },
+      {"id": "end_control", "type": "end", "label": "Journey End (control)", "reason": "completed"},
+      {
+        "id": "email_announce",
+        "type": "action",
+        "label": "Email T-7d - UCL Final preview",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-23"},
+        "copy": {
+          "subject": "The UCL Final is one week away: {{MTC}} at Puskás Aréna",
+          "cta_label": "See the preview"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_competing_club_supporter",
+        "type": "decision",
+        "label": "Supporter of a competing club?",
+        "decision_basis": "audience",
+        "condition": {"field": "favorite_club", "op": "in", "value": ["<finalist_1>", "<finalist_2>"]}
+      },
+      {
+        "id": "email_club_specific",
+        "type": "action",
+        "label": "Email T-3d - Club-specific preview (winner-take-all)",
+        "channel": "ch_email",
+        "touch_id": "TB1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-27"},
+        "copy": {
+          "subject": "{{FT}} are in the UCL Final - what to know",
+          "cta_label": "Read club preview"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {
+        "id": "email_neutral_preview",
+        "type": "action",
+        "label": "Email T-3d - Neutral preview",
+        "channel": "ch_email",
+        "touch_id": "TB2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-27"},
+        "copy": {
+          "subject": "UCL Final preview: storylines and predictions",
+          "cta_label": "Read preview"
+        }
+      },
+      {
+        "id": "dec_paramount_subscriber",
+        "type": "decision",
+        "label": "Paramount+ subscriber?",
+        "decision_basis": "pull",
+        "condition": {"field": "paramount_plus.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_sub_ways_to_watch",
+        "type": "action",
+        "label": "Email T-1d - Subscriber ways to watch (pre-match programming)",
+        "channel": "ch_email",
+        "touch_id": "TC1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-29"},
+        "copy": {
+          "subject": "Tomorrow's UCL Final: your pre-match programming",
+          "cta_label": "Open Paramount+"
+        }
+      },
+      {
+        "id": "email_nonsub_acquisition",
+        "type": "action",
+        "label": "Email T-1d - Non-subscriber Paramount+ trial CTA",
+        "channel": "ch_email",
+        "touch_id": "TC2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-29"},
+        "copy": {
+          "subject": "Watch the UCL Final free: Paramount+ 7-day trial",
+          "cta_label": "Start free trial",
+          "modules": [
+            {"rank": "primary", "name": "Paramount+ trial offer"},
+            {"rank": "secondary", "name": "Match details and pre-match programming"}
+          ]
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_paramount", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push Day-of - Kickoff in 30min",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-30", "time_local": "14:30 ET"},
+        "copy": {"headline": "UCL Final kicks off in 30 minutes - watch on Paramount+"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_test_control"},
+      {"from": "dec_test_control", "to": "end_control", "branch_label": "control"},
+      {"from": "dec_test_control", "to": "email_announce", "branch_label": "test"},
+      {"from": "email_announce", "to": "dec_competing_club_supporter"},
+      {"from": "dec_competing_club_supporter", "to": "email_club_specific", "branch_label": "yes"},
+      {"from": "dec_competing_club_supporter", "to": "email_neutral_preview", "branch_label": "no"},
+      {"from": "email_club_specific", "to": "dec_paramount_subscriber"},
+      {"from": "email_neutral_preview", "to": "dec_paramount_subscriber"},
+      {"from": "dec_paramount_subscriber", "to": "email_sub_ways_to_watch", "branch_label": "yes"},
+      {"from": "dec_paramount_subscriber", "to": "email_nonsub_acquisition", "branch_label": "no"},
+      {"from": "email_sub_ways_to_watch", "to": "dec_push_optin"},
+      {"from": "email_nonsub_acquisition", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_kickoff", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "UCL Final tune-in viewership lift vs control"}, {"name": "Paramount+ trial signups (non-subscribers)"}],
+      "secondary_kpis": [{"name": "Per-club preview engagement rate"}],
+      "tests": [{"name": "Overall journey lift", "hypothesis": "Routing + per-club content lifts tune-in and trial signups vs no journey.", "design": "10% control holdout receives no touches.", "control_holdout_pct": 10.0}]
+    }
+  }
+}

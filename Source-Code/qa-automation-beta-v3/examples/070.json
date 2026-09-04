@@ -1,0 +1,161 @@
+{
+  "id": "070",
+  "matrix_row_id": 70,
+  "matrix_row_name": "Leagues Cup 2026 Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Leagues Cup 2026 tune-in journey covering Aug 4 through Sep 6.",
+    "Create a Leagues Cup tune-in journey from Aug 4 to Sep 6, 2026. Cross-league routing: MLS supporters get content centered on their club's group-stage and KO matches on MLS Season Pass; Liga MX supporters get a Spanish-language variant centered on their club's matches. Cadence covers group-stage matchdays through the Sep 6 final.",
+    "Need a Leagues Cup tune-in journey with cross-league fan routing — MLS supporters get English variants, Liga MX supporters get Spanish variants, both pointed at MLS Season Pass."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-leagues-cup-2026",
+    "metadata": {
+      "name": "Leagues Cup 2026 Tune-In",
+      "internal_name": "MLS_LeaguesCup_2026",
+      "brand": {"vertical": "sports_league", "league": "MLS", "team": null, "product": "MLS Season Pass"},
+      "purpose": "Drive Leagues Cup tune-in on MLS Season Pass across MLS and Liga MX supporter audiences, with Spanish-language variants for Liga MX fans.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-07-28",
+      "end_date": "2026-09-07",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Leagues Cup match views on MLS Season Pass.", "kpi": "Leagues Cup viewership per supporter", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Cross-league composite audience: MLS supporters routed to club-specific English content focused on their club's matches; Liga MX supporters routed to Spanish-language variants focused on Liga MX clubs. Cadence covers group-stage matchdays through the Sep 6 final.",
+        "timing_rationale": "Leagues Cup runs Aug 4 - Sep 6, 2026.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content", "language_routing"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_mls_supporter",
+        "name": "MLS club supporter",
+        "criteria": {"all_of": [{"field": "favorite_league", "op": "equals", "value": "MLS"}, {"field": "favorite_team", "op": "is_not_null"}]},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_liga_mx_supporter",
+        "name": "Liga MX club supporter",
+        "criteria": {"all_of": [{"field": "favorite_league", "op": "equals", "value": "LIGA_MX"}, {"field": "favorite_team", "op": "is_not_null"}]},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Leagues Cup cadence opens (T-7d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "split_league_affinity",
+        "type": "audience_split",
+        "label": "MLS vs Liga MX supporter split",
+        "audiences": ["aud_mls_supporter", "aud_liga_mx_supporter"],
+        "mode": "parallel"
+      },
+      {
+        "id": "email_mls_tournament_intro",
+        "type": "action",
+        "label": "Email EN - Leagues Cup intro for MLS supporters",
+        "channel": "ch_email",
+        "touch_id": "TA-EN",
+        "timing": {"type": "scheduled", "calendar_date": "2026-07-28"},
+        "copy": {
+          "subject": "Leagues Cup kicks off Aug 4: {{FC}}'s group-stage path",
+          "cta_label": "View the bracket"
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_liga_mx_tournament_intro",
+        "type": "action",
+        "label": "Email ES - Leagues Cup intro for Liga MX supporters",
+        "channel": "ch_email",
+        "touch_id": "TA-ES",
+        "timing": {"type": "scheduled", "calendar_date": "2026-07-28"},
+        "copy": {
+          "subject": "Leagues Cup arranca el 4 de agosto: el camino de {{FC}}",
+          "cta_label": "Ver el cuadro"
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLS App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_matchday",
+        "type": "action",
+        "label": "Push - Per-matchday during group stage and KO rounds",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_leagues_cup_match",
+          "direction": "before",
+          "offset": {"value": 6, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FC}} plays today - watch on Season Pass"},
+        "personalization_used": ["FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_final",
+        "type": "action",
+        "label": "Email - Leagues Cup Final tune-in",
+        "channel": "ch_email",
+        "touch_id": "TF",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-06"},
+        "copy": {
+          "subject": "Leagues Cup Final tonight",
+          "cta_label": "Watch on Season Pass"
+        },
+        "personalization_used": ["FN"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_league_affinity"},
+      {"from": "split_league_affinity", "to": "email_mls_tournament_intro", "branch_label": "mls"},
+      {"from": "split_league_affinity", "to": "email_liga_mx_tournament_intro", "branch_label": "liga_mx"},
+      {"from": "email_mls_tournament_intro", "to": "dec_push_optin"},
+      {"from": "email_liga_mx_tournament_intro", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_matchday", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "email_final", "branch_label": "no"},
+      {"from": "push_matchday", "to": "email_final"},
+      {"from": "email_final", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Leagues Cup viewership per supporter"}],
+      "secondary_kpis": [{"name": "EN vs ES email open rate"}, {"name": "Matchday push view rate"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "id": "106",
+  "matrix_row_id": 106,
+  "matrix_row_name": "Madrid GP Debut Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the F1 Madrid GP debut Sep 11-13 with a Spanish-language variant.",
+    "Create a Madrid GP tune-in cadence on F1 TV: T-1w pre-race buildup email, T-1d Free Practice push, Saturday qualifying push, Sunday race-day push. Deploy a Spanish-language email variant for Spanish-speaking fans (Spain, US Hispanic, Latin America). Per-fav-driver and per-fav-team variants.",
+    "Need an F1 tune-in for the new Madrid race. Multi-day race weekend cadence. Include Spanish-language email for ES-speaking audiences."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-madrid-gp-2026-tune-in",
+    "metadata": {
+      "name": "F1 Madrid GP Debut Tune-In - Sep 11-13",
+      "internal_name": "F1_Madrid_GP_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "F1", "team": null, "product": "F1 TV"},
+      "purpose": "Drive tune-in to the inaugural Madrid GP race weekend (Sep 11-13, 2026) — a major 2026 storyline as Madrid replaces Barcelona on the calendar. Includes Spanish-language variants for fans in Spain, US Hispanic markets, and Latin America.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-09-04",
+      "end_date": "2026-09-14",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the Madrid GP race weekend on F1 TV and ESPN.", "kpi": "Madrid GP viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "One-week ramp followed by a three-day race weekend push. Spanish-language email variant deployed to Spanish-speaking fans (geo or language preference signals). Per-fav-driver and per-fav-team content variants drive relevance for fans with declared favorites.",
+        "timing_rationale": "Madrid GP race weekend Sep 11-13, 2026. Free Practice Friday, Qualifying Saturday, Race Sunday. Cadence works backward from race day.",
+        "notes": "Madrid replaces Barcelona on the 2026 calendar — first-ever F1 race at the Madrid circuit."
+      },
+      "considerations": ["Confirm Spanish-language email creative production is ready by Sep 1; legal review for Latin America deployment."],
+      "capabilities_used": ["email", "push", "multi_lang_creative"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_f1_fan",
+        "name": "Active F1 fan",
+        "criteria": {"field": "f1.activity_within_days", "op": "lte", "value": 365},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_spanish_speaker",
+        "name": "Spanish-speaking F1 fan",
+        "description": "Fan whose language preference is Spanish OR whose country is Spain, Mexico, Argentina, Chile, Colombia, Peru, or a Spanish-speaking US Hispanic geo.",
+        "criteria": {
+          "any_of": [
+            {"field": "profile.language", "op": "equals", "value": "es"},
+            {"field": "country", "op": "in", "value": ["ES", "MX", "AR", "CL", "CO", "PE", "VE", "UY"]},
+            {
+              "all_of": [
+                {"field": "country", "op": "equals", "value": "US"},
+                {"field": "profile.us_hispanic_segment", "op": "equals", "value": true}
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Driver or Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Madrid GP cadence opens (T-7d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_language",
+        "type": "decision",
+        "label": "Spanish-speaking fan?",
+        "decision_basis": "audience",
+        "condition": {
+          "any_of": [
+            {"field": "profile.language", "op": "equals", "value": "es"},
+            {"field": "country", "op": "in", "value": ["ES", "MX", "AR", "CL", "CO", "PE", "VE", "UY"]}
+          ]
+        }
+      },
+      {
+        "id": "email_en_preview",
+        "type": "action",
+        "label": "Email T-7d - English preview",
+        "channel": "ch_email",
+        "touch_id": "TA-EN",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-04"},
+        "copy": {
+          "subject": "Madrid debuts on the F1 calendar - what to know",
+          "cta_label": "See the track guide"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "email_es_preview",
+        "type": "action",
+        "label": "Email T-7d - Spanish preview",
+        "channel": "ch_email",
+        "touch_id": "TA-ES",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-04"},
+        "copy": {
+          "subject": "Bienvenido a Madrid: el GP debuta en el calendario de F1",
+          "cta_label": "Conoce el circuito"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "push_friday_fp",
+        "type": "action",
+        "label": "Push T-2d - Friday Free Practice highlights",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-11"},
+        "copy": {"headline": "Madrid GP Free Practice underway"}
+      },
+      {
+        "id": "push_saturday_quali",
+        "type": "action",
+        "label": "Push T-1d - Qualifying grid positions",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-12"},
+        "copy": {"headline": "{{FT}} starts P? at the Madrid GP"}
+      },
+      {
+        "id": "push_race_day",
+        "type": "action",
+        "label": "Push Race Day - Lights out",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-13"},
+        "copy": {"headline": "Lights out at the Madrid GP - watch live on F1 TV"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_language"},
+      {"from": "dec_language", "to": "email_es_preview", "branch_label": "yes"},
+      {"from": "dec_language", "to": "email_en_preview", "branch_label": "no"},
+      {"from": "email_en_preview", "to": "push_friday_fp"},
+      {"from": "email_es_preview", "to": "push_friday_fp"},
+      {"from": "push_friday_fp", "to": "push_saturday_quali"},
+      {"from": "push_saturday_quali", "to": "push_race_day"},
+      {"from": "push_race_day", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Madrid GP viewership"}],
+      "secondary_kpis": [{"name": "EN vs ES email engagement rate"}, {"name": "Push click-through rate by race-weekend day"}],
+      "tests": []
+    }
+  }
+}

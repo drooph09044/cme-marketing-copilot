@@ -1,0 +1,188 @@
+{
+  "id": "066",
+  "matrix_row_id": 66,
+  "matrix_row_name": "Lapsed MLS Season Pass win-back",
+  "template": "tpl_win_back",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a 30/60/90 win-back for lapsed MLS Season Pass subscribers.",
+    "Create a lapsed-subscriber win-back for MLS Season Pass. Three touches at 30/60/90 days post-lapse with email + push for opted-in fans. Storylines should rotate between playoff race, transfer-window signings, and Leagues Cup hype depending on time of year.",
+    "Need a win-back journey for MLS Season Pass churners. Standard 30/60/90 cadence with seasonal storyline hooks."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-season-pass-winback-2026",
+    "metadata": {
+      "name": "Lapsed MLS Season Pass Win-Back",
+      "internal_name": "MLS_SeasonPass_WinBack_2026",
+      "brand": {"vertical": "streaming", "league": "MLS", "team": null, "product": "MLS Season Pass (Apple TV)"},
+      "purpose": "Win back lapsed MLS Season Pass subscribers using a 30/60/90 cadence with seasonal storyline hooks (playoff race, transfer window, Leagues Cup).",
+      "archetype": "win_back",
+      "launch_date": "2026-03-01",
+      "end_date": "2026-12-31",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate lapsed Season Pass subscribers.", "kpi": "Re-subscription rate among lapsed users", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Standard 30/60/90 cadence anchored on lapse date. Storyline at each touch is timed to the MLS calendar: transfer-window signings (Feb-Apr, Jul-Aug), Leagues Cup hype (Aug 4-Sep 6), playoff race (Sep-Nov). Push reinforces Day 60 for opted-in supporters.",
+        "timing_rationale": "Anchored to subscription lapse date with fixed 30/60/90 cadence.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_season_pass",
+        "name": "Lapsed Season Pass subscriber",
+        "criteria": {
+          "all_of": [
+            {"field": "mls_season_pass.status", "op": "equals", "value": "churned"},
+            {"field": "mls_season_pass.days_since_lapse", "op": "between", "value": [30, 120]},
+            {"field": "favorite_team", "op": "is_not_null"}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_resubscribed", "name": "Already re-subscribed", "scope": "global", "criteria": {"field": "mls_season_pass.status", "op": "equals", "value": "active"}},
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 30 days post-lapse",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {"field": "mls_season_pass.days_since_lapse", "op": "equals", "value": 30}
+        }
+      },
+      {
+        "id": "email_d30_we_miss_you",
+        "type": "action",
+        "label": "Email Day 30 - We miss you (MLS seasonal hook)",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FC}} is back on the pitch - here's what you've missed",
+          "cta_label": "Come back to Season Pass",
+          "modules": [
+            {"rank": "primary", "name": "Seasonal storyline (transfer window / Leagues Cup / playoff race)"},
+            {"rank": "secondary", "name": "Fav-club upcoming match schedule"}
+          ]
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_30_days",
+        "type": "wait",
+        "label": "Wait 30 days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d30",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "mls_season_pass.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d60_storyline",
+        "type": "action",
+        "label": "Email Day 60 - Storyline depth",
+        "channel": "ch_email",
+        "touch_id": "T60",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FC}} pushing for the playoffs - come back and watch",
+          "cta_label": "Restart Season Pass"
+        },
+        "personalization_used": ["FN", "FC"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLS App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_d60",
+        "type": "action",
+        "label": "Push Day 60 - Fav-club kicks off tonight",
+        "channel": "ch_push",
+        "touch_id": "P60",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "{{FC}} kicks off tonight - watch on Season Pass"}
+      },
+      {
+        "id": "wait_30_more",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d60",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "mls_season_pass.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d90_incentive",
+        "type": "action",
+        "label": "Email Day 90 - Renewal incentive",
+        "channel": "ch_email",
+        "touch_id": "T90",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Final invite back: 25% off Season Pass through MLS Cup",
+          "cta_label": "Renew at 25% off"
+        }
+      },
+      {"id": "end_converted", "type": "end", "label": "Journey End - Reactivated", "reason": "converted"},
+      {"id": "end_completed", "type": "end", "label": "Journey End - Completed", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_d30_we_miss_you"},
+      {"from": "email_d30_we_miss_you", "to": "wait_30_days"},
+      {"from": "wait_30_days", "to": "dec_back_after_d30"},
+      {"from": "dec_back_after_d30", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d30", "to": "email_d60_storyline", "branch_label": "no"},
+      {"from": "email_d60_storyline", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_d60", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_30_more", "branch_label": "no"},
+      {"from": "push_d60", "to": "wait_30_more"},
+      {"from": "wait_30_more", "to": "dec_back_after_d60"},
+      {"from": "dec_back_after_d60", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d60", "to": "email_d90_incentive", "branch_label": "no"},
+      {"from": "email_d90_incentive", "to": "end_completed"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Re-subscription rate among lapsed Season Pass users"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rate"}, {"name": "Push view rate at Day 60"}],
+      "tests": []
+    }
+  }
+}

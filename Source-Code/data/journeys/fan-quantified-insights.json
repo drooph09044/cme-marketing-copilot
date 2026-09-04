@@ -1,0 +1,207 @@
+{
+  "useCaseId": "fan-quantified-insights",
+  "name": "Fan Quantified Insights Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Fan Insights & Quantified Engagement",
+    "journeyGoal": "Increase engagement via analytics-driven insights and predictions",
+    "entryTrigger": "analytics_engagement_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if fan engages with insights twice"
+  },
+  "entryCriteria": {
+    "event": "stats_view",
+    "eventId": "evt_stats_001",
+    "conditions": [
+      {
+        "field": "statsSessions",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 1
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Data_Engaged_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Match Insights Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your team’s winning probability insights",
+      "cta": "View Dashboard",
+      "tracking": {
+        "campaignId": "email_insight_1",
+        "deliveryId": "del_insight_1",
+        "trackingEvents": [
+          "email_open",
+          "dashboard_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Prediction Push",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "PUSH",
+      "messageTheme": "Updated predictions available now",
+      "cta": "Check Now",
+      "tracking": {
+        "campaignId": "push_insight_2",
+        "deliveryId": "del_insight_2",
+        "trackingEvents": [
+          "push_open",
+          "prediction_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Deep Stats Email",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Advanced stats breakdown for fans like you",
+      "cta": "Explore Stats",
+      "tracking": {
+        "campaignId": "email_insight_3",
+        "deliveryId": "del_insight_3",
+        "trackingEvents": [
+          "email_open",
+          "stats_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "stats_view",
+        "eventId": "evt_stats_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "insight_engagement",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "insight_engagement",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "insight_engagement",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "insight_engagement",
+      "eventId": "evt_insight_eng_001",
+      "condition": "engaged == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "insight_engagement"
+    ],
+    "eventMapping": {
+      "insight_engagement": "evt_insight_eng_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "dashboard_view",
+    "secondaryKPIs": [
+      "prediction_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

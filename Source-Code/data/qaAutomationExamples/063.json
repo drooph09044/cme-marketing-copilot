@@ -1,0 +1,126 @@
+{
+  "id": "063",
+  "matrix_row_id": 63,
+  "matrix_row_name": "Matchday Push - Local Club",
+  "template": "tpl_game_day",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a single-channel matchday push for MLS supporters tuned to fan's favorite club.",
+    "Create an MLS matchday push journey. T-2h before kickoff push to supporters of fan's favorite club with match details, broadcast info (MLS Season Pass on Apple TV), and an in-app tune-in CTA. Suppress supporters whose favorite club has a bye or is on international duty.",
+    "Need a matchday push 2h before kickoff for the fan's favorite MLS club, with broadcast info and a tune-in CTA."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-matchday-push-local-club",
+    "metadata": {
+      "name": "Matchday Push - Local Club",
+      "internal_name": "MLS_Matchday_Push_2026",
+      "brand": {"vertical": "sports_league", "league": "MLS", "team": null, "product": "MLS App"},
+      "purpose": "Drive matchday tune-in by sending supporters a push 2h before their favorite club's kickoff with broadcast info.",
+      "archetype": "game_day",
+      "launch_date": "2026-02-21",
+      "end_date": "2026-12-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive matchday tune-in among fav-club supporters.", "kpi": "Tune-in rate among notified supporters", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single-channel push fired 2h before kickoff. Personalized by fav club, opponent, broadcast info. Suppression rules cover bye weeks and international-duty fixtures.",
+        "timing_rationale": "T-2h before kickoff balances reach with relevance.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["push", "dynamic_content", "event_triggered"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_supporter_with_fav_club",
+        "name": "MLS supporter with favorite club",
+        "criteria": {"all_of": [{"field": "favorite_team", "op": "is_not_null"}, {"field": "consent.push_mls_app", "op": "equals", "value": true}]},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_bye_or_international",
+        "name": "Fav club has bye or is on international duty",
+        "scope": "global",
+        "criteria": {"any_of": [{"field": "favorite_team.next_match_within_days", "op": "gt", "value": 7}, {"field": "favorite_team.international_duty_window", "op": "equals", "value": true}]}
+      }
+    ],
+    "channels": [
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FC", "name": "Favorite Club"},
+      {"key": "OPP", "name": "Opponent"},
+      {"key": "VEN", "name": "Venue"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "day"}, "max_entries": 50},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: fav club matchday detected",
+        "entry_criteria": {"trigger": "event", "event_name": "fav_club_matchday_t2h"}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLS App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "wait_t2h",
+        "type": "wait",
+        "label": "Wait until T-2h before kickoff",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_kickoff",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        }
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push T-2h - {{FC}} kicks off vs {{OPP}}",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_kickoff",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {
+          "headline": "{{FC}} kicks off in 2 hours vs {{OPP}}",
+          "body": "Watch live on MLS Season Pass. Venue: {{VEN}}."
+        },
+        "personalization_used": ["FC", "OPP", "VEN"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "wait_t2h", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "wait_t2h", "to": "push_kickoff"},
+      {"from": "push_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Tune-in rate among notified supporters"}],
+      "secondary_kpis": [{"name": "Push open rate by club"}],
+      "tests": []
+    }
+  }
+}

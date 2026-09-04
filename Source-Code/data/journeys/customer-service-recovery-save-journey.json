@@ -1,0 +1,239 @@
+{
+  "useCaseId": "customer-service-recovery-save-journey",
+  "name": "Customer Service Recovery Save Journey",
+  "category": {
+    "categoryId": "retention-save",
+    "categoryName": "Retention & Service Recovery"
+  },
+  "journeyTable": {
+    "journeyName": "Customer Service Recovery Save Journey",
+    "journeyGoal": "Recover at-risk customers through proactive support, human outreach, and targeted retention offers",
+    "entryTrigger": "dissatisfaction_signal",
+    "journeyCategory": "Retention & Service Recovery",
+    "totalDuration": "21 days",
+    "exitClause": "Exit when issue_resolved OR subscription_cancelled"
+  },
+  "entryCriteria": {
+    "event": "dissatisfaction_signal",
+    "eventId": "evt_dissatisfaction_001",
+    "conditions": [
+      {
+        "field": "sentimentScore",
+        "operator": "LESS_THAN",
+        "value": 3
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "At_Risk_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 1",
+      "timing": {
+        "description": "1 day after dissatisfaction signal",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We want to make things right – proactive service check-in; offer to review plan or resolve issues",
+      "cta": "Talk to Us",
+      "tracking": {
+        "campaignId": "service_recovery_checkin",
+        "deliveryId": "del_email_1701",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "issueCategory",
+        "supportTicketStatus"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 7",
+      "timing": {
+        "description": "7 days after dissatisfaction signal",
+        "offsetHours": 168
+      },
+      "channel": [
+        "CALL",
+        "SMS"
+      ],
+      "messageTheme": "Rep outreach – understand reason; present tailored retention offer",
+      "cta": "Speak to a Specialist",
+      "tracking": {
+        "campaignId": "retention_reachout",
+        "deliveryId": "del_call_sms_1702",
+        "trackingEvents": [
+          "call_attempted",
+          "call_connected",
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "accountManagerName",
+        "retentionOffer",
+        "issueSummary"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 21",
+      "timing": {
+        "description": "21 days after dissatisfaction signal",
+        "offsetHours": 504
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We'd hate to see you go – best available retention offer; easy cancellation option included",
+      "cta": "Stay & Save",
+      "tracking": {
+        "campaignId": "final_save_offer",
+        "deliveryId": "del_email_1703",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "bestRetentionOffer",
+        "cancellationLink",
+        "planAlternatives"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "dissatisfactionDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "dissatisfaction_signal",
+        "eventId": "evt_dissatisfaction_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "issue_resolved",
+          "field": "issueResolved",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 144
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "issue_resolved",
+          "field": "issueResolved",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 336
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "issue_resolved",
+      "eventId": "evt_issue_resolved_001",
+      "action": "IMMEDIATE_EXIT"
+    },
+    {
+      "event": "subscription_cancelled",
+      "eventId": "evt_subscription_cancelled_002",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowDays": 21
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_cancelled",
+        "condition": "subscription_cancelled == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "issue_resolved",
+      "subscription_cancelled"
+    ],
+    "eventMapping": {
+      "dissatisfaction_signal": "evt_dissatisfaction_001",
+      "issue_resolved": "evt_issue_resolved_001",
+      "subscription_cancelled": "evt_subscription_cancelled_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "issue_resolved",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "call_connected",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 21
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

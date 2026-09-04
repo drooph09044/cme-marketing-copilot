@@ -1,0 +1,190 @@
+{
+  "id": "037",
+  "matrix_row_id": 37,
+  "matrix_row_name": "NBA inactive fan reactivation - season touchpoints",
+  "template": "tpl_calendar_reactivation",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NBA inactive-fan reactivation journey anchored to the major NBA season moments.",
+    "Create a season-long calendar reactivation journey for inactive NBA fans. Backbone touches at Tipoff (Oct 21), Emirates NBA Cup, Christmas Day, MLK Day, All-Star Weekend, Trade Deadline, Play-In, Playoffs, and Finals. Each fan also gets one personalized touch on their fav team's marquee nationally televised game.",
+    "Need to reactivate inactive NBA fans. Use the season's anchor moments (Tipoff through Finals) as the backbone plus one personalized fav-team national-TV touch."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-inactive-reactivation-2025-2026",
+    "metadata": {
+      "name": "NBA Inactive Fan Reactivation - 2025-26 Season",
+      "internal_name": "NBA_Reactivation_2025_2026",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA"},
+      "purpose": "Re-engage inactive NBA fans across the 2025-26 season using a calendar-anchored cadence at major season moments plus one personalized fav-team national-TV touch.",
+      "archetype": "reactivation",
+      "launch_date": "2025-10-21",
+      "end_date": "2026-06-19",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive NBA fans across the season.", "kpi": "Fans returning to NBA app or NBA.com with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans email touches at canonical NBA season anchors (Tipoff, Emirates NBA Cup, Christmas, MLK Day, All-Star, Trade Deadline, Play-In, Playoffs, Finals). Layer in one personalized touch on fan's fav team's marquee nationally televised game.",
+        "timing_rationale": "Calendar-anchored to canonical NBA 2025-26 schedule moments.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_nba_fan",
+        "name": "Inactive NBA fan",
+        "description": "Fan with no NBA app or NBA.com engagement in the last 365 days.",
+        "criteria": {"field": "nba.last_active_within_days", "op": "gt", "value": 365},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Season opens (Oct 21)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_tipoff",
+        "type": "action",
+        "label": "Email - Tipoff Night (Oct 21)",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2025-10-21"},
+        "copy": {"subject": "NBA is back: 2025-26 tips off tonight"}
+      },
+      {
+        "id": "email_cup",
+        "type": "action",
+        "label": "Email - Emirates NBA Cup",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "recurrence": "november cup group stage"},
+        "copy": {"subject": "Emirates NBA Cup heats up"}
+      },
+      {
+        "id": "email_christmas",
+        "type": "action",
+        "label": "Email - Christmas Day slate (Dec 25)",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {"type": "scheduled", "calendar_date": "2025-12-25"},
+        "copy": {"subject": "Five games on Christmas Day"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_personalized_natl_tv",
+        "type": "action",
+        "label": "Email - Personalized fav-team national TV touch",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {"type": "relative_to_event", "event": "fav_team_marquee_natl_tv_game", "direction": "before", "offset": {"value": 3, "unit": "day"}},
+        "copy": {
+          "subject": "{{FT}} on national TV: {{MTC}}",
+          "preview": "Don't miss your team's marquee game"
+        },
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_mlk_day",
+        "type": "action",
+        "label": "Email - MLK Day slate (Jan 19)",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-19"},
+        "copy": {"subject": "MLK Day basketball - honoring the legacy on the court"}
+      },
+      {
+        "id": "email_allstar",
+        "type": "action",
+        "label": "Email - All-Star Weekend (Feb 13-15)",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-13"},
+        "copy": {"subject": "All-Star Weekend kicks off in LA"}
+      },
+      {
+        "id": "email_trade_deadline",
+        "type": "action",
+        "label": "Email - Trade Deadline",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {"type": "scheduled", "recurrence": "first thursday of february"},
+        "copy": {"subject": "Trade Deadline day: who moved, who didn't"}
+      },
+      {
+        "id": "email_play_in",
+        "type": "action",
+        "label": "Email - Play-In Tournament",
+        "channel": "ch_email",
+        "touch_id": "WK8",
+        "timing": {"type": "scheduled", "recurrence": "mid april play-in"},
+        "copy": {"subject": "Play-In Tournament begins: the road to the playoffs"}
+      },
+      {
+        "id": "email_playoffs",
+        "type": "action",
+        "label": "Email - Playoffs begin (Apr 18)",
+        "channel": "ch_email",
+        "touch_id": "WK9",
+        "timing": {"type": "scheduled", "calendar_date": "2026-04-18"},
+        "copy": {"subject": "The NBA Playoffs are here"}
+      },
+      {
+        "id": "email_finals",
+        "type": "action",
+        "label": "Email - NBA Finals begin",
+        "channel": "ch_email",
+        "touch_id": "WK10",
+        "timing": {"type": "scheduled", "recurrence": "early june finals"},
+        "copy": {"subject": "The NBA Finals tip off"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_tipoff"},
+      {"from": "email_tipoff", "to": "email_cup"},
+      {"from": "email_cup", "to": "email_christmas"},
+      {"from": "email_christmas", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "email_personalized_natl_tv", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_mlk_day", "branch_label": "no"},
+      {"from": "email_personalized_natl_tv", "to": "email_mlk_day"},
+      {"from": "email_mlk_day", "to": "email_allstar"},
+      {"from": "email_allstar", "to": "email_trade_deadline"},
+      {"from": "email_trade_deadline", "to": "email_play_in"},
+      {"from": "email_play_in", "to": "email_playoffs"},
+      {"from": "email_playoffs", "to": "email_finals"},
+      {"from": "email_finals", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate", "definition": "Fans inactive at start of journey who engaged with at least one touchpoint"}],
+      "secondary_kpis": [{"name": "Per-touch open / click rate"}, {"name": "Personalized natl-TV touch incremental lift"}],
+      "tests": []
+    }
+  }
+}

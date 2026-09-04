@@ -1,0 +1,174 @@
+{
+  "id": "050",
+  "matrix_row_id": 50,
+  "matrix_row_name": "WBC 2026 Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the 2026 World Baseball Classic on Fox and FS1.",
+    "Create a WBC 2026 tune-in journey running Mar 5-17. Per-fav-country and per-fav-team routing across the bracket. Composite audience: active MLB fans plus international audience signals (country, language). Multi-channel: pre-tournament email, group-stage push, knockout-round push, and final-day tune-in email.",
+    "Need a WBC tune-in cadence for a once-every-three-years event. Route fans to broadcast based on their declared country or fav-team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "wbc-2026-tune-in",
+    "metadata": {
+      "name": "WBC 2026 Tune-In",
+      "internal_name": "WBC_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "Fox / FS1 / Fox Sports app"},
+      "purpose": "Drive tune-in to the 2026 World Baseball Classic (Mar 5-17 on Fox and FS1) with per-fav-country and per-fav-team routing across group stage and knockouts.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-02-26",
+      "end_date": "2026-03-18",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to WBC games across the tournament window.", "kpi": "WBC viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Composite audience: active MLB fan AND (declared fav country OR fav-team). Pre-tournament email Mar 4, per-game push during group stage for fans whose country plays, knockout-round push for survivors, and a final-day tune-in email Mar 17.",
+        "timing_rationale": "WBC Mar 5-17, 2026 on Fox and FS1; cadence runs the full tournament.",
+        "notes": "Once-every-three-years event."
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_wbc_composite",
+        "name": "Active MLB / international fan (composite)",
+        "description": "Active MLB fan plus international affinity signal (country, language, or fav-country).",
+        "criteria": {
+          "all_of": [
+            {"field": "mlb.activity_within_days", "op": "lte", "value": 365},
+            {
+              "any_of": [
+                {"field": "profile.wbc_fav_country", "op": "is_not_null"},
+                {"field": "favorite_team", "op": "is_not_null"},
+                {"field": "country", "op": "in", "value": ["US", "JP", "DO", "PR", "VE", "MX", "CU", "KR", "TW", "PA", "CO"]}
+              ]
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "FC", "name": "Favorite Country"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Pre-WBC cadence opens", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_pretournament",
+        "type": "action",
+        "label": "Email - WBC pre-tournament preview",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-04"},
+        "copy": {
+          "subject": "The 2026 World Baseball Classic kicks off tomorrow",
+          "preview": "Your country's path through the bracket",
+          "cta_label": "See the bracket",
+          "modules": [
+            {"rank": "primary", "name": "Bracket overview"},
+            {"rank": "secondary", "name": "Per-country broadcast info"}
+          ]
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_has_fav_country",
+        "type": "decision",
+        "label": "Has fav country?",
+        "decision_basis": "pull",
+        "condition": {"field": "profile.wbc_fav_country", "op": "is_not_null"}
+      },
+      {
+        "id": "dec_push_optin_group",
+        "type": "decision",
+        "label": "Push opted in (MLB App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_group_stage",
+        "type": "action",
+        "label": "Push - Group-stage games for fan's country",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_country_wbc_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FC}} plays in 2h - WBC group stage on Fox / FS1"},
+        "personalization_used": ["FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_knockout",
+        "type": "action",
+        "label": "Push - Knockout-round games",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_country_wbc_knockout_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {"headline": "Win or go home: {{FC}} in the WBC knockouts"},
+        "personalization_used": ["FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_final_day",
+        "type": "action",
+        "label": "Email - Final-day tune-in (Mar 17)",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-17"},
+        "copy": {
+          "subject": "WBC Final tonight - watch on Fox",
+          "cta_label": "Tune in"
+        },
+        "personalization_used": ["FN"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_pretournament"},
+      {"from": "email_pretournament", "to": "dec_has_fav_country"},
+      {"from": "dec_has_fav_country", "to": "dec_push_optin_group", "branch_label": "yes"},
+      {"from": "dec_has_fav_country", "to": "email_final_day", "branch_label": "no"},
+      {"from": "dec_push_optin_group", "to": "push_group_stage", "branch_label": "yes"},
+      {"from": "dec_push_optin_group", "to": "email_final_day", "branch_label": "no"},
+      {"from": "push_group_stage", "to": "push_knockout"},
+      {"from": "push_knockout", "to": "email_final_day"},
+      {"from": "email_final_day", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "WBC viewership"}],
+      "secondary_kpis": [{"name": "Per-country push CTR"}, {"name": "Final-day email open rate"}],
+      "tests": []
+    }
+  }
+}

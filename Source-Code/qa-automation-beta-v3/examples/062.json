@@ -1,0 +1,148 @@
+{
+  "id": "062",
+  "matrix_row_id": 62,
+  "matrix_row_name": "MLS Opening Weekend Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for MLS Opening Weekend Feb 21, 2026.",
+    "Create an MLS Opening Weekend tune-in journey on MLS Season Pass. Per-fav-club matchday-morning push for opted-in supporters with broadcast info and team news, all-fans pre-weekend email summarizing the slate of opening matches, plus a linear tune-in CTA into Season Pass on Apple TV.",
+    "Need a multi-channel Opening Weekend journey for MLS. Pre-weekend slate email plus per-club matchday push routed by fav club."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-opening-weekend-2026",
+    "metadata": {
+      "name": "MLS Opening Weekend 2026 Tune-In",
+      "internal_name": "MLS_OpeningWeekend_2026",
+      "brand": {"vertical": "sports_league", "league": "MLS", "team": null, "product": "MLS Season Pass"},
+      "purpose": "Drive tune-in to MLS Opening Weekend Feb 21, 2026 with a slate email and per-club matchday push cadence.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-02-14",
+      "end_date": "2026-02-23",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Opening Weekend tune-in on MLS Season Pass.", "kpi": "Opening Weekend match views per supporter", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-weekend all-fans slate email summarizing every opening match with kickoff times and broadcast info. Layer per-fav-club matchday push for opted-in supporters delivering kickoff alerts. Closing email summary on Sun night.",
+        "timing_rationale": "Opening Weekend kicks off Feb 21. Cadence begins one week prior with the slate email.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_mls_fan",
+        "name": "Active MLS fan",
+        "criteria": {"field": "mls.activity_within_days", "op": "lte", "value": 365},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"},
+      {"key": "OPP", "name": "Opponent"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Opening Weekend cadence opens (T-7d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_slate",
+        "type": "action",
+        "label": "Email T-7d - Opening Weekend slate",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-14"},
+        "copy": {
+          "subject": "MLS is back: Opening Weekend kicks off Feb 21",
+          "cta_label": "View the slate"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_has_fav_club",
+        "type": "decision",
+        "label": "Has favorite MLS club?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_fav_club_preview",
+        "type": "action",
+        "label": "Email T-2d - {{FC}} opener preview",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-19"},
+        "copy": {
+          "subject": "{{FC}} kicks off the 2026 season vs {{OPP}}",
+          "preview": "Roster moves, broadcast info, and what to watch"
+        },
+        "personalization_used": ["FN", "FC", "OPP"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLS App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_matchday_morning",
+        "type": "action",
+        "label": "Push Matchday Morning - {{FC}} kickoff",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_opening_match",
+          "direction": "before",
+          "offset": {"value": 6, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FC}} kicks off today vs {{OPP}} - watch on Season Pass"}
+      },
+      {
+        "id": "email_weekend_wrap",
+        "type": "action",
+        "label": "Email - Opening Weekend wrap",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-23"},
+        "copy": {"subject": "Opening Weekend in the books - results and highlights"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_slate"},
+      {"from": "email_slate", "to": "dec_has_fav_club"},
+      {"from": "dec_has_fav_club", "to": "email_fav_club_preview", "branch_label": "yes"},
+      {"from": "dec_has_fav_club", "to": "email_weekend_wrap", "branch_label": "no"},
+      {"from": "email_fav_club_preview", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_matchday_morning", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "email_weekend_wrap", "branch_label": "no"},
+      {"from": "push_matchday_morning", "to": "email_weekend_wrap"},
+      {"from": "email_weekend_wrap", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Opening Weekend match views per supporter"}],
+      "secondary_kpis": [{"name": "Slate email click rate"}, {"name": "Per-club preview open rate"}, {"name": "Matchday push view rate"}],
+      "tests": []
+    }
+  }
+}

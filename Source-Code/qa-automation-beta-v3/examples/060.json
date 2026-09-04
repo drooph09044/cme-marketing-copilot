@@ -1,0 +1,155 @@
+{
+  "id": "060",
+  "matrix_row_id": 60,
+  "matrix_row_name": "Stadium Series Bruins-Lightning Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "matchup",
+  "teams_referenced": "BOS,TBL",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the 2026 Stadium Series, Bruins at Lightning at Raymond James Stadium, Tampa.",
+    "Create a dual-channel tune-in for Stadium Series Feb 1, 2026: Bruins vs Lightning at Raymond James Stadium. Per-fav-team variants for Bruins and Lightning supporters with team-specific imagery, outdoor-game novelty hook with weather forecast, and a national tune-in CTA for ESPN+.",
+    "Need a Stadium Series tune-in journey for Bruins-Lightning in Tampa. Use per-team variants and lead with the outdoor stadium novelty."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-stadium-series-bos-tbl-2026",
+    "metadata": {
+      "name": "Stadium Series 2026 Tune-In (Bruins-Lightning)",
+      "internal_name": "NHL_StadiumSeries_BOS_TBL_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "ESPN+"},
+      "purpose": "Drive tune-in to the Feb 1 Stadium Series Bruins-Lightning game at Raymond James Stadium, Tampa, with team-affinity routing and outdoor-game framing.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-01-15",
+      "end_date": "2026-02-02",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Stadium Series tune-in on ESPN+ and linear broadcast.", "kpi": "Stadium Series tune-in rate among Bruins/Lightning fans and broader NHL audience", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Two-week cadence with team-affinity routing. Bruins and Lightning supporters get team-specific variants with player imagery and storylines; all other NHL fans get a neutral tune-in variant emphasizing the outdoor-game novelty. Pre-game email leads with stadium imagery and a Tampa weather forecast.",
+        "timing_rationale": "Stadium Series puck drops Feb 1 at 8pm ET. Cadence opens 17 days prior with a pre-game email and lands a day-of push.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nhl_fan",
+        "name": "Active NHL fan",
+        "criteria": {"field": "nhl.activity_within_days", "op": "lte", "value": 180},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_bruins_fan",
+        "name": "Boston Bruins fan",
+        "criteria": {"field": "favorite_team", "op": "equals", "value": "BOS"}
+      },
+      {
+        "id": "aud_lightning_fan",
+        "name": "Tampa Bay Lightning fan",
+        "criteria": {"field": "favorite_team", "op": "equals", "value": "TBL"}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nhl_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Stadium Series cadence opens (T-17d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_pregame",
+        "type": "action",
+        "label": "Email T-14d - Outdoor game preview with weather",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-18"},
+        "copy": {
+          "subject": "Outdoor hockey under the Tampa sky: Bruins vs Lightning, Feb 1",
+          "preview": "First Stadium Series in the state of Florida"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_team_affinity",
+        "type": "decision",
+        "label": "Fav team Bruins or Lightning?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "in", "value": ["BOS", "TBL"]}
+      },
+      {
+        "id": "email_team_variant",
+        "type": "action",
+        "label": "Email T-3d - Team-specific preview (BOS or TBL variant)",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-29"},
+        "copy": {
+          "subject": "{{FT}} takes the outdoor ice at Raymond James",
+          "cta_label": "Set a reminder"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_national",
+        "type": "action",
+        "label": "Email T-3d - National tune-in (non-fans of either team)",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-29"},
+        "copy": {
+          "subject": "Stadium Series Sunday: Bruins vs Lightning, outdoors in Tampa",
+          "cta_label": "Watch on ESPN+"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NHL App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_dayof",
+        "type": "action",
+        "label": "Push Day-of - Puck drops in 1h",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-01", "time_local": "19:00 ET"},
+        "copy": {"headline": "Outdoor hockey under the lights - puck drops in 1h"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_pregame"},
+      {"from": "email_pregame", "to": "dec_team_affinity"},
+      {"from": "dec_team_affinity", "to": "email_team_variant", "branch_label": "yes"},
+      {"from": "dec_team_affinity", "to": "email_national", "branch_label": "no"},
+      {"from": "email_team_variant", "to": "dec_push_optin"},
+      {"from": "email_national", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_dayof", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_dayof", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Stadium Series tune-in rate (Bruins/Lightning fans)"}, {"name": "National tune-in rate among broader NHL audience"}],
+      "secondary_kpis": [{"name": "Team-variant click rate"}, {"name": "Day-of push view rate"}],
+      "tests": []
+    }
+  }
+}

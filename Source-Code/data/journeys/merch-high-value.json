@@ -1,0 +1,127 @@
+{
+  "useCaseId": "merch-high-value",
+  "name": "High Value Merchandise Purchase Journey",
+  "category": {
+    "categoryId": "merchandising",
+    "categoryName": "Shop - Merchandise"
+  },
+  "journeyTable": {
+    "journeyName": "High Value Merchandise Buyers",
+    "journeyGoal": "Increase cross-sell and repeat high-value merch purchases",
+    "entryTrigger": "high_merch_segment",
+    "journeyCategory": "Revenue",
+    "totalDuration": "14 days",
+    "exitClause": "Exit after repeat purchase or upgrade segment"
+  },
+  "entryCriteria": {
+    "event": "merch_purchase_event",
+    "eventId": "evt_merch_001",
+    "conditions": [
+      {
+        "field": "averageOrderValue",
+        "operator": "GREATER_THAN",
+        "value": 300
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Value_Merch_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "VIP Merchandise Drop",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Exclusive merch collection just for you",
+      "cta": "Shop Now",
+      "tracking": {
+        "campaignId": "email_merch_vip",
+        "deliveryId": "del_email_mh1",
+        "trackingEvents": [
+          "email_open",
+          "product_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "merch_purchase_event",
+        "eventId": "evt_merch_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "repeatMerchPurchase",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_purchase",
+      "eventId": "evt_product_001",
+      "condition": "repeatMerchPurchase == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_purchase"
+    ],
+    "eventMapping": {
+      "product_purchase": "evt_product_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_purchase",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

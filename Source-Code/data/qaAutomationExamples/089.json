@@ -1,0 +1,129 @@
+{
+  "id": "089",
+  "matrix_row_id": 89,
+  "matrix_row_name": "Matchday Morning Push - Big Six",
+  "template": "tpl_game_day",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a matchday-morning push for supporters of EPL Big Six clubs on matchdays.",
+    "Create a matchday-morning push journey for supporters of Big Six clubs (Arsenal, Chelsea, Liverpool, Manchester City, Manchester United, Tottenham) on matchdays involving their club. Single push channel. Cadence: morning-of with kickoff info, broadcast channel (Peacock for US fans), and key-player storylines. Suppresses fans without a Big Six club as favorite.",
+    "Need a matchday push when fan's Big Six club is playing — morning of, with kickoff time and where to watch."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "epl-big-six-matchday-push-2026",
+    "metadata": {
+      "name": "EPL Big Six Matchday Morning Push",
+      "internal_name": "EPL_BigSix_Matchday_2026",
+      "brand": {"vertical": "sports_league", "league": "EPL", "team": null, "product": "Peacock"},
+      "purpose": "Drive matchday tune-in for supporters of the Big Six clubs in the US Peacock market.",
+      "archetype": "game_day",
+      "launch_date": "2026-08-15",
+      "end_date": "2027-05-24",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive matchday tune-in on Peacock for Big Six supporters.", "kpi": "Matchday viewership lift", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single matchday-morning push per fixture in which fan's favorite club is playing. Suppress non-Big-Six supporters. Suppress matches where fav-club has a bye or is on international duty.",
+        "timing_rationale": "Morning-of timing maximizes viewership intent for the day's match.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["push"],
+      "moments_that_matter": ["GET PUMPED"]
+    },
+    "audiences": [
+      {
+        "id": "aud_big_six_supporter",
+        "name": "Big Six supporter (US, push opted in)",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "equals", "value": "US"},
+            {"field": "favorite_club", "op": "in", "value": ["ARS", "CHE", "LIV", "MCI", "MUN", "TOT"]},
+            {"field": "consent.push_peacock", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_fav_not_playing",
+        "name": "Fav club not playing today",
+        "scope": "global",
+        "criteria": {"field": "favorite_club.has_match_today", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [{"id": "ch_push", "type": "push", "platform": "peacock_app"}],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Club"},
+      {"key": "MTC", "name": "Opponent"},
+      {"key": "KO", "name": "Kickoff Time"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 6, "unit": "hour"}, "max_entries": 38},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Matchday trigger", "entry_criteria": {"trigger": "event", "event_name": "favorite_club_matchday"}},
+      {
+        "id": "dec_is_big_six",
+        "type": "decision",
+        "label": "Favorite club is Big Six?",
+        "decision_basis": "audience",
+        "condition": {"field": "favorite_club", "op": "in", "value": ["ARS", "CHE", "LIV", "MCI", "MUN", "TOT"]}
+      },
+      {
+        "id": "supp_check_optout",
+        "type": "suppression",
+        "label": "Suppression - non-Big-Six fans drop out",
+        "suppression_ref": "supp_fav_not_playing"
+      },
+      {
+        "id": "wait_morning",
+        "type": "wait",
+        "label": "Wait until 9am local matchday",
+        "timing": {
+          "type": "wait_until",
+          "until": {"field": "local_time", "op": "gte", "value": "09:00"},
+          "check_every": {"value": 30, "unit": "minute"},
+          "max_wait": {"value": 12, "unit": "hour"}
+        }
+      },
+      {
+        "id": "push_matchday_morning",
+        "type": "action",
+        "label": "Push matchday morning - kickoff details",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "favorite_club_kickoff",
+          "direction": "before",
+          "offset": {"value": 6, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} vs {{MTC}} today at {{KO}} - watch on Peacock"},
+        "personalization_used": ["FT", "MTC", "KO"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_is_big_six"},
+      {"from": "dec_is_big_six", "to": "wait_morning", "branch_label": "yes"},
+      {"from": "dec_is_big_six", "to": "supp_check_optout", "branch_label": "no"},
+      {"from": "supp_check_optout", "to": "end_journey"},
+      {"from": "wait_morning", "to": "push_matchday_morning"},
+      {"from": "push_matchday_morning", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Matchday viewership lift on Peacock"}],
+      "secondary_kpis": [{"name": "Push open rate"}, {"name": "Per-club matchday CTR"}],
+      "tests": []
+    }
+  }
+}

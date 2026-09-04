@@ -1,0 +1,360 @@
+{
+  "id": "010",
+  "matrix_row_id": 10,
+  "matrix_row_name": "Super Bowl LX Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Super Bowl LX tune-in journey with NFL+ subscriber and non-subscriber paths.",
+    "Drive tune-in to Super Bowl LX on Feb 8, 2026. Route NFL+ subscribers to NFL+ pre-game programming with retention messaging; route non-subscribers to the broadcaster with an NFL+ acquisition CTA embedded in the pre-game email. T-2w announcement, T-1w preview, T-1d push, kickoff push. Include 10% A/B holdout.",
+    "Need an SB LX tune-in cadence with composite subscriber + non-subscriber audience. Subscribers get retention path; non-subs get acquisition. Hold out 10% for measurement."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-super-bowl-lx-tune-in",
+    "metadata": {
+      "name": "Super Bowl LX Tune-In",
+      "internal_name": "NFL_SBLX_TuneIn_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "Various Broadcasters"
+      },
+      "purpose": "Drive tune-in to Super Bowl LX (Feb 8, 2026), routing NFL+ subscribers to NFL+ pre-game programming and non-subscribers to the official broadcaster with an NFL+ acquisition CTA.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-01-26",
+      "end_date": "2026-02-09",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive SB LX tune-in.",
+          "kpi": "Viewership lift attributable to journey",
+          "forecast": null
+        },
+        {
+          "rank": "secondary",
+          "description": "Drive NFL+ acquisitions from non-subscribers.",
+          "kpi": "NFL+ signups from non-subscriber arm",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Composite audience combining NFL+ subscribers and non-subscriber active fans. Cadence: T-2w announcement, T-1w preview, T-1d hype, gameday push. 10% control holdout.",
+        "timing_rationale": "Super Bowl LX kicks off Feb 8, 2026 at 6:30pm ET.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push",
+        "ab_test_holdout"
+      ],
+      "moments_that_matter": [
+        "GET PUMPED",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_subscribers",
+        "name": "NFL+ subscribers",
+        "criteria": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_nonsubscriber_active",
+        "name": "Non-subscriber active NFL fan",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "nfl_plus.status",
+              "op": "not_equals",
+              "value": "active"
+            },
+            {
+              "any_of": [
+                {
+                  "field": "activity.last_active_within_days",
+                  "op": "lte",
+                  "value": 180
+                },
+                {
+                  "field": "favorite_team",
+                  "op": "is_not_null"
+                }
+              ]
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "SB LX cadence opens (T-2w)",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "dec_test_control",
+        "type": "decision",
+        "label": "10% control holdout",
+        "decision_basis": "test_split",
+        "condition": {
+          "field": "_random_pct",
+          "op": "lt",
+          "value": 10
+        }
+      },
+      {
+        "id": "end_control",
+        "type": "end",
+        "label": "Journey End (control)",
+        "reason": "completed"
+      },
+      {
+        "id": "email_announce",
+        "type": "action",
+        "label": "Email T-2w - SB LX announcement",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-01-26"
+        },
+        "copy": {
+          "subject": "Super Bowl LX is set - here's how to watch"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "dec_subscriber",
+        "type": "decision",
+        "label": "NFL+ subscriber?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "email_sub_preview",
+        "type": "action",
+        "label": "Email T-1w - Subscriber preview (NFL+ pre-game)",
+        "channel": "ch_email",
+        "touch_id": "TB-sub",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-02-01"
+        },
+        "copy": {
+          "subject": "Your NFL+ pre-game programming for Super Bowl LX",
+          "cta_label": "Watch on NFL+"
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ]
+      },
+      {
+        "id": "email_nonsub_preview",
+        "type": "action",
+        "label": "Email T-1w - Non-subscriber preview (broadcast + NFL+ acquisition CTA)",
+        "channel": "ch_email",
+        "touch_id": "TB-nonsub",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-02-01"
+        },
+        "copy": {
+          "subject": "Super Bowl LX preview - watch with NFL+",
+          "cta_label": "Try NFL+ free"
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_t1d",
+        "type": "action",
+        "label": "Push T-1d - Hype",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-02-07",
+          "time_local": "10:00 ET"
+        },
+        "copy": {
+          "headline": "Super Bowl LX kicks off tomorrow"
+        }
+      },
+      {
+        "id": "push_gameday",
+        "type": "action",
+        "label": "Push Game Day - Kickoff in 30min",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-02-08",
+          "time_local": "18:00 ET"
+        },
+        "copy": {
+          "headline": "Kickoff in 30 minutes"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_test_control"
+      },
+      {
+        "from": "dec_test_control",
+        "to": "end_control",
+        "branch_label": "control"
+      },
+      {
+        "from": "dec_test_control",
+        "to": "email_announce",
+        "branch_label": "test"
+      },
+      {
+        "from": "email_announce",
+        "to": "dec_subscriber"
+      },
+      {
+        "from": "dec_subscriber",
+        "to": "email_sub_preview",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_subscriber",
+        "to": "email_nonsub_preview",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_sub_preview",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "email_nonsub_preview",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_t1d",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t1d",
+        "to": "push_gameday"
+      },
+      {
+        "from": "push_gameday",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "SB LX tune-in lift vs control"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "NFL+ signups from non-subscriber arm"
+        },
+        {
+          "name": "Push view rate game-day"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Overall journey lift",
+          "control_holdout_pct": 10.0,
+          "hypothesis": "Multi-touch cadence with sub/non-sub routing lifts viewership and NFL+ signups vs no-touch baseline.",
+          "design": "10% control holdout receives no journey touches."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,280 @@
+{
+  "id": "011",
+  "matrix_row_id": 11,
+  "matrix_row_name": "Thanksgiving Tripleheader Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Thanksgiving Day NFL tripleheader tune-in journey.",
+    "Three games on Thanksgiving Day Nov 26 2026: morning, afternoon, and primetime slots. All-fans morning email at 9am ET with the full slate and broadcast info (CBS, FOX, NBC). Per-game push 30 minutes before kickoff to fans who favorite either competing team.",
+    "Need an all-fans morning email + per-game push cadence for the Thanksgiving NFL slate. Route push to fans of competing teams only."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-thanksgiving-tripleheader-2026",
+    "metadata": {
+      "name": "Thanksgiving Tripleheader Tune-In",
+      "internal_name": "NFL_Thx_Tripleheader_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Drive tune-in to the three Thanksgiving Day NFL games (Nov 26, 2026): morning, afternoon, and primetime slots.",
+      "archetype": "game_day",
+      "launch_date": "2026-11-25",
+      "end_date": "2026-11-27",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive viewership across all three Thanksgiving games.",
+          "kpi": "Tune-in rate per game",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Morning email Thanksgiving Day to all opted-in fans with the full slate (CBS, FOX, NBC). Per-game push 30 minutes before kickoff to fans who favorite either competing team.",
+        "timing_rationale": "Thanksgiving Day, Nov 26 2026. Morning email at 9am ET; per-game push 30min before kickoff.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "GET PUMPED",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_nfl_fan",
+        "name": "Active NFL fan",
+        "criteria": {
+          "field": "activity.last_active_within_days",
+          "op": "lte",
+          "value": 180
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_game_team_fan",
+        "name": "Fan of a Thanksgiving competing team",
+        "description": "Fan whose favorite team is one of the six teams playing on Thanksgiving.",
+        "criteria": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "DET",
+            "GB",
+            "DAL",
+            "NYG",
+            "BAL",
+            "CIN"
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Thanksgiving Day morning",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "email_morning",
+        "type": "action",
+        "label": "Email - Full Thanksgiving slate",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-11-26",
+          "time_local": "09:00 ET"
+        },
+        "copy": {
+          "subject": "Happy Thanksgiving - three NFL games today",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Morning matchup (CBS)"
+            },
+            {
+              "rank": "secondary",
+              "name": "Afternoon matchup (FOX)"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Primetime matchup (NBC)"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "dec_team_fan",
+        "type": "decision",
+        "label": "Fav-team in today's slate?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "favorite_team",
+          "op": "in",
+          "value": [
+            "DET",
+            "GB",
+            "DAL",
+            "NYG",
+            "BAL",
+            "CIN"
+          ]
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push - Kickoff in 30min (fav-team game)",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff_fav_team_game",
+          "direction": "before",
+          "offset": {
+            "value": 30,
+            "unit": "minute"
+          }
+        },
+        "copy": {
+          "headline": "{{MTC}} - kickoff in 30 minutes"
+        },
+        "personalization_used": [
+          "FT",
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_morning"
+      },
+      {
+        "from": "email_morning",
+        "to": "dec_team_fan"
+      },
+      {
+        "from": "dec_team_fan",
+        "to": "dec_push_optin",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_team_fan",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_kickoff",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_kickoff",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Per-game tune-in rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Email open / click rate"
+        },
+        {
+          "name": "Push view rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

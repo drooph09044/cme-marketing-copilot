@@ -1,0 +1,226 @@
+{
+  "categoryId": "fan-engagement",
+  "categoryName": "Fan Engagement",
+  "categoryDescription": "Journeys that reactivate app activity, content consumption, and post-event engagement.",
+  "subCategoryId": "engagements",
+  "subCategoryName": "Engagements",
+  "slug": "post-game-reengagement",
+  "name": "Post-game Re-engagement",
+  "brief": "Event attendees have not reopened the app or purchased merchandise in the last 30 days. Use email and push to re-engage them with recap content, recommendations, and return prompts.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-02",
+  "journeyOverrides": {
+    "name": "Post-game Re-engagement - 30 Day",
+    "objective": "Re-engage recent attendees with recap content and return prompts after an event.",
+    "audience": "Recent_Attendees_No_App_30d",
+    "variantA": "Standard re-engagement cadence",
+    "variantB": "Personalized merchandise follow-up"
+  },
+  "nodeOverrides": {
+    "n3": {
+      "title": [
+        "Email 1"
+      ],
+      "subtitle": [
+        "Event recap",
+        "return CTA"
+      ]
+    },
+    "n3b": {
+      "title": [
+        "Email 1B"
+      ],
+      "subtitle": [
+        "Personalized recap",
+        "product CTA"
+      ]
+    },
+    "n6": {
+      "title": [
+        "Push 1"
+      ],
+      "subtitle": [
+        "Return now",
+        "featured content"
+      ]
+    },
+    "n8": {
+      "title": [
+        "Wait 3d"
+      ],
+      "subtitle": [
+        "content watch",
+        "session monitor"
+      ]
+    },
+    "n9": {
+      "title": [
+        "Email 2"
+      ],
+      "subtitle": [
+        "Follow-up offer",
+        "member perk"
+      ]
+    },
+    "n11": {
+      "title": [
+        "Goal",
+        "Achieved?"
+      ]
+    }
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Email 1",
+      "timing": {
+        "description": "+24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Event recap — return CTA",
+      "cta": "Email 1",
+      "tracking": {
+        "campaignId": "email_email1",
+        "deliveryId": "del_email_2",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Push 1",
+      "timing": {
+        "description": "+72h from entry",
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "Return now — featured content",
+      "cta": "Push 1",
+      "tracking": {
+        "campaignId": "push_push1",
+        "deliveryId": "del_push_3",
+        "trackingEvents": [
+          "push_sent",
+          "push_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Email 2",
+      "timing": {
+        "description": "+168h from entry",
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Follow-up offer — member perk",
+      "cta": "Email 2",
+      "tracking": {
+        "campaignId": "email_email2",
+        "deliveryId": "del_email_4",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "post_game_re_engagement_qualified",
+    "eventId": "evt_post_game_re_engagement_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Recent_Attendees_No_App_30d"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Recent_Attendees_No_App_30d"
+  },
+  "exitConditions": [
+    {
+      "event": "journey_goal_achieved",
+      "eventId": "evt_journey_goal_achieved_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "post_game_re_engagement_qualified",
+        "eventId": "evt_post_game_re_engagement_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "journey_goal_achieved",
+          "field": "journeyGoalAchieved",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "journey_goal_achieved",
+          "field": "journeyGoalAchieved",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "post-game-reengagement"
+}

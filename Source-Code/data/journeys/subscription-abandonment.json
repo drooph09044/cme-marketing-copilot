@@ -1,0 +1,172 @@
+{
+  "useCaseId": "subscription-abandonment",
+  "name": "Subscription Sign-up Abandonment Journey",
+  "category": {
+    "categoryId": "conversion",
+    "categoryName": "Conversion"
+  },
+  "journeyTable": {
+    "journeyName": "Subscription Abandonment",
+    "journeyGoal": "Recover users who abandoned subscription signup",
+    "entryTrigger": "signup_abandonment",
+    "journeyCategory": "Conversion",
+    "totalDuration": "48 hours",
+    "exitClause": "Exit after subscription completion"
+  },
+  "entryCriteria": {
+    "event": "signup_started",
+    "eventId": "evt_signup_001",
+    "conditions": [
+      {
+        "field": "checkoutCompleted",
+        "operator": "EQUALS",
+        "value": false
+      },
+      {
+        "field": "authStatus",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "visitorId",
+      "namespace": "COOKIE"
+    },
+    "audienceName": "Signup_Abandoners"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Reminder Email",
+      "timing": {
+        "offsetHours": 6
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Finish your subscription in seconds",
+      "cta": "Complete Signup",
+      "tracking": {
+        "campaignId": "email_signup_recover",
+        "deliveryId": "del_signup_1",
+        "trackingEvents": [
+          "email_open",
+          "signup_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "SMS Reminder",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "SMS",
+      "messageTheme": "Your signup is waiting – complete now",
+      "cta": "Resume Signup",
+      "tracking": {
+        "campaignId": "sms_signup_recover",
+        "deliveryId": "del_signup_2",
+        "trackingEvents": [
+          "sms_click",
+          "signup_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "signup_started",
+        "eventId": "evt_signup_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "signup_complete",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 6
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "signup_complete",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 18
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "signup_complete",
+      "eventId": "evt_signup_002",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "signup_complete"
+    ],
+    "eventMapping": {
+      "signup_complete": "evt_signup_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "signup_complete",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "single_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

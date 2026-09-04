@@ -1,0 +1,26 @@
+{
+  "categoryId": "loyalty-commerce",
+  "categoryName": "Loyalty & Commerce",
+  "categoryDescription": "Journeys that blend loyalty nudges, win-back motions, and merchandise conversion.",
+  "subCategoryId": "loyalty-commerce",
+  "subCategoryName": "Loyalty & Commerce",
+  "slug": "merch-drop-countdown",
+  "name": "Merch Drop Countdown",
+  "brief": "Recent merchandise buyers have not pre-registered for the next product drop. Use email and push with early-access messaging, product personalization, and a holdout to measure pre-order lift.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-21",
+  "journeyOverrides": {
+    "name": "Merch Drop Countdown",
+    "objective": "Increase pre-registration and pre-orders for the upcoming product drop.",
+    "audience": "Recent_Merch_Buyers_90d",
+    "variantA": "Standard countdown cadence",
+    "variantB": "Personalized product plus early access"
+  },
+  "nodeOverrides": {
+    "n3": { "title": ["Email 1"], "subtitle": ["Drop is coming", "preview CTA"] },
+    "n3b": { "title": ["Email 1B"], "subtitle": ["Your style ready", "early access"] },
+    "n6": { "title": ["Push 1"], "subtitle": ["Product drop", "reserve now"] },
+    "n9": { "title": ["Email 2"], "subtitle": ["Last preview", "pre-order today"] },
+    "n11": { "title": ["Pre-order", "Started?"] }
+  }
+}

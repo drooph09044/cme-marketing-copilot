@@ -1,0 +1,654 @@
+{
+  "domain": "automotive",
+  "anchor": "customers",
+  "key": "customer_id",
+  "bridge": null,
+  "tables": {
+    "customers": {
+      "role": "profile",
+      "description": "Customer profile. One row per customer. customer_id is master key. Use for age, income_band, lifecycle_stage, churn_risk_score, ev_propensity_score, estimated_clv, generation, preferred_language, primary_state_province.",
+      "row_count": 5804,
+      "columns": {
+        "gender": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Female",
+            "Male",
+            "Non-binary",
+            "Prefer not to say",
+            "Unknown"
+          ]
+        },
+        "age": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            25.0,
+            76.0
+          ]
+        },
+        "generation": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Gen X",
+            "Boomer",
+            "Millennial",
+            "Gen Z"
+          ]
+        },
+        "lifecycle_stage": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Prospect",
+            "Loyalist",
+            "Owner"
+          ]
+        },
+        "customer_since": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "preferred_language": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "English",
+            "Spanish"
+          ]
+        },
+        "primary_country": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "CA",
+            "US"
+          ]
+        },
+        "primary_state_province": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "CA",
+            "IL",
+            "AZ",
+            "TX",
+            "MI",
+            "NY",
+            "CO",
+            "GA",
+            "OH",
+            "MN",
+            "MO",
+            "MA",
+            "ON",
+            "BC",
+            "WA",
+            "FL",
+            "PA",
+            "TN",
+            "NV",
+            "NC"
+          ]
+        },
+        "primary_city": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Chicago",
+            "Phoenix",
+            "Detroit",
+            "Los Angeles",
+            "Buffalo",
+            "Denver",
+            "Atlanta",
+            "Cleveland",
+            "Minneapolis",
+            "Kansas City",
+            "Boston",
+            "Toronto",
+            "Vancouver",
+            "Seattle",
+            "Dallas",
+            "Tampa",
+            "Pittsburgh",
+            "Nashville",
+            "Las Vegas",
+            "Charlotte",
+            "Austin",
+            "San Jose"
+          ]
+        },
+        "income_band": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "$100K-$150K",
+            "$75K-$100K",
+            "Under $50K",
+            "$150K+",
+            "$50K-$75K",
+            "$150K-$200K"
+          ]
+        },
+        "estimated_clv": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            5606.65,
+            63299.14
+          ]
+        },
+        "churn_risk_score": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            0.06,
+            0.94
+          ]
+        },
+        "ev_propensity_score": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            0.08,
+            0.98
+          ]
+        }
+      }
+    },
+    "households": {
+      "role": "profile",
+      "description": "Household level data. One row per household. Use vehicles_in_household to find households with multiple vehicles. Does NOT have customer_id \u2014 joined via customers.household_id.",
+      "row_count": 3750,
+      "columns": {
+        "home_country": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "CA",
+            "US"
+          ]
+        },
+        "home_state_province": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "CA",
+            "NY",
+            "IL",
+            "CO",
+            "GA",
+            "OH",
+            "MN",
+            "MO",
+            "MA",
+            "ON",
+            "BC",
+            "TX",
+            "FL",
+            "AZ",
+            "WA",
+            "NV",
+            "MI",
+            "PA",
+            "TN",
+            "NC"
+          ]
+        },
+        "home_city": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Los Angeles",
+            "Buffalo",
+            "Chicago",
+            "Denver",
+            "Atlanta",
+            "Cleveland",
+            "Minneapolis",
+            "Kansas City",
+            "Boston",
+            "Toronto",
+            "Vancouver",
+            "Dallas",
+            "Tampa",
+            "Phoenix",
+            "Seattle",
+            "Las Vegas",
+            "Detroit",
+            "Pittsburgh",
+            "Nashville",
+            "Charlotte"
+          ]
+        },
+        "income_band": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Under $50K",
+            "$75K-$100K",
+            "$150K+",
+            "$50K-$75K",
+            "$100K-$150K"
+          ]
+        },
+        "household_size": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            1.0,
+            5.0
+          ]
+        },
+        "vehicles_in_household": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            1.0,
+            3.0
+          ]
+        }
+      }
+    },
+    "connected_services_subscriptions": {
+      "role": "behavioral",
+      "description": "Connected service subscriptions per customer. One row per subscription. plan_name values: Connected Vehicle, Remote Access, Safety and Security, Premium. subscription_status values: Active, Cancelled, Expired, Trial. To find customers NOT on a plan use EXCLUDE operator. Example: customers not on Premium = plan_name EXCLUDE Premium.",
+      "row_count": 6000,
+      "columns": {
+        "plan_name": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Connected Vehicle",
+            "Remote Access",
+            "Safety & Security",
+            "Premium"
+          ]
+        },
+        "subscription_status": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Active",
+            "Trial",
+            "Expired",
+            "Cancelled"
+          ]
+        }
+      }
+    },
+    "service_orders": {
+      "role": "transactional",
+      "description": "Service visit records. One row per service visit. closed_date = when service was completed. Use closed_date with NOT_IN_LAST N days for customers not serviced in last N days. Also has odometer reading at time of service.",
+      "row_count": 28303,
+      "columns": {
+        "opened_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "closed_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "odometer": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            8389.3,
+            111564.7
+          ]
+        },
+        "ro_status": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Closed"
+          ]
+        },
+        "total_labor_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            114.19,
+            920.0
+          ]
+        },
+        "total_parts_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            72.66,
+            1552.73
+          ]
+        },
+        "total_tax_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            25.73,
+            159.14
+          ]
+        },
+        "total_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            383.1,
+            2369.47
+          ]
+        }
+      }
+    },
+    "service_line_items": {
+      "role": "transactional",
+      "description": "Individual line items per service order. One row per line item. service_category values: Battery, Tires, Maintenance, Repair, Recall, Warranty, Collision. Use EQ on service_category for broad service categories. For replacement intent such as battery replacement or tire replacement, use description CONTAINS the replacement keyword because service_category can include diagnostics or inspections. Joined via service_order_id to service_orders. Use service_orders.closed_date for time filters. To find customers who never had a service use EXCLUDE operator on service_category.",
+      "row_count": 125803,
+      "columns": {
+        "service_category": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Maintenance",
+            "Repair",
+            "Recall",
+            "Warranty",
+            "Tires",
+            "Collision",
+            "Battery"
+          ]
+        },
+        "description": {
+          "type": "text",
+          "operators": [
+            "CONTAINS"
+          ],
+          "note": "Free text. Always use CONTAINS and extract the exact keyword phrase from the user query."
+        },
+        "labor_hours": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            0.4,
+            4.5
+          ]
+        },
+        "labor_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            57.07,
+            670.49
+          ]
+        },
+        "parts_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            53.69,
+            1139.82
+          ]
+        },
+        "warranty_covered_flag": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "False",
+            "True"
+          ]
+        }
+      }
+    },
+    "telematics_monthly_summary": {
+      "role": "behavioral",
+      "description": "Monthly telematics data per customer and vehicle. odometer_end = cumulative odometer at end of month. MAX odometer_end = total lifetime miles on vehicle. Use odometer_end GT value for mileage threshold filters. Also has miles_driven per month, trip_count, safety_score.",
+      "row_count": 177412,
+      "columns": {
+        "month_start": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "odometer_end": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            8745.0,
+            51923.0
+          ]
+        },
+        "miles_driven": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            674.0,
+            1741.0
+          ]
+        },
+        "trip_count": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            24.0,
+            110.0
+          ]
+        },
+        "avg_trip_miles": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            7.9,
+            51.4
+          ]
+        },
+        "safety_score": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            63.5,
+            92.7
+          ]
+        }
+      }
+    }
+  }
+}

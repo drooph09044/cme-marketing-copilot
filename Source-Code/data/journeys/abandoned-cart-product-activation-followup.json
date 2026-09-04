@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-cart-product-activation-followup",
+  "name": "Abandoned Cart: Product – Activation Follow-up Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Cart: Product – Activation Follow-up",
+    "journeyGoal": "Follow up with users who added products to cart but did not complete purchase",
+    "entryTrigger": "user_added_cart_product",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after product purchased or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_cart_product",
+    "eventId": "evt_cart_product_002",
+    "conditions": [
+      {
+        "field": "cartStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Product Cart Users – Follow-up Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Product Activation Follow-up Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Complete your product purchase now – items in your cart are waiting!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "email_cart_product_activation_followup",
+        "deliveryId": "del_email_48",
+        "trackingEvents": [
+          "email_open",
+          "product_purchase"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Product Activation Follow-up Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your product cart is waiting – complete your purchase now!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "push_cart_product_activation_followup",
+        "deliveryId": "del_push_48",
+        "trackingEvents": [
+          "push_open",
+          "product_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_cart_product",
+        "eventId": "evt_cart_product_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "productPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "productPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_purchase",
+      "eventId": "evt_product_006",
+      "condition": "productPurchased == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_purchase"
+    ],
+    "eventMapping": {
+      "product_purchase": "evt_product_006"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_purchase",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

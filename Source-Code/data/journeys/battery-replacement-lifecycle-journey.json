@@ -1,0 +1,189 @@
+{
+  "categoryId": "maintenance-essentials",
+  "categoryName": "Maintenance Essentials",
+  "categoryDescription": "Journeys designed around preventive maintenance milestones.",
+  "subCategoryId": "battery-care",
+  "subCategoryName": "Battery Care",
+  "slug": "battery-replacement-lifecycle-journey",
+  "name": "Battery Replacement Lifecycle Journey",
+  "active": true,
+  "brief": "Find customers who have not replaced battery in 5 years and orchestrate proactive replacement reminders before failure risk increases.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-15",
+  "journeyOverrides": {
+    "name": "Battery Replacement Lifecycle",
+    "objective": "Boost preventive battery checks and replacement appointments for aging vehicles.",
+    "audience": "Battery_5Y_No_Replacement",
+    "variantA": "Preventive maintenance education cadence",
+    "variantB": "Education plus appointment incentive"
+  },
+  "nodeOverrides": {
+    "n11": {
+      "title": [
+        "Battery Service",
+        "Booked?"
+      ],
+      "subtitle": [
+        "appointment",
+        "or follow-up"
+      ]
+    },
+    "n12": {
+      "title": [
+        "Exit",
+        "Booked"
+      ],
+      "subtitle": [
+        "service",
+        "scheduled"
+      ]
+    },
+    "n13": {
+      "title": [
+        "Exit",
+        "No Response"
+      ],
+      "subtitle": [
+        "nurture",
+        "expired"
+      ]
+    }
+  },
+  "detailOverrides": {
+    "n11": {
+      "title": "Battery Service Booked?",
+      "rows": [
+        {
+          "key": "condition",
+          "value": "battery replacement appointment booked or service lead submitted"
+        },
+        {
+          "key": "yesPath",
+          "value": "Exit Booked"
+        },
+        {
+          "key": "noPath",
+          "value": "Exit No Response"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "batteryServiceIntent, appointmentBooked, pathRouted"
+        }
+      ],
+      "note": "Automotive conversion checks for a battery service booking, not a ticket purchase."
+    },
+    "n12": {
+      "title": "Exit Booked",
+      "rows": [
+        {
+          "key": "trigger",
+          "value": "battery appointment confirmed"
+        },
+        {
+          "key": "suppression",
+          "value": "stop remaining replacement reminders"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "batteryAppointmentBooked, journeyConversion"
+        },
+        {
+          "key": "downstream",
+          "value": "eligible for service follow-up journey"
+        }
+      ]
+    },
+    "n13": {
+      "title": "Exit No Response",
+      "rows": [
+        {
+          "key": "trigger",
+          "value": "replacement reminder window expired"
+        },
+        {
+          "key": "status",
+          "value": "no appointment captured"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "batteryJourneyExpired, noResponse"
+        },
+        {
+          "key": "downstream",
+          "value": "return to maintenance nurture pool"
+        }
+      ]
+    }
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Find customers who have not replaced battery in 5 years and orchestrate proactive replacement reminders before failure risk increases.",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "battery_replacement_lifecycle_journey_qualified",
+    "eventId": "evt_battery_replacement_lifecycle_journey_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Battery_5Y_No_Replacement"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Battery_5Y_No_Replacement"
+  },
+  "exitConditions": [
+    {
+      "event": "app_session_started",
+      "eventId": "evt_app_session_started_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "battery_replacement_lifecycle_journey_qualified",
+        "eventId": "evt_battery_replacement_lifecycle_journey_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "battery-replacement-lifecycle-journey"
+}

@@ -1,0 +1,42 @@
+# Python virtual env
+venv/
+**/venv/
+
+# Node runtime
+.tools/
+
+# Node modules
+node_modules/
+
+# Next.js
+.next/
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# The committed frontend bundle is required by the Databricks App runtime.
+!Source-Code/dist/
+!Source-Code/dist/**
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Zip files
+*.zip
+
+# Logs
+*.log
+
+# Ignore only large generated/output data
+
+Source-Code/legacy_idres/consent_data/
+Source-Code/legacy_idres/preprocessed_data/
+Source-Code/legacy_idres/golden_records_output/
+Source-Code/legacy_idres/generated_data/
+Source-Code/legacy_idres/gm_cdp_csv/
+Source-Code/legacy_idres/clustering_output/
+Source-Code/legacy_idres/evaluation_output/
+Source-Code/legacy_idres/standardization_reports/

@@ -1,0 +1,279 @@
+{
+  "id": "025",
+  "matrix_row_id": 25,
+  "matrix_row_name": "Free Agency Frenzy Reengage",
+  "template": "tpl_off_season_reengage",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Free Agency reengagement journey for the 2026 league year open.",
+    "Run a news-driven cadence Mar 9 (legal tampering) through Mar 19. Daily roundup emails of fav-team activity, real-time push for any major signing or trade involving the fav-team, and a wrap-up email Mar 19 summarizing the week's offseason moves.",
+    "Need a Free Agency reengage flow tied to fav-team activity \u2014 daily roundup email plus real-time signing push."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-free-agency-frenzy-2026",
+    "metadata": {
+      "name": "Free Agency Frenzy Reengage",
+      "internal_name": "NFL_FA_Frenzy_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL App"
+      },
+      "purpose": "News-driven re-engagement during the 2026 NFL league-year open (Mar 11) with daily roundup emails plus real-time push on major fav-team signings/trades.",
+      "archetype": "reactivation",
+      "launch_date": "2026-03-09",
+      "end_date": "2026-03-19",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive offseason engagement during Free Agency.",
+          "kpi": "FA-period app return rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Mar 9 (legal tampering) through Mar 18 daily roundup email of fav-team activity. Real-time push for any major signing or trade involving fav-team. Wrap-up email Mar 19 summarizing the week's moves.",
+        "timing_rationale": "League Year opens Mar 11.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_fav_team_fan",
+        "name": "Fan with fav-team set",
+        "criteria": {
+          "field": "favorite_team",
+          "op": "is_not_null"
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Legal tampering opens Mar 9",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "email_open",
+        "type": "action",
+        "label": "Email Mar 9 - Tampering opens",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-03-09"
+        },
+        "copy": {
+          "subject": "{{FT}} Free Agency tracker is live"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_open",
+        "type": "wait",
+        "label": "Wait to league-year open",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_open_day",
+        "type": "action",
+        "label": "Email Mar 11 - League year open",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-03-11"
+        },
+        "copy": {
+          "subject": "Free Agency is officially open - {{FT}} latest"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_major_signing",
+        "type": "action",
+        "label": "Push - Major fav-team signing/trade (event triggered)",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "{{FT}} just made a move - read more"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_wrap",
+        "type": "wait",
+        "label": "Wait to wrap-up",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 8,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_wrap",
+        "type": "action",
+        "label": "Email Mar 19 - Week wrap-up",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-03-19"
+        },
+        "copy": {
+          "subject": "{{FT}} Free Agency wrap-up: every move and depth chart shift"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_open"
+      },
+      {
+        "from": "email_open",
+        "to": "wait_to_open"
+      },
+      {
+        "from": "wait_to_open",
+        "to": "email_open_day"
+      },
+      {
+        "from": "email_open_day",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_major_signing",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_to_wrap",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_major_signing",
+        "to": "wait_to_wrap"
+      },
+      {
+        "from": "wait_to_wrap",
+        "to": "email_wrap"
+      },
+      {
+        "from": "email_wrap",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "FA-period app return rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Push view rate on major moves"
+        },
+        {
+          "name": "Wrap-up email engagement"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

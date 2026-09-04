@@ -1,0 +1,370 @@
+{
+  "id": "027",
+  "matrix_row_id": 27,
+  "matrix_row_name": "Super Bowl LX Ticket Purchase Onboarding",
+  "template": "tpl_post_purchase",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a SB LX post-purchase onboarding for On-Location ticket buyers.",
+    "Order confirmation email immediately after purchase, game-week prep email at T-7d with travel and stadium logistics, day-of arrival push, post-game survey email Day +1, then NFL Draft 2026 ticket cross-sell email Day +14 for high-LTV purchasers.",
+    "Need a post-purchase onboarding for SB LX ticket buyers \u2014 confirmation, prep, day-of push, survey, and Draft cross-sell for high-LTV."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-sblx-ticket-onboarding",
+    "metadata": {
+      "name": "Super Bowl LX Ticket Purchase Onboarding",
+      "internal_name": "NFL_SBLX_TicketOnboarding_2026",
+      "brand": {
+        "vertical": "ticketing",
+        "league": "NFL",
+        "team": null,
+        "product": "On-Location"
+      },
+      "purpose": "Onboard SB LX ticket purchasers (via On-Location) with confirmation, prep, day-of, survey, and Draft 2026 cross-sell.",
+      "archetype": "transactional",
+      "launch_date": "2025-09-01",
+      "end_date": "2026-02-23",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Onboard SB LX ticket purchasers smoothly.",
+          "kpi": "Day-of arrival rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Sequence: order confirmation email immediately, game-week prep email T-7d with travel and stadium logistics, day-of arrival push, post-game survey email Day +1, Draft 2026 ticket cross-sell email Day +14 for high-LTV purchasers.",
+        "timing_rationale": "Super Bowl LX Feb 8, 2026.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "PLAN & COMMIT",
+        "GET READY",
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_sb_ticket_purchasers",
+        "name": "SB LX ticket purchasers (On-Location)",
+        "criteria": {
+          "field": "ticket.sblx_purchased",
+          "op": "equals",
+          "value": true
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "PR",
+        "name": "Product (package)"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Ticket purchased",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "sblx_ticket_purchased"
+        }
+      },
+      {
+        "id": "email_confirm",
+        "type": "action",
+        "label": "Email - Order confirmation",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Your Super Bowl LX tickets are confirmed",
+          "cta_label": "View order"
+        },
+        "personalization_used": [
+          "FN",
+          "PR"
+        ]
+      },
+      {
+        "id": "wait_to_t7d",
+        "type": "wait",
+        "label": "Wait to T-7d before SB LX",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "sblx_game_day",
+          "direction": "before",
+          "offset": {
+            "value": 7,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_prep",
+        "type": "action",
+        "label": "Email T-7d - Game week prep",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Game week: travel and stadium logistics for SB LX",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Travel and hotel info"
+            },
+            {
+              "rank": "secondary",
+              "name": "Stadium entry / parking"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Event schedule of activations"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_to_gameday",
+        "type": "wait",
+        "label": "Wait to game day",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "sblx_game_day",
+          "direction": "before",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          },
+          "time_local": "08:00 PT"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_gameday",
+        "type": "action",
+        "label": "Push - Day-of arrival",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Game day - gates open in 4h"
+        }
+      },
+      {
+        "id": "wait_d1",
+        "type": "wait",
+        "label": "Wait 1 day after game",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_survey",
+        "type": "action",
+        "label": "Email Day +1 - Post-game survey",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Tell us about your Super Bowl LX experience",
+          "cta_label": "Take survey"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_d14",
+        "type": "wait",
+        "label": "Wait to Day +14",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 13,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_high_ltv",
+        "type": "decision",
+        "label": "High LTV?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "ticket.ltv_quartile",
+          "op": "equals",
+          "value": 4
+        }
+      },
+      {
+        "id": "email_draft_cross",
+        "type": "action",
+        "label": "Email Day +14 - Draft 2026 cross-sell",
+        "channel": "ch_email",
+        "touch_id": "TD",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Next up: 2026 NFL Draft experiences in Pittsburgh",
+          "cta_label": "See Draft packages"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_confirm"
+      },
+      {
+        "from": "email_confirm",
+        "to": "wait_to_t7d"
+      },
+      {
+        "from": "wait_to_t7d",
+        "to": "email_prep"
+      },
+      {
+        "from": "email_prep",
+        "to": "wait_to_gameday"
+      },
+      {
+        "from": "wait_to_gameday",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_gameday",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_d1",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_gameday",
+        "to": "wait_d1"
+      },
+      {
+        "from": "wait_d1",
+        "to": "email_survey"
+      },
+      {
+        "from": "email_survey",
+        "to": "wait_d14"
+      },
+      {
+        "from": "wait_d14",
+        "to": "dec_high_ltv"
+      },
+      {
+        "from": "dec_high_ltv",
+        "to": "email_draft_cross",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_high_ltv",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_draft_cross",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Day-of arrival rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Survey completion rate"
+        },
+        {
+          "name": "Draft 2026 cross-sell CTR"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "categoryId": "service-retention",
+  "categoryName": "Service Retention & Reactivation",
+  "categoryDescription": "Journeys focused on bringing inactive service customers back into scheduled maintenance.",
+  "subCategoryId": "maintenance-winback",
+  "subCategoryName": "Maintenance Win-Back",
+  "slug": "vehicle-service-lapse-recovery-journey",
+  "name": "Vehicle Service Lapse Recovery Journey",
+  "active": true,
+  "brief": "Find customers who have not serviced their vehicle in 9 months and run a reminder plus incentive journey to bring them back to workshop appointments.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-06-30",
+  "journeyOverrides": {
+    "name": "Vehicle Service Lapse Recovery",
+    "objective": "Recover service engagement from customers inactive for nine months by driving appointment bookings.",
+    "audience": "No_Service_9M_Customers",
+    "variantA": "Standard service reminder cadence",
+    "variantB": "Reminder plus loyalty incentive"
+  }
+}

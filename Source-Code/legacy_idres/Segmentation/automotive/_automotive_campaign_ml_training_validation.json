@@ -1,0 +1,10 @@
+{
+  "row_count": 800,
+  "tire_rows": 400,
+  "battery_rows": 400,
+  "eligible_rows": 400,
+  "conversion_rows": 67,
+  "tire_rule_mismatches": [],
+  "battery_rule_mismatches": [],
+  "checks_passed": true
+}

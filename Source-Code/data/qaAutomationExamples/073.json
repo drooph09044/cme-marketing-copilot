@@ -1,0 +1,156 @@
+{
+  "id": "073",
+  "matrix_row_id": 73,
+  "matrix_row_name": "CFP National Championship Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the CFP National Championship on Jan 19, 2026.",
+    "Create a multi-channel CFP National Championship tune-in journey. Per-fav-school routing — fans of the two competing teams get personalized variants with team-specific imagery and storylines; all other college football fans get a neutral tune-in CTA. 10% holdout for A/B test on broadcast-CTA placement (broadcast on ESPN).",
+    "Need a tune-in for the CFP National Championship at Hard Rock Stadium. Composite audience: per-fav-school variants for the two playing teams, neutral copy for everyone else, with an A/B holdout."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cfp-natl-championship-2026",
+    "metadata": {
+      "name": "CFP National Championship 2026 Tune-In",
+      "internal_name": "NCAA_CFP_NatlChamp_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": "ESPN"},
+      "purpose": "Drive tune-in to the CFP National Championship Jan 19, 2026 at Hard Rock Stadium, Miami Gardens, with per-fav-school variants and an A/B holdout test on broadcast-CTA placement.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-01-05",
+      "end_date": "2026-01-20",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive National Championship tune-in on ESPN.", "kpi": "Tune-in lift vs control", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Two-week cadence with team-affinity routing. Composite audience: fans of the two competing schools get school-specific imagery, traditions, and player storylines; all other college football fans get a neutral national tune-in CTA. 10% holdout receives no journey touches and serves as the lift baseline.",
+        "timing_rationale": "Kickoff Jan 19. Cadence opens with the championship-set announcement at the end of the semifinals (early Jan).",
+        "notes": "Competing-school identities resolve after the semifinals; team-specific creative is dynamic at send time."
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "ab_test_holdout", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {"id": "aud_cfb_fan", "name": "Active college football fan", "criteria": {"all_of": [{"field": "ncaa.cfb_content_engagement_last_year", "op": "equals", "value": true}, {"field": "country", "op": "equals", "value": "US"}]}, "refresh": "dynamic"},
+      {"id": "aud_competing_school_fan", "name": "Fan of either competing school", "criteria": {"field": "favorite_team.is_competing_in_natl_championship", "op": "equals", "value": true}, "refresh": "dynamic"}
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "espn_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Championship set (post-semifinals)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_test_control",
+        "type": "decision",
+        "label": "10% control holdout",
+        "decision_basis": "test_split",
+        "condition": {"field": "_random_pct", "op": "lt", "value": 10}
+      },
+      {"id": "end_control", "type": "end", "label": "Journey End (control)", "reason": "completed"},
+      {
+        "id": "email_announce",
+        "type": "action",
+        "label": "Email T-12d - Championship set announcement",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-07"},
+        "copy": {
+          "subject": "The 2026 CFP National Championship is set",
+          "cta_label": "View the matchup"
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_competing_school_fan",
+        "type": "decision",
+        "label": "Fan of either competing school?",
+        "decision_basis": "audience",
+        "condition": {"field": "favorite_team.is_competing_in_natl_championship", "op": "equals", "value": true}
+      },
+      {
+        "id": "email_school_variant",
+        "type": "action",
+        "label": "Email T-3d - Fav-school championship preview",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-16"},
+        "copy": {
+          "subject": "{{FT}} plays for the title Monday night",
+          "cta_label": "Set a reminder"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_neutral",
+        "type": "action",
+        "label": "Email T-3d - Neutral tune-in",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-16"},
+        "copy": {
+          "subject": "Watch the CFP National Championship Monday on ESPN",
+          "cta_label": "Set a reminder"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (ESPN App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_espn_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push Day-of - Kickoff in 1h",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-19", "time_local": "19:00 ET"},
+        "copy": {"headline": "CFP National Championship kicks off in 1h on ESPN"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_test_control"},
+      {"from": "dec_test_control", "to": "end_control", "branch_label": "control"},
+      {"from": "dec_test_control", "to": "email_announce", "branch_label": "test"},
+      {"from": "email_announce", "to": "dec_competing_school_fan"},
+      {"from": "dec_competing_school_fan", "to": "email_school_variant", "branch_label": "yes"},
+      {"from": "dec_competing_school_fan", "to": "email_neutral", "branch_label": "no"},
+      {"from": "email_school_variant", "to": "dec_push_optin"},
+      {"from": "email_neutral", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_kickoff", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "CFP National Championship tune-in lift vs control"}],
+      "secondary_kpis": [{"name": "Per-school variant click rate"}, {"name": "Kickoff push view rate"}],
+      "tests": [{
+        "name": "Broadcast-CTA placement holdout",
+        "hypothesis": "Multi-touch personalized cadence lifts tune-in vs no-touch baseline.",
+        "design": "10% control holdout receives no journey touches.",
+        "control_holdout_pct": 10.0
+      }]
+    }
+  }
+}

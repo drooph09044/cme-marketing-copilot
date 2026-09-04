@@ -1,0 +1,166 @@
+{
+  "id": "093",
+  "matrix_row_id": 93,
+  "matrix_row_name": "EPL inactive fan reactivation - season touchpoints",
+  "template": "tpl_calendar_reactivation",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an EPL inactive-fan reactivation journey anchored to season moments.",
+    "Create a season-long calendar reactivation journey for inactive EPL fans. Backbone touches at Community Shield, Opening Weekend, Boxing Day, January transfer window, FA Cup Final, Title Run-In, and Final Matchday. Each supporter gets one personalized touch on their favorite club's derby fixture.",
+    "Need to re-engage EPL fans who've gone inactive. Use the season's anchor moments as the backbone, plus an extra personalized derby touch tied to fan's favorite club."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "epl-inactive-reactivation-2026",
+    "metadata": {
+      "name": "EPL Inactive Fan Reactivation - 2026-27 Season",
+      "internal_name": "EPL_Reactivation_2026",
+      "brand": {"vertical": "sports_league", "league": "EPL", "team": null, "product": null},
+      "purpose": "Re-engage inactive Premier League fans across the 2026-27 season using a calendar-anchored backbone plus one personalized derby touch.",
+      "archetype": "reactivation",
+      "launch_date": "2026-08-01",
+      "end_date": "2027-05-31",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive EPL fans across the season.", "kpi": "Fans returning to Premier League app or Peacock with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans touches at canonical EPL moments. Layer one per-club personalized touch on fan's favorite club's derby fixture.",
+        "timing_rationale": "Calendar-anchored to canonical EPL season moments per the 2026-27 schedule.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_epl_fan",
+        "name": "Inactive EPL fan",
+        "description": "Fan with no Premier League engagement in the last 365 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "epl.activity_last_active_within_days", "op": "gt", "value": 365}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [{"id": "ch_email", "type": "email"}],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Club"},
+      {"key": "MTC", "name": "Derby Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Season cadence opens (Community Shield week)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_community_shield",
+        "type": "action",
+        "label": "Email - Community Shield (early Aug)",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-08-09"},
+        "copy": {"subject": "The Community Shield kicks off the new EPL season"}
+      },
+      {
+        "id": "email_opening_weekend",
+        "type": "action",
+        "label": "Email - Opening Weekend (mid Aug)",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-08-15"},
+        "copy": {"subject": "Premier League is back: Matchday 1"}
+      },
+      {
+        "id": "dec_has_fav_club",
+        "type": "decision",
+        "label": "Has favorite club?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_club", "op": "is_not_null"}
+      },
+      {
+        "id": "email_personalized_derby",
+        "type": "action",
+        "label": "Email - Personalized derby for fav club",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_derby_fixture",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "day"}
+        },
+        "copy": {
+          "subject": "{{FT}} vs {{MTC}}: derby week is here",
+          "preview": "Your club's biggest fixture of the season"
+        },
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_boxing_day",
+        "type": "action",
+        "label": "Email - Boxing Day fixtures (Dec 26)",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-26"},
+        "copy": {"subject": "Boxing Day football: 10 matches across the festive window"}
+      },
+      {
+        "id": "email_january_window",
+        "type": "action",
+        "label": "Email - January transfer window deadline (Feb 2)",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "calendar_date": "2027-02-02"},
+        "copy": {"subject": "Transfer deadline day - who's on the move?"}
+      },
+      {
+        "id": "email_fa_cup_final",
+        "type": "action",
+        "label": "Email - FA Cup Final (mid May)",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "calendar_date": "2027-05-15"},
+        "copy": {"subject": "The FA Cup Final - the oldest trophy in football"}
+      },
+      {
+        "id": "email_final_matchday",
+        "type": "action",
+        "label": "Email - Final Matchday (May 23)",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {"type": "scheduled", "calendar_date": "2027-05-23"},
+        "copy": {"subject": "Final Matchday: the title, top four, and the drop"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_community_shield"},
+      {"from": "email_community_shield", "to": "email_opening_weekend"},
+      {"from": "email_opening_weekend", "to": "dec_has_fav_club"},
+      {"from": "dec_has_fav_club", "to": "email_personalized_derby", "branch_label": "yes"},
+      {"from": "dec_has_fav_club", "to": "email_boxing_day", "branch_label": "no"},
+      {"from": "email_personalized_derby", "to": "email_boxing_day"},
+      {"from": "email_boxing_day", "to": "email_january_window"},
+      {"from": "email_january_window", "to": "email_fa_cup_final"},
+      {"from": "email_fa_cup_final", "to": "email_final_matchday"},
+      {"from": "email_final_matchday", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rates"}, {"name": "Personalized derby touch incremental lift"}],
+      "tests": []
+    }
+  }
+}

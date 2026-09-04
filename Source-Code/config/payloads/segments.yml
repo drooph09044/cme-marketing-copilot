@@ -1,0 +1,490 @@
+{
+  "prebuilt_segments": [
+    {
+      "id": "sth_active",
+      "name": "Season Ticket Holders",
+      "description": "Current full-season ticket package holders",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "CRM"
+      ]
+    },
+    {
+      "id": "sth_lapsed",
+      "name": "Lapsed Season Ticket Holders",
+      "description": "Previously held season tickets; did not renew last cycle",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "paid_media"
+      ]
+    },
+    {
+      "id": "sth_firstyear",
+      "name": "First-Year Season Ticket Holders",
+      "description": "Season ticket holders in their inaugural year",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "single_game",
+      "name": "Single-Game Buyers",
+      "description": "Purchased individual game tickets in past 24 months",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "playoff_buyers",
+      "name": "Playoff / High-Stakes Buyers",
+      "description": "Only purchase during playoffs or marquee matchups",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "vip_fans",
+      "name": "High-Value / VIP Fans",
+      "description": "Top-tier spenders across tickets, merch, and F&B",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "CRM",
+        "email"
+      ]
+    },
+    {
+      "id": "suite_holders",
+      "name": "Suite / Premium Club Holders",
+      "description": "Corporate or individual holders of suite/premium inventory",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "CRM",
+        "email"
+      ]
+    },
+    {
+      "id": "group_buyers",
+      "name": "Group Ticket Buyers",
+      "description": "Purchased group packages (10+ tickets in single transaction)",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "paid_media"
+      ]
+    },
+    {
+      "id": "away_travelers",
+      "name": "Away Game Travelers",
+      "description": "Fans who purchase tickets to away games",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "merch_buyers",
+      "name": "Merchandise Buyers",
+      "description": "Purchased team merchandise online or in-stadium",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "paid_media"
+      ]
+    },
+    {
+      "id": "fb_spenders",
+      "name": "Concessions / F&B High Spenders",
+      "description": "Above-average in-stadium food & beverage spend",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "push"
+      ]
+    },
+    {
+      "id": "fantasy_players",
+      "name": "Fantasy Football Participants",
+      "description": "Fans engaged with official team fantasy products or content",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "offseason_engagers",
+      "name": "Draft Day / Offseason Engagers",
+      "description": "High engagement spikes during NFL Draft & free agency",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "app_nonbuyer",
+      "name": "App Engaged (Non-Buyer)",
+      "description": "High app engagement but no recent ticket or merch purchase",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "push"
+      ]
+    },
+    {
+      "id": "digital_fans",
+      "name": "Social / Digital Content Fans",
+      "description": "Heavy consumers of team digital content with no purchase history",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "push",
+        "paid_media"
+      ]
+    },
+    {
+      "id": "email_nonbuyer",
+      "name": "Email Engaged (Non-Buyer)",
+      "description": "Opens and clicks email consistently but has not purchased",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email"
+      ]
+    },
+    {
+      "id": "winback_lapsed",
+      "name": "Win-Back: Lapsed Buyers (1-3yr)",
+      "description": "No purchase of any kind in 1-3 years; previously active",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "paid_media"
+      ]
+    },
+    {
+      "id": "youth_family",
+      "name": "Youth / Family Segment",
+      "description": "Households with children; family pack or kids-ticket purchasers",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email"
+      ]
+    },
+    {
+      "id": "legacy_fans",
+      "name": "Alumni / Legacy Fans",
+      "description": "Fans with 10+ years of continuous purchase history",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "email",
+        "CRM"
+      ]
+    },
+    {
+      "id": "corporate_b2b",
+      "name": "Corporate / B2B Accounts",
+      "description": "Businesses purchasing group, suite, or sponsorship inventory",
+      "industry": [
+        "Sports"
+      ],
+      "channel": [
+        "CRM",
+        "email"
+      ]
+    },
+    {
+      "id": "active_subs",
+      "name": "Active Subscribers",
+      "description": "Currently subscribed & regularly engaging with content",
+      "industry": [
+        "Media & OTT"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "at_risk_subs",
+      "name": "At-Risk Subscribers",
+      "description": "Subscribed but showing declining engagement — high churn probability",
+      "industry": [
+        "Media & OTT"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "churned_subs",
+      "name": "Churned Subscribers",
+      "description": "Cancelled subscription within last 90 days",
+      "industry": [
+        "Media & OTT"
+      ],
+      "channel": [
+        "email",
+        "paid_media"
+      ]
+    },
+    {
+      "id": "free_to_paid",
+      "name": "Free-to-Paid Converters",
+      "description": "Free tier users showing strong signals of upgrade readiness",
+      "industry": [
+        "Media & OTT"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "heavy_consumers",
+      "name": "Heavy Content Consumers",
+      "description": "Binge-watchers / high-frequency content users",
+      "industry": [
+        "Media & OTT"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "contract_renewal",
+      "name": "Contract Renewal Eligible",
+      "description": "Contracts expiring within 30-90 days",
+      "industry": [
+        "Telecom"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "high_data",
+      "name": "High Data Users",
+      "description": "Consistently near or over data cap each billing cycle",
+      "industry": [
+        "Telecom"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "multi_product",
+      "name": "Multi-Product Holders",
+      "description": "Customers holding 2 or more products/services",
+      "industry": [
+        "Telecom"
+      ],
+      "channel": [
+        "email",
+        "CRM"
+      ]
+    },
+    {
+      "id": "churn_risk_tel",
+      "name": "Churn Risk",
+      "description": "Modelled high probability of switching to competitor",
+      "industry": [
+        "Telecom"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "new_joiners",
+      "name": "New Joiners",
+      "description": "Customers within first 90 days",
+      "industry": [
+        "Telecom"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "auto_high_ltv",
+      "name": "High LTV Owners",
+      "description": "Owners with high-value vehicle, service, loyalty, or connected-service history",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "email",
+        "CRM"
+      ]
+    },
+    {
+      "id": "auto_service_due",
+      "name": "Service Due",
+      "description": "Owners showing maintenance, mileage, or service interval signals",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "auto_ev_battery_risk",
+      "name": "EV Battery Health Risk",
+      "description": "EV owners with battery-health or diagnostic follow-up signals",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "auto_connected_services",
+      "name": "Connected Services Upsell",
+      "description": "Connected-vehicle eligible owners with trial or expansion potential",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "push",
+        "email"
+      ]
+    },
+    {
+      "id": "auto_trade_in_ready",
+      "name": "Trade-In Ready",
+      "description": "Owners likely ready for replacement, trade-in, or lease pull-ahead offers",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "CRM",
+        "email"
+      ]
+    },
+    {
+      "id": "auto_loyalty_vip",
+      "name": "Loyalty VIP Owners",
+      "description": "Gold or Platinum rewards members and repeat owner profiles",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "CRM",
+        "email"
+      ]
+    },
+    {
+      "id": "auto_insurance_cross_sell",
+      "name": "Insurance Cross-Sell",
+      "description": "Owners eligible for insurance or telematics discount offers",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "email",
+        "CRM"
+      ]
+    },
+    {
+      "id": "auto_recall_open",
+      "name": "Open Recall Outreach",
+      "description": "Owners needing recall completion or safety-service outreach",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "email",
+        "push"
+      ]
+    },
+    {
+      "id": "auto_nps_recovery",
+      "name": "NPS Recovery",
+      "description": "Service or sales customers with low satisfaction recovery signals",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "CRM"
+      ]
+    },
+    {
+      "id": "auto_app_engaged",
+      "name": "Mobile App Engaged",
+      "description": "Owners actively using app sessions, remote commands, or connected experiences",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "push"
+      ]
+    },
+    {
+      "id": "auto_warranty_service",
+      "name": "Warranty Service",
+      "description": "Owners with warranty claim, protection-plan, or service contract signals",
+      "industry": [
+        "Automotive"
+      ],
+      "channel": [
+        "CRM",
+        "email"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-cart-merchandise-activation",
+  "name": "Abandoned Cart: Merchandise - Activation Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Cart: Merchandise - Activation",
+    "journeyGoal": "Re-engage users who added merchandise to cart but did not complete purchase and activate them",
+    "entryTrigger": "user_added_to_cart",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after purchase or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_to_cart",
+    "eventId": "evt_addcart_003",
+    "conditions": [
+      {
+        "field": "productCategory",
+        "operator": "EQUALS",
+        "value": "Merchandise"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added to Cart Merchandise Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Complete your merchandise purchase now and activate your rewards!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "email_activation_cart_merch",
+        "deliveryId": "del_email_08",
+        "trackingEvents": [
+          "email_open",
+          "purchase_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Activation Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your merchandise cart is waiting – complete purchase and activate your benefits!",
+      "cta": "View Cart",
+      "tracking": {
+        "campaignId": "push_activation_cart_merch",
+        "deliveryId": "del_push_08",
+        "trackingEvents": [
+          "push_open",
+          "purchase_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_to_cart",
+        "eventId": "evt_addcart_003"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_complete",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_complete",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_complete",
+      "eventId": "evt_purchase_006",
+      "condition": "purchaseCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "purchase_complete"
+    ],
+    "eventMapping": {
+      "purchase_complete": "evt_purchase_006"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_complete",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

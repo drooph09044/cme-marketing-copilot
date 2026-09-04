@@ -1,0 +1,51 @@
+{
+  "data_dir": "generated_data\\automotive",
+  "checks_passed": true,
+  "check_count": 4,
+  "checks": [
+    {
+      "customer_id": "CAMPDEMO_TIRE_001",
+      "vehicle_id": "VEH_CAMPDEMO_TIRE_001",
+      "campaign_type": "Tire Replacement",
+      "rule": "mileage >= 50000 and no tire replacement service history",
+      "passed": true,
+      "current_mileage": 64280,
+      "latest_battery_health_pct": 82,
+      "battery_degradation_pct_90d": 2,
+      "replacement_scenario": ""
+    },
+    {
+      "customer_id": "CAMPDEMO_TIRE_002",
+      "vehicle_id": "VEH_CAMPDEMO_TIRE_002",
+      "campaign_type": "Tire Replacement",
+      "rule": "mileage >= 50000 and no tire replacement service history",
+      "passed": true,
+      "current_mileage": 58890,
+      "latest_battery_health_pct": 76,
+      "battery_degradation_pct_90d": 2,
+      "replacement_scenario": ""
+    },
+    {
+      "customer_id": "CAMPDEMO_BATT_001",
+      "vehicle_id": "VEH_CAMPDEMO_BATT_001",
+      "campaign_type": "Battery Health",
+      "rule": "battery_health_pct <= 35 and battery_degradation_pct_90d >= 15",
+      "passed": true,
+      "current_mileage": 42110,
+      "latest_battery_health_pct": 31,
+      "battery_degradation_pct_90d": 24,
+      "replacement_scenario": "Weak battery outreach - schedule diagnostic"
+    },
+    {
+      "customer_id": "CAMPDEMO_BATT_002",
+      "vehicle_id": "VEH_CAMPDEMO_BATT_002",
+      "campaign_type": "Battery Health",
+      "rule": "battery_health_pct <= 35 and battery_degradation_pct_90d >= 15",
+      "passed": true,
+      "current_mileage": 47650,
+      "latest_battery_health_pct": 24,
+      "battery_degradation_pct_90d": 25,
+      "replacement_scenario": "Battery replacement completed after campaign response"
+    }
+  ]
+}

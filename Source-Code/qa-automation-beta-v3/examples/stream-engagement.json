@@ -1,0 +1,143 @@
+{
+  "useCaseId": "stream-engagement",
+  "clientTag": "PGA",
+  "name": "Streaming Engagement Journey",
+  "subCategoryId": "real-time-engagement",
+  "subCategoryName": "Real-Time Engagement",
+  "category": {
+    "categoryId": "real-time-engagement",
+    "categoryName": "Real-Time Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Streaming Engagement",
+    "journeyGoal": "Drive live streaming consumption and repeat viewing",
+    "entryTrigger": "user_logged_in",
+    "journeyCategory": "Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after stream started"
+  },
+  "entryCriteria": {
+    "event": "user_logged_in",
+    "eventId": "evt_login_001",
+    "conditions": [
+      {
+        "field": "subscriptionStatus",
+        "operator": "EQUALS",
+        "value": "ACTIVE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Highly_Engaged_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Live Now Alert",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "Live now - watch PGA TOUR action",
+      "cta": "Watch Live",
+      "tracking": {
+        "campaignId": "push_stream_live",
+        "deliveryId": "del_push_s1",
+        "trackingEvents": [
+          "push_open",
+          "stream_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Reminder",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "IN_APP",
+      "messageTheme": "Do not miss key moments - tune in now",
+      "cta": "Resume Stream",
+      "tracking": {
+        "campaignId": "inapp_stream_reminder",
+        "deliveryId": "del_inapp_s2",
+        "trackingEvents": [
+          "inapp_view",
+          "stream_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_logged_in",
+        "eventId": "evt_login_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "duration": 2,
+        "unit": "HOURS"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "stream_start",
+      "eventId": "evt_stream_001",
+      "condition": "streamStarted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "stream_start"
+    ],
+    "eventMapping": {
+      "stream_start": "evt_stream_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "stream_start",
+    "secondaryKPIs": [
+      "push_open",
+      "inapp_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

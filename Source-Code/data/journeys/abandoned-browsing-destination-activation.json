@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-browsing-destination-activation",
+  "name": "Abandoned Browsing: Destination Promotion - Activation Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Browsing: Destination Promotion - Activation",
+    "journeyGoal": "Re-engage users who showed interest in a destination but did not complete the action and activate them",
+    "entryTrigger": "user_added_destination",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after destination viewed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_destination",
+    "eventId": "evt_add_destination_001",
+    "conditions": [
+      {
+        "field": "destinationType",
+        "operator": "EQUALS",
+        "value": "Destination"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Destination Users – Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Destination Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You added a destination – complete your exploration now and activate your benefits!",
+      "cta": "Explore Destination",
+      "tracking": {
+        "campaignId": "email_destination_activation",
+        "deliveryId": "del_email_18",
+        "trackingEvents": [
+          "email_open",
+          "destination_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Destination Activation Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your destination is waiting – activate now and explore!",
+      "cta": "Explore Destination",
+      "tracking": {
+        "campaignId": "push_destination_activation",
+        "deliveryId": "del_push_18",
+        "trackingEvents": [
+          "push_open",
+          "destination_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_destination",
+        "eventId": "evt_add_destination_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "destination_view",
+          "field": "destinationViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "destination_view",
+          "field": "destinationViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "destination_view",
+      "eventId": "evt_destination_002",
+      "condition": "destinationViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "destination_view"
+    ],
+    "eventMapping": {
+      "destination_view": "evt_destination_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "destination_view",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

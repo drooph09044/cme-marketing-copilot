@@ -1,0 +1,172 @@
+{
+  "useCaseId": "trial-to-paid-conversion",
+  "name": "Free Trial to Paid Conversion Journey",
+  "category": {
+    "categoryId": "acquisition",
+    "categoryName": "Acquisition"
+  },
+  "journeyTable": {
+    "journeyName": "Trial to Paid Conversion",
+    "journeyGoal": "Convert active trial users into paid subscribers",
+    "entryTrigger": "trial_active",
+    "journeyCategory": "Conversion",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after subscription purchase"
+  },
+  "entryCriteria": {
+    "event": "trial_started",
+    "eventId": "evt_trial_001",
+    "conditions": [
+      {
+        "field": "daysToTrialExpiry",
+        "operator": "LESS_THAN_EQUALS",
+        "value": 7
+      },
+      {
+        "field": "sessionsLast7Days",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 3
+      }
+    ],
+    "identity": {
+      "primaryId": "subscriberId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Trial_Users_Near_Expiry"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Upgrade Reminder",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your trial is ending soon—keep watching",
+      "cta": "Go Premium",
+      "tracking": {
+        "campaignId": "email_trial_convert",
+        "deliveryId": "del_trial_1",
+        "trackingEvents": [
+          "email_open",
+          "conversion"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Final Offer Push",
+      "timing": {
+        "offsetHours": 96
+      },
+      "channel": "PUSH",
+      "messageTheme": "Last chance to upgrade with 20% off",
+      "cta": "Claim Offer",
+      "tracking": {
+        "campaignId": "push_trial_final",
+        "deliveryId": "del_trial_2",
+        "trackingEvents": [
+          "push_open",
+          "conversion"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "trial_started",
+        "eventId": "evt_trial_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_active",
+          "field": "converted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_active",
+          "field": "converted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_active",
+      "eventId": "evt_sub_001",
+      "condition": "converted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "conversion"
+    ],
+    "eventMapping": {
+      "conversion": "evt_sub_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "conversion",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,135 @@
+{
+  "id": "099",
+  "matrix_row_id": 99,
+  "matrix_row_name": "Race Weekend Multi-Day Push",
+  "template": "tpl_game_day",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a three-touch race-weekend push cadence for F1 fans.",
+    "Create a three-touch race-weekend push journey for opted-in F1 fans. Friday Free Practice highlights push, Saturday Qualifying grid-position alert push, Sunday race-day kickoff push. Per-fav-driver and per-fav-team content variants. Single channel (push). One journey instance per race weekend.",
+    "Need a race-weekend push cadence — one push each day across Friday, Saturday, Sunday, varied by fan's favorite driver or team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-race-weekend-push-2026",
+    "metadata": {
+      "name": "F1 Race Weekend Multi-Day Push",
+      "internal_name": "F1_Race_Weekend_2026",
+      "brand": {"vertical": "sports_league", "league": "F1", "team": null, "product": "F1 TV"},
+      "purpose": "Drive race-weekend engagement and F1 TV tune-in via a three-touch push cadence aligned to Free Practice, Qualifying, and the race.",
+      "archetype": "game_day",
+      "launch_date": "2026-03-06",
+      "end_date": "2026-12-06",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive race-day tune-in on F1 TV.", "kpi": "Race-day viewership lift", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Per-race-weekend three-touch push cadence. Personalized to fan's favorite driver or team when set.",
+        "timing_rationale": "Aligned to Friday Free Practice, Saturday Qualifying, Sunday race-day across the 24-race 2026 calendar.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["push"],
+      "moments_that_matter": ["GET PUMPED"]
+    },
+    "audiences": [
+      {
+        "id": "aud_f1_push_optin",
+        "name": "F1 fan with push opt-in",
+        "criteria": {
+          "all_of": [
+            {"field": "f1.activity_within_days", "op": "lte", "value": 365},
+            {"field": "consent.push_f1", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [],
+    "channels": [{"id": "ch_push", "type": "push", "platform": "f1_tv_app"}],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Driver or Team"},
+      {"key": "GP", "name": "Grand Prix Name"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 6, "unit": "day"}, "max_entries": 24},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Race weekend trigger (Friday FP eve)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_has_fav",
+        "type": "decision",
+        "label": "Fav driver or team set?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {"field": "f1.favorite_driver", "op": "is_not_null"},
+            {"field": "f1.favorite_team", "op": "is_not_null"}
+          ]
+        }
+      },
+      {
+        "id": "push_friday_personalized",
+        "type": "action",
+        "label": "Push Fri - FP highlights, personalized",
+        "channel": "ch_push",
+        "touch_id": "P1A",
+        "timing": {"type": "relative_to_event", "event": "free_practice_1_start", "direction": "before", "offset": {"value": 30, "unit": "minute"}},
+        "copy": {"headline": "{{FT}} hits the track at {{GP}} Free Practice in 30 min"},
+        "personalization_used": ["FT", "GP"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_friday_neutral",
+        "type": "action",
+        "label": "Push Fri - FP highlights, neutral",
+        "channel": "ch_push",
+        "touch_id": "P1B",
+        "timing": {"type": "relative_to_event", "event": "free_practice_1_start", "direction": "before", "offset": {"value": 30, "unit": "minute"}},
+        "copy": {"headline": "{{GP}} Free Practice starts in 30 min - watch live on F1 TV"},
+        "personalization_used": ["GP"]
+      },
+      {
+        "id": "push_saturday_quali",
+        "type": "action",
+        "label": "Push Sat - Qualifying grid",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "relative_to_event", "event": "qualifying_end", "direction": "after", "offset": {"value": 30, "unit": "minute"}},
+        "copy": {"headline": "{{FT}} starts P? at {{GP}} tomorrow"},
+        "personalization_used": ["FT", "GP"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_race_day",
+        "type": "action",
+        "label": "Push Race Day - Lights out",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {"type": "relative_to_event", "event": "race_start", "direction": "before", "offset": {"value": 15, "unit": "minute"}},
+        "copy": {"headline": "Lights out at {{GP}} in 15 minutes - watch on F1 TV"},
+        "personalization_used": ["GP"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav"},
+      {"from": "dec_has_fav", "to": "push_friday_personalized", "branch_label": "yes"},
+      {"from": "dec_has_fav", "to": "push_friday_neutral", "branch_label": "no"},
+      {"from": "push_friday_personalized", "to": "push_saturday_quali"},
+      {"from": "push_friday_neutral", "to": "push_saturday_quali"},
+      {"from": "push_saturday_quali", "to": "push_race_day"},
+      {"from": "push_race_day", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Race-day viewership lift on F1 TV"}],
+      "secondary_kpis": [{"name": "Push open rate by race-weekend day"}, {"name": "Personalized vs neutral push CTR"}],
+      "tests": []
+    }
+  }
+}

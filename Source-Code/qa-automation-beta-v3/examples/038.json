@@ -1,0 +1,173 @@
+{
+  "id": "038",
+  "matrix_row_id": 38,
+  "matrix_row_name": "NBA Playoffs Bracket Push",
+  "template": "tpl_playoff_push",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NBA Playoffs bracket-reveal and tune-in journey running from Apr 17 through Finals.",
+    "Create an NBA Playoffs push journey. Bracket reveal email Apr 17 with a bracket-fill engagement experience, nightly per-fav-team push on game nights through Round 1, plus a Finals tune-in email for fans whose fav team isn't playing. Cadence covers Apr 18 - Jun 19.",
+    "Need a Playoffs cadence — bracket reveal at start, nightly tune-in push for fav-team fans on game nights, Finals tune-in email at the end."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-playoffs-bracket-push-2026",
+    "metadata": {
+      "name": "NBA Playoffs Bracket Push",
+      "internal_name": "NBA_Playoffs_Bracket_2026",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA League Pass"},
+      "purpose": "Drive engagement and tune-in across the NBA Playoffs (Apr 18 - Jun 19, 2026) with a bracket-reveal email, nightly fav-team tune-in push, and a Finals tune-in email.",
+      "archetype": "game_day",
+      "launch_date": "2026-04-17",
+      "end_date": "2026-06-19",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Playoffs tune-in across rounds.", "kpi": "Playoffs game tune-in viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Bracket reveal email Apr 17 with a clickable bracket-fill experience for engagement. Nightly per-fav-team push on Round 1 game nights with series status (e.g., '2-0 lead', 'win-or-go-home'). Cadence continues through Finals (Jun 3-19) with reduced frequency.",
+        "timing_rationale": "Playoffs Apr 18 - Jun 19, 2026. Round 1 nightly push; later rounds use series-game cadence.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "interactive_bracket"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_active_nba_fan",
+        "name": "Active NBA fan",
+        "criteria": {"field": "nba.last_active_within_days", "op": "lte", "value": 180},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_fav_team_in_playoffs",
+        "name": "Fan with fav team in playoffs",
+        "criteria": {
+          "all_of": [
+            {"field": "favorite_team", "op": "is_not_null"},
+            {"field": "fav_team.in_playoffs", "op": "equals", "value": true}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nba_app"},
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "nba_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Bracket reveal (Apr 17)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_bracket_reveal",
+        "type": "action",
+        "label": "Email - Bracket reveal with bracket-fill experience",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-04-17"},
+        "copy": {
+          "subject": "The 2026 NBA Playoffs bracket is set",
+          "cta_label": "Fill your bracket",
+          "modules": [
+            {"rank": "primary", "name": "Bracket reveal"},
+            {"rank": "secondary", "name": "Bracket-fill interactive engagement"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "modal_bracket_fill",
+        "type": "action",
+        "label": "App Modal - Bracket-fill engagement",
+        "channel": "ch_app_modal",
+        "touch_id": "NM1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-04-17"},
+        "copy": {
+          "headline": "Fill out your 2026 Playoffs bracket",
+          "cta_label": "Open bracket"
+        }
+      },
+      {
+        "id": "dec_fav_team_in_playoffs",
+        "type": "decision",
+        "label": "Fav team in playoffs?",
+        "decision_basis": "audience",
+        "condition": {"field": "fav_team.in_playoffs", "op": "equals", "value": true}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_fav_game_nightly",
+        "type": "action",
+        "label": "Push - Fav-team series game with status",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_team_playoff_tipoff",
+          "direction": "before",
+          "offset": {"value": 30, "unit": "minute"}
+        },
+        "copy": {"headline": "{{FT}} {{MTC}} - series status: tune in"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_finals",
+        "type": "wait",
+        "label": "Wait to Finals window",
+        "timing": {"type": "wait", "duration": {"value": 45, "unit": "day"}}
+      },
+      {
+        "id": "email_finals_tunein",
+        "type": "action",
+        "label": "Email - Finals tune-in for all-fans",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "recurrence": "early june finals start"},
+        "copy": {
+          "subject": "The 2026 NBA Finals tip off",
+          "cta_label": "Watch on League Pass"
+        }
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_bracket_reveal"},
+      {"from": "email_bracket_reveal", "to": "modal_bracket_fill"},
+      {"from": "modal_bracket_fill", "to": "dec_fav_team_in_playoffs"},
+      {"from": "dec_fav_team_in_playoffs", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_fav_team_in_playoffs", "to": "wait_to_finals", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_fav_game_nightly", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_to_finals", "branch_label": "no"},
+      {"from": "push_fav_game_nightly", "to": "wait_to_finals"},
+      {"from": "wait_to_finals", "to": "email_finals_tunein"},
+      {"from": "email_finals_tunein", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Playoffs game tune-in viewership"}],
+      "secondary_kpis": [{"name": "Bracket-fill engagement rate"}, {"name": "Per-game push click-through"}],
+      "tests": []
+    }
+  }
+}

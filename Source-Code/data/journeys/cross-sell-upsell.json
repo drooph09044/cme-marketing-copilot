@@ -1,0 +1,221 @@
+{
+  "useCaseId": "cross-sell-upsell",
+  "name": "Cross-Sell / Upsell Journey",
+  "category": {
+    "categoryId": "revenue-growth",
+    "categoryName": "Upsell / Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Cross-Sell / Upsell",
+    "journeyGoal": "Increase ARPU by introducing relevant additional products and bundles",
+    "entryTrigger": "tenure_or_usage_threshold_met",
+    "journeyCategory": "Upsell",
+    "totalDuration": "30 days",
+    "exitClause": "Exit if customer adds product or upgrades plan"
+  },
+  "entryCriteria": {
+    "event": "product_usage_evaluation",
+    "eventId": "evt_crosssell_001",
+    "conditions": [
+      {
+        "field": "tenureMonths",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 6
+      },
+      {
+        "field": "addOnOwnership",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Eligible_CrossSell_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Personalised Cross-Sell Email",
+      "timing": {
+        "offsetDays": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You're getting great value – discover complementary products",
+      "cta": "See What Fits",
+      "tracking": {
+        "campaignId": "crosssell_email_1",
+        "deliveryId": "del_cross_1",
+        "trackingEvents": [
+          "email_open",
+          "product_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Bundle Recommendation Push",
+      "timing": {
+        "offsetDays": 10
+      },
+      "channel": "PUSH_EMAIL",
+      "messageTheme": "Customers like you also upgraded to bundles",
+      "cta": "Build My Bundle",
+      "tracking": {
+        "campaignId": "crosssell_bundle_10",
+        "deliveryId": "del_cross_2",
+        "trackingEvents": [
+          "push_open",
+          "bundle_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Limited-Time Offer Reminder",
+      "timing": {
+        "offsetDays": 30
+      },
+      "channel": "SMS_EMAIL",
+      "messageTheme": "Limited-time bundle offer ending soon",
+      "cta": "Add Now",
+      "tracking": {
+        "campaignId": "crosssell_urgency_30",
+        "deliveryId": "del_cross_3",
+        "trackingEvents": [
+          "sms_click",
+          "upgrade_completed"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "product_usage_evaluation",
+        "eventId": "evt_crosssell_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_added",
+          "field": "added",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_added",
+          "field": "added",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 216
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_added",
+          "field": "added",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 480
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_added",
+      "eventId": "evt_product_add_001",
+      "condition": "added == true",
+      "action": "EXIT"
+    },
+    {
+      "event": "plan_upgraded",
+      "eventId": "evt_upgrade_001",
+      "condition": "upgraded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 720
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_added",
+      "upgrade_completed"
+    ],
+    "eventMapping": {
+      "product_added": "evt_product_add_001",
+      "upgrade_completed": "evt_upgrade_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "arpu_increase",
+    "secondaryKPIs": [
+      "bundle_attach_rate",
+      "conversion_rate"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,197 @@
+{
+  "useCaseId": "subscriber-onboarding",
+  "name": "Subscriber Onboarding Journey",
+  "category": {
+    "categoryId": "onboarding",
+    "categoryName": "Onboarding"
+  },
+  "journeyTable": {
+    "journeyName": "Subscriber Onboarding",
+    "journeyGoal": "Welcome new subscribers and drive early content engagement to reduce churn",
+    "entryTrigger": "subscription_activated",
+    "journeyCategory": "Onboarding",
+    "totalDuration": "7 days",
+    "exitClause": "No exit - full cadence delivered regardless of engagement"
+  },
+  "entryCriteria": {
+    "event": "subscription_activation",
+    "eventId": "evt_sub_onb_001",
+    "conditions": [
+      {
+        "field": "subscriptionStatus",
+        "operator": "EQUALS",
+        "value": "active"
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "New_Subscribers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Welcome Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Welcome – your subscription is live with personalized recommendations",
+      "cta": "Start Watching",
+      "tracking": {
+        "campaignId": "email_sub_onboarding_1",
+        "deliveryId": "del_onb_1",
+        "trackingEvents": [
+          "email_open",
+          "content_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Trending Push",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "PUSH",
+      "messageTheme": "Trending now based on your early viewing",
+      "cta": "Keep Watching",
+      "tracking": {
+        "campaignId": "push_sub_onboarding_2",
+        "deliveryId": "del_onb_2",
+        "trackingEvents": [
+          "push_open",
+          "content_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Feature Discovery Email",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Discover features that enhance your experience",
+      "cta": "Explore Features",
+      "tracking": {
+        "campaignId": "email_sub_onboarding_3",
+        "deliveryId": "del_onb_3",
+        "trackingEvents": [
+          "email_open",
+          "feature_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Week 1 Recap Email",
+      "timing": {
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your first week recap and next recommendations",
+      "cta": "Rate & Discover More",
+      "tracking": {
+        "campaignId": "email_sub_onboarding_4",
+        "deliveryId": "del_onb_4",
+        "trackingEvents": [
+          "email_open",
+          "rating_submit"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "subscription_activation",
+        "eventId": "evt_sub_onb_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "content_start",
+      "feature_click",
+      "rating_submit"
+    ],
+    "eventMapping": {
+      "content_start": "evt_content_start_001",
+      "feature_click": "evt_feature_click_001",
+      "rating_submit": "evt_rating_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "content_start",
+    "secondaryKPIs": [
+      "email_open",
+      "feature_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

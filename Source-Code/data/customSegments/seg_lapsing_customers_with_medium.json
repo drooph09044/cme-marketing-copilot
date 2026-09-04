@@ -1,0 +1,18 @@
+{
+  "id": "seg_lapsing_customers_with_medium",
+  "name": "Lapsing Customers With Medium",
+  "purpose": "Custom audience segment",
+  "size": "2.1K",
+  "refresh": "Daily",
+  "exclusions": "None defined",
+  "status": "Draft",
+  "rules": [
+    {
+      "id": "ai_rule_ltv",
+      "field": "LTV Tier",
+      "value": "Medium",
+      "joiner": ""
+    }
+  ],
+  "isPreset": false
+}

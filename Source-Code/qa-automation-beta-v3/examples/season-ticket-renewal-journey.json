@@ -1,0 +1,253 @@
+{
+  "useCaseId": "season-ticket-renewal-journey",
+  "name": "Season Ticket Renewal Journey",
+  "category": {
+    "categoryId": "retention-renewals",
+    "categoryName": "Retention & Renewals"
+  },
+  "journeyTable": {
+    "journeyName": "Season Ticket Renewal Journey",
+    "journeyGoal": "Drive season ticket renewals using phased engagement and urgency",
+    "entryTrigger": "subscription_expiring",
+    "journeyCategory": "Retention & Renewals",
+    "totalDuration": "90 days",
+    "exitClause": "Exit when renewal_completed OR at expiry date"
+  },
+  "entryCriteria": {
+    "event": "subscription_expiring",
+    "eventId": "evt_subscription_expiring_002",
+    "conditions": [
+      {
+        "field": "daysToExpiry",
+        "operator": "EQUALS",
+        "value": 90
+      },
+      {
+        "field": "productType",
+        "operator": "EQUALS",
+        "value": "SEASON_TICKET"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Season_Ticket_Holders_Expiring"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day -90",
+      "timing": {
+        "relativeDay": -90,
+        "description": "90 days before expiry"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Early Bird Renewal – seat map visual, loyalty perks recap, early-bird pricing incentive",
+      "cta": "Renew Now",
+      "tracking": {
+        "campaignId": "email_renewal_earlybird_v2",
+        "deliveryId": "del_email_renewal_101",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "seatLocation",
+        "loyaltyTier",
+        "price"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day -60",
+      "timing": {
+        "relativeDay": -60,
+        "description": "60 days before expiry"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Season Highlights Reel – personalised stat/moment recap from current season + renewal CTA",
+      "cta": "Lock In Your Seats",
+      "tracking": {
+        "campaignId": "email_renewal_highlights_v2",
+        "deliveryId": "del_email_renewal_102",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "favoriteTeam",
+        "matchesAttended",
+        "topMoments"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day -45",
+      "timing": {
+        "relativeDay": -45,
+        "description": "45 days before expiry"
+      },
+      "channel": "PUSH",
+      "messageTheme": "Countdown reminder – '45 days to secure your seats' + one-tap renewal deep link",
+      "cta": "Renew in App",
+      "tracking": {
+        "campaignId": "push_renewal_countdown_v2",
+        "deliveryId": "del_push_101",
+        "trackingEvents": [
+          "push_sent",
+          "push_click"
+        ]
+      },
+      "delivery": {
+        "deepLink": "app://renewal"
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day -30",
+      "timing": {
+        "relativeDay": -30,
+        "description": "30 days before expiry"
+      },
+      "channel": "SMS",
+      "messageTheme": "Urgency nudge – limited availability messaging for fan's section; rep name personalised",
+      "cta": "Call Us / Renew Online",
+      "tracking": {
+        "campaignId": "sms_renewal_urgency_v2",
+        "deliveryId": "del_sms_101",
+        "trackingEvents": [
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "repName",
+        "seatSection"
+      ]
+    },
+    {
+      "tpId": "TP5",
+      "label": "Day -14",
+      "timing": {
+        "relativeDay": -14,
+        "description": "14 days before expiry"
+      },
+      "channel": [
+        "CALL",
+        "EMAIL"
+      ],
+      "messageTheme": "Personal rep outreach – offer payment plan; final retention conversation",
+      "cta": "Confirm Renewal",
+      "tracking": {
+        "campaignId": "rep_outreach_final_v2",
+        "deliveryId": "del_call_email_101",
+        "trackingEvents": [
+          "call_attempted",
+          "call_connected",
+          "email_open"
+        ]
+      },
+      "personalization": [
+        "repName",
+        "paymentPlanOptions"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "expiryDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "subscription_expiring",
+        "eventId": "evt_subscription_expiring_002"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP5"
+      },
+      {
+        "id": "n7",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "renewal_completed",
+      "eventId": "evt_renewal_completed_002",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 5,
+      "timeWindowDays": 90
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_renewed",
+        "condition": "renewal_completed == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "renewal_completed"
+    ],
+    "eventMapping": {
+      "subscription_expiring": "evt_subscription_expiring_002",
+      "renewal_completed": "evt_renewal_completed_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "renewal_completed",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "sms_click",
+      "call_connected"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 90
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

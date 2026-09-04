@@ -1,0 +1,15 @@
+{
+  "training_rows": 800,
+  "checks": {
+    "customers.csv": 800,
+    "customer_contacts.csv": 800,
+    "vehicle_ownership.csv": 800,
+    "telematics_monthly_summary.csv": 800,
+    "vehicle_health_reports.csv": 800,
+    "service_orders.csv": 800,
+    "campaign_interactions.csv": 800,
+    "campaign_eligibility.csv": 800,
+    "vehicles.csv": 800
+  },
+  "checks_passed": true
+}

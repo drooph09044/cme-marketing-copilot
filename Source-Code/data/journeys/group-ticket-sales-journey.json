@@ -1,0 +1,275 @@
+{
+  "useCaseId": "group-ticket-sales-journey",
+  "name": "Group Ticket Sales Journey",
+  "category": {
+    "categoryId": "conversions",
+    "categoryName": "Conversions"
+  },
+  "journeyTable": {
+    "journeyName": "Group Ticket Sales Journey",
+    "journeyGoal": "Convert interested fans into group ticket bookings through guided sales engagement and personalized offers",
+    "entryTrigger": "group_interest",
+    "journeyCategory": "Conversion & Sales",
+    "totalDuration": "21 days",
+    "exitClause": "Exit when group_booking_confirmed OR journey completed"
+  },
+  "entryCriteria": {
+    "event": "group_interest",
+    "eventId": "evt_group_interest_001",
+    "conditions": [
+      {
+        "field": "interestType",
+        "operator": "EQUALS",
+        "value": "GROUP_TICKETS"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Group_Ticket_Prospects"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 1",
+      "timing": {
+        "description": "1 day after expressing interest",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Bring Your Group – group ticket overview, pricing tiers, past group experience photos",
+      "cta": "Enquire About Groups",
+      "tracking": {
+        "campaignId": "email_group_intro",
+        "deliveryId": "del_email_801",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "eventType",
+        "groupSizeEstimate"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 5",
+      "timing": {
+        "description": "5 days after expressing interest",
+        "offsetHours": 120
+      },
+      "channel": "CALL",
+      "messageTheme": "Sales rep intro call – understand group size, occasion, budget; propose options",
+      "cta": "Book a Call",
+      "tracking": {
+        "campaignId": "call_group_discovery",
+        "deliveryId": "del_call_802",
+        "trackingEvents": [
+          "call_attempted",
+          "call_connected"
+        ]
+      },
+      "personalization": [
+        "repName"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 10",
+      "timing": {
+        "description": "10 days after expressing interest",
+        "offsetHours": 240
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your Custom Quote – personalised group package proposal with deadline",
+      "cta": "View My Proposal",
+      "tracking": {
+        "campaignId": "email_group_quote",
+        "deliveryId": "del_email_803",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "groupPackageDetails",
+        "pricingQuote",
+        "offerExpiryDate"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 21",
+      "timing": {
+        "description": "21 days after expressing interest",
+        "offsetHours": 504
+      },
+      "channel": [
+        "EMAIL",
+        "CALL"
+      ],
+      "messageTheme": "Last chance – offer expiry reminder + rep direct contact for any questions",
+      "cta": "Confirm My Booking",
+      "tracking": {
+        "campaignId": "group_booking_last_call",
+        "deliveryId": "del_email_call_804",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click",
+          "call_attempted",
+          "call_connected"
+        ]
+      },
+      "personalization": [
+        "repName",
+        "offerExpiryDate"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "interestDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "group_interest",
+        "eventId": "evt_group_interest_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "group_booking_confirmed",
+          "field": "groupBookingConfirmed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "group_booking_confirmed",
+          "field": "groupBookingConfirmed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "group_booking_confirmed",
+          "field": "groupBookingConfirmed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n11"
+      },
+      {
+        "id": "n11",
+        "type": "WAIT",
+        "durationHours": 264
+      },
+      {
+        "id": "n12",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n13",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "group_booking_confirmed",
+      "eventId": "evt_group_booking_confirmed_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowDays": 21
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "group_booking_confirmed == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "group_booking_confirmed"
+    ],
+    "eventMapping": {
+      "group_interest": "evt_group_interest_001",
+      "group_booking_confirmed": "evt_group_booking_confirmed_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "group_booking_confirmed",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "call_connected"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 21
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

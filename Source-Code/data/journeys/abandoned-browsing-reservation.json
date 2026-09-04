@@ -1,0 +1,169 @@
+{
+  "useCaseId": "abandoned-browsing-reservation",
+  "name": "Abandoned Browsing: Reservation Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Browsing: Reservation",
+    "journeyGoal": "Re-engage users who browsed a reservation but did not complete it",
+    "entryTrigger": "user_browsed_reservation",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after reservation or 3 days"
+  },
+  "entryCriteria": {
+    "event": "user_browsed_reservation",
+    "eventId": "evt_browse_reservation_001",
+    "conditions": [
+      {
+        "field": "reservationStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Abandoned Reservation Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Reservation Reminder Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "You browsed a reservation – secure your spot now!",
+      "cta": "View Reservation",
+      "tracking": {
+        "campaignId": "push_abandoned_reservation",
+        "deliveryId": "del_push_05",
+        "trackingEvents": [
+          "push_open",
+          "reservation_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Follow-up Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Don’t miss your chance – complete your reservation today!",
+      "cta": "Complete Reservation",
+      "tracking": {
+        "campaignId": "email_abandoned_reservation",
+        "deliveryId": "del_email_05",
+        "trackingEvents": [
+          "email_open",
+          "reservation_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_browsed_reservation",
+        "eventId": "evt_browse_reservation_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "reservation_complete",
+      "eventId": "evt_reservation_001",
+      "condition": "reservationCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "reservation_complete"
+    ],
+    "eventMapping": {
+      "reservation_complete": "evt_reservation_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "reservation_complete",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open",
+      "reservation_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

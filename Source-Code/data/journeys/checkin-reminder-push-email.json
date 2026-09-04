@@ -1,0 +1,168 @@
+{
+  "useCaseId": "checkin-reminder-push-email",
+  "name": "Check-in Reminder – Push & Email Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Check-in Reminder – Push & Email",
+    "journeyGoal": "Remind users to complete check-in via push and email",
+    "entryTrigger": "user_checkin_pending",
+    "journeyCategory": "Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after app download or check-in"
+  },
+  "entryCriteria": {
+    "event": "user_checkin_pending",
+    "eventId": "evt_checkin_005",
+    "conditions": [
+      {
+        "field": "appInstalled",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Pending Check-in Users – Push & Email"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Check-in Reminder Push",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "PUSH",
+      "messageTheme": "You haven’t checked in yet – download the app to complete check-in quickly!",
+      "cta": "Check-in Now",
+      "tracking": {
+        "campaignId": "push_checkin_reminder",
+        "deliveryId": "del_push_35",
+        "trackingEvents": [
+          "push_open",
+          "app_download"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Check-in Reminder Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Don’t forget to check-in – complete it now via the app!",
+      "cta": "Check-in Now",
+      "tracking": {
+        "campaignId": "email_checkin_reminder",
+        "deliveryId": "del_email_35",
+        "trackingEvents": [
+          "email_open",
+          "app_download"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_checkin_pending",
+        "eventId": "evt_checkin_005"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_download",
+          "field": "appDownloaded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_download",
+          "field": "appDownloaded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "app_download",
+      "eventId": "evt_app_005",
+      "condition": "appDownloaded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "app_download"
+    ],
+    "eventMapping": {
+      "app_download": "evt_app_005"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "app_download",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

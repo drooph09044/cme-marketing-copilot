@@ -1,0 +1,20 @@
+{
+  "categoryId": "service-upsell",
+  "categoryName": "Premium Service Upsell",
+  "categoryDescription": "Journeys focused on moving qualified customers to premium maintenance packages.",
+  "subCategoryId": "premium-care",
+  "subCategoryName": "Premium Care",
+  "slug": "premium-service-upsell-journey",
+  "name": "Premium Service Upsell Journey",
+  "active": true,
+  "brief": "Find customers eligible for premium service upsell and personalize package recommendations based on service history and vehicle profile.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-29",
+  "journeyOverrides": {
+    "name": "Premium Service Upsell",
+    "objective": "Increase premium service package attach rate among eligible customers.",
+    "audience": "Premium_Service_Eligible",
+    "variantA": "Value-led package recommendation",
+    "variantB": "Value plus concierge booking experience"
+  }
+}

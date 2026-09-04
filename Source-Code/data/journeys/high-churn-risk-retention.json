@@ -1,0 +1,180 @@
+{
+  "useCaseId": "high-churn-risk-retention",
+  "name": "High Churn Risk Retention Journey",
+  "category": {
+    "categoryId": "retention",
+    "categoryName": "Retention"
+  },
+  "journeyTable": {
+    "journeyName": "High Churn Risk Retention",
+    "journeyGoal": "Reduce subscriber churn through proactive retention offers",
+    "entryTrigger": "high_churn_detected",
+    "journeyCategory": "Retention",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after retention accepted or churn risk reduced"
+  },
+  "entryCriteria": {
+    "event": "high_churn_detected",
+    "eventId": "evt_churn_001",
+    "conditions": [
+      {
+        "field": "churnPropensityScore",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 70
+      },
+      {
+        "field": "complaintsLast30Days",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 2
+      },
+      {
+        "field": "usageDropPercent",
+        "operator": "GREATER_THAN",
+        "value": 30
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Churn_Risk_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Retention Offer",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Exclusive loyalty offer just for you",
+      "cta": "View Offer",
+      "tracking": {
+        "campaignId": "email_retention_offer",
+        "deliveryId": "del_email_r1",
+        "trackingEvents": [
+          "email_open",
+          "offer_accept"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Customer Care Follow-Up",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "SMS",
+      "messageTheme": "We’re here to help improve your experience",
+      "cta": "Contact Support",
+      "tracking": {
+        "campaignId": "sms_customer_care",
+        "deliveryId": "del_sms_r2",
+        "trackingEvents": [
+          "sms_click",
+          "support_contacted"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "high_churn_detected",
+        "eventId": "evt_churn_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "offer_accept",
+          "field": "offerAccepted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "offer_accept",
+          "field": "offerAccepted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "offer_accept",
+      "eventId": "evt_offer_001",
+      "condition": "offerAccepted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "offer_accept",
+      "support_contacted"
+    ],
+    "eventMapping": {
+      "offer_accept": "evt_offer_001",
+      "support_contacted": "evt_support_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "offer_accept",
+    "secondaryKPIs": [
+      "email_open",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

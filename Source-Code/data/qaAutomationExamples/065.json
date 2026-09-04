@@ -1,0 +1,210 @@
+{
+  "id": "065",
+  "matrix_row_id": 65,
+  "matrix_row_name": "MLS Season Pass annual renewal",
+  "template": "tpl_renewal",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLS Season Pass renewal journey at 30/14/7/1 days before expiry.",
+    "Create a 30/14/7/1-day renewal cadence for MLS Season Pass on Apple TV. Email at T-30/T-7/T-1, push at T-14 and T-7, SMS at T-1 for opted-in fans. Cap SMS at 1 in window. Storyline hooks tied to preseason results and roster moves heading into Opening Weekend.",
+    "Need an MLS Season Pass renewal sequence with email + push + SMS, anchored to subscription expiry and tied to preseason hooks."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-season-pass-renewal-2026",
+    "metadata": {
+      "name": "MLS Season Pass Annual Renewal",
+      "internal_name": "MLS_SeasonPass_Renewal_2026",
+      "brand": {"vertical": "streaming", "league": "MLS", "team": null, "product": "MLS Season Pass (Apple TV)"},
+      "purpose": "Drive MLS Season Pass renewals at 30/14/7/1 days before expiry with preseason and roster-change content hooks.",
+      "archetype": "renewal",
+      "launch_date": "2026-01-15",
+      "end_date": "2026-03-15",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Maximize Season Pass annual renewal rate.", "kpi": "Renewal rate among approaching-expiry subscribers", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-expiry renewal sequence at 30/14/7/1 days. Email leads T-30/T-7/T-1; push at T-14 and T-7; SMS at T-1 for opted-in supporters. SMS frequency cap: 1 in window. Content hooks rotate between preseason match results, roster-move news, and Opening Weekend tease.",
+        "timing_rationale": "Anchored to Season Pass subscription expiry, typically aligned to Opening Weekend Feb 21.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "sms", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_approaching_expiry",
+        "name": "Season Pass annual subscriber approaching expiry",
+        "criteria": {
+          "all_of": [
+            {"field": "mls_season_pass.status", "op": "equals", "value": "active"},
+            {"field": "mls_season_pass.plan", "op": "equals", "value": "annual"},
+            {"field": "mls_season_pass.days_until_expiry", "op": "lte", "value": 30}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}},
+      {"id": "supp_already_renewed", "name": "Already renewed", "scope": "global", "criteria": {"field": "mls_season_pass.renewal_status", "op": "equals", "value": "renewed"}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"},
+      {"id": "ch_sms", "type": "sms"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [
+      {"scope": "channel", "limit": 1, "window": {"value": 30, "unit": "day"}, "applies_to": ["ch_sms"]}
+    ],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 30 days before expiry",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {"field": "mls_season_pass.days_until_expiry", "op": "equals", "value": 30}
+        }
+      },
+      {
+        "id": "email_t30",
+        "type": "action",
+        "label": "Email T-30 - Renew with preseason hook",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Your Season Pass renews in 30 days - {{FC}} preseason is rolling",
+          "cta_label": "Renew now",
+          "modules": [
+            {"rank": "primary", "name": "Preseason results / roster moves / Opening Weekend tease"},
+            {"rank": "secondary", "name": "Fav-club fixture preview"}
+          ]
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_t14",
+        "type": "wait",
+        "label": "Wait 16 days to T-14",
+        "timing": {"type": "wait", "duration": {"value": 16, "unit": "day"}}
+      },
+      {
+        "id": "dec_push_optin_t14",
+        "type": "decision",
+        "label": "Push opted in (MLS App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_t14",
+        "type": "action",
+        "label": "Push T-14 - Renewal reminder",
+        "channel": "ch_push",
+        "touch_id": "P14",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Two weeks left on your Season Pass - keep watching {{FC}}"}
+      },
+      {
+        "id": "wait_to_t7",
+        "type": "wait",
+        "label": "Wait 7 days to T-7",
+        "timing": {"type": "wait", "duration": {"value": 7, "unit": "day"}}
+      },
+      {
+        "id": "email_t7",
+        "type": "action",
+        "label": "Email T-7 - Renew this week",
+        "channel": "ch_email",
+        "touch_id": "T7",
+        "timing": {"type": "realtime"},
+        "copy": {"subject": "One week left on your Season Pass", "cta_label": "Renew now"}
+      },
+      {
+        "id": "dec_push_optin_t7",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_t7",
+        "type": "action",
+        "label": "Push T-7",
+        "channel": "ch_push",
+        "touch_id": "P7",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Renew your Season Pass to keep watching {{FC}}"}
+      },
+      {
+        "id": "wait_to_t1",
+        "type": "wait",
+        "label": "Wait 6 days to T-1",
+        "timing": {"type": "wait", "duration": {"value": 6, "unit": "day"}}
+      },
+      {
+        "id": "email_t1",
+        "type": "action",
+        "label": "Email T-1 - Last chance",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {"type": "realtime"},
+        "copy": {"subject": "Last chance: your Season Pass renews tomorrow", "cta_label": "Renew now"}
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.sms", "op": "equals", "value": true}
+      },
+      {
+        "id": "sms_t1",
+        "type": "action",
+        "label": "SMS T-1 - Last chance (1/window cap)",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {"type": "realtime"},
+        "copy": {"body": "MLS: Your Season Pass renews tomorrow. Renew: mlssoccer.com/seasonpass/renew"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_t30"},
+      {"from": "email_t30", "to": "wait_to_t14"},
+      {"from": "wait_to_t14", "to": "dec_push_optin_t14"},
+      {"from": "dec_push_optin_t14", "to": "push_t14", "branch_label": "yes"},
+      {"from": "dec_push_optin_t14", "to": "wait_to_t7", "branch_label": "no"},
+      {"from": "push_t14", "to": "wait_to_t7"},
+      {"from": "wait_to_t7", "to": "email_t7"},
+      {"from": "email_t7", "to": "dec_push_optin_t7"},
+      {"from": "dec_push_optin_t7", "to": "push_t7", "branch_label": "yes"},
+      {"from": "dec_push_optin_t7", "to": "wait_to_t1", "branch_label": "no"},
+      {"from": "push_t7", "to": "wait_to_t1"},
+      {"from": "wait_to_t1", "to": "email_t1"},
+      {"from": "email_t1", "to": "dec_sms_optin"},
+      {"from": "dec_sms_optin", "to": "sms_t1", "branch_label": "yes"},
+      {"from": "dec_sms_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "sms_t1", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Renewal rate among approaching-expiry subscribers"}],
+      "secondary_kpis": [{"name": "Per-touch click and conversion rate"}, {"name": "SMS T-1 incremental lift"}],
+      "tests": []
+    }
+  }
+}

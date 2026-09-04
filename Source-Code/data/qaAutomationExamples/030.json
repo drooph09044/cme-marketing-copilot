@@ -1,0 +1,272 @@
+{
+  "id": "030",
+  "matrix_row_id": 30,
+  "matrix_row_name": "Playoff Ticket Waitlist - Back in Stock",
+  "template": "tpl_back_in_stock",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a playoff-ticket waitlist back-in-stock journey with a 2-touch frequency cap.",
+    "Triggered when sold-out playoff-game tickets reopen on Ticketmaster (returns, cancellations, or additional inventory release). Real-time push to fans on the waitlist for that specific game, followed by a 24h email with purchase CTA. Cap at 2 touches per inventory-release event to prevent fatigue from multiple availability cycles.",
+    "Need a back-in-stock notification for playoff waitlist \u2014 real-time push, 24h email, capped at 2 touches per release."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-playoff-waitlist-back-in-stock",
+    "metadata": {
+      "name": "Playoff Ticket Waitlist - Back in Stock",
+      "internal_name": "NFL_Playoff_Waitlist_BackInStock_2027",
+      "brand": {
+        "vertical": "ticketing",
+        "league": "NFL",
+        "team": null,
+        "product": "Ticketmaster"
+      },
+      "purpose": "Notify playoff waitlist fans when sold-out tickets reopen, capped at 2 touches per inventory-release event.",
+      "archetype": "transactional",
+      "launch_date": "2027-01-04",
+      "end_date": "2027-02-08",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Convert waitlist fans on inventory release.",
+          "kpi": "Conversion rate among waitlist",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Real-time push when waitlisted fans' game-inventory reopens, plus email 24h later. Cap at 2 touches per inventory-release event to prevent fatigue.",
+        "timing_rationale": "Inventory cycles can hit several times during playoffs; cap protects fans from repeat notifications.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "GET READY",
+        "PLAN & COMMIT"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_playoff_waitlist",
+        "name": "Playoff ticket waitlist fan",
+        "criteria": {
+          "field": "playoff.ticket_waitlist",
+          "op": "equals",
+          "value": true
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_already_bought",
+        "name": "Already purchased for this game",
+        "scope": "global",
+        "criteria": {
+          "field": "playoff.ticket_purchased_this_game",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [
+      {
+        "scope": "journey",
+        "limit": 2,
+        "window": {
+          "value": 7,
+          "unit": "day"
+        },
+        "applies_to": [
+          "ch_email",
+          "ch_push"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Inventory released",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "playoff_inventory_released"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_release",
+        "type": "action",
+        "label": "Push - Tickets are back",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "{{MTC}} tickets just opened - buy now"
+        },
+        "personalization_used": [
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait 24h",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 24,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "dec_purchased",
+        "type": "decision",
+        "label": "Purchased?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "playoff.ticket_purchased_this_game",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_24h",
+        "type": "action",
+        "label": "Email 24h - Tickets still available",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "{{MTC}} tickets - last call on this inventory release",
+          "cta_label": "Buy now"
+        },
+        "personalization_used": [
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Purchased",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_release",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_24h",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_release",
+        "to": "wait_24h"
+      },
+      {
+        "from": "wait_24h",
+        "to": "dec_purchased"
+      },
+      {
+        "from": "dec_purchased",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_purchased",
+        "to": "email_24h",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_24h",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Conversion rate among waitlist"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Push view rate"
+        },
+        {
+          "name": "Email CTR"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

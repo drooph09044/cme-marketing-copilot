@@ -1,0 +1,168 @@
+{
+  "id": "104",
+  "matrix_row_id": 104,
+  "matrix_row_name": "Abu Dhabi GP Season Finale Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the F1 Abu Dhabi GP season finale Dec 4-6.",
+    "Create an Abu Dhabi GP tune-in journey for the 2026 F1 season finale at Yas Marina. Championship-deciding race weekend. Cadence: T-3d email with constructors championship context, Free Practice day push, Qualifying day push, race day push. Broadcast on F1 TV Pro and ESPN. Per-fav-driver and per-fav-team variants.",
+    "Need a tune-in for the F1 season finale at Abu Dhabi — four touches across the race weekend with championship-decider context."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-abu-dhabi-gp-2026-tune-in",
+    "metadata": {
+      "name": "F1 Abu Dhabi GP Season Finale Tune-In - Dec 4-6",
+      "internal_name": "F1_Abu_Dhabi_GP_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "F1", "team": null, "product": "F1 TV Pro"},
+      "purpose": "Drive tune-in to the 2026 F1 season finale at Yas Marina Circuit, Abu Dhabi - the championship-deciding race weekend.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-12-01",
+      "end_date": "2026-12-07",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the Abu Dhabi GP finale on F1 TV Pro and ESPN.", "kpi": "Abu Dhabi GP viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Four-touch race-weekend cadence with constructors-championship context. Per-fav-driver and per-fav-team variants reinforce the championship-decider angle.",
+        "timing_rationale": "Abu Dhabi GP race weekend Dec 4-6, 2026. Free Practice Friday, Qualifying Saturday, Race Sunday.",
+        "notes": "Yas Marina Circuit; 2026 season finale."
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_f1_fan",
+        "name": "Active F1 fan",
+        "criteria": {"field": "f1.activity_within_days", "op": "lte", "value": 365},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_fan_with_fav",
+        "name": "F1 fan with favorite driver or team",
+        "criteria": {
+          "any_of": [
+            {"field": "f1.favorite_driver", "op": "is_not_null"},
+            {"field": "f1.favorite_team", "op": "is_not_null"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Driver or Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Cadence opens (T-3d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_has_fav",
+        "type": "decision",
+        "label": "Fav driver or team set?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {"field": "f1.favorite_driver", "op": "is_not_null"},
+            {"field": "f1.favorite_team", "op": "is_not_null"}
+          ]
+        }
+      },
+      {
+        "id": "email_personalized_finale",
+        "type": "action",
+        "label": "Email T-3d - Personalized finale preview",
+        "channel": "ch_email",
+        "touch_id": "TA1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-01"},
+        "copy": {
+          "subject": "{{FT}}'s 2026 season ends in Abu Dhabi - the championship picture",
+          "cta_label": "See the standings"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_neutral_finale",
+        "type": "action",
+        "label": "Email T-3d - Neutral finale preview",
+        "channel": "ch_email",
+        "touch_id": "TA2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-01"},
+        "copy": {
+          "subject": "The 2026 F1 championship ends in Abu Dhabi - what's at stake",
+          "cta_label": "See the standings"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_f1", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_friday_fp",
+        "type": "action",
+        "label": "Push Fri Dec 4 - Free Practice underway",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-04"},
+        "copy": {"headline": "Free Practice underway in Abu Dhabi - watch live on F1 TV"}
+      },
+      {
+        "id": "push_sat_quali",
+        "type": "action",
+        "label": "Push Sat Dec 5 - Qualifying grid",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-05"},
+        "copy": {"headline": "{{FT}} starts P? at Abu Dhabi - championship on the line tomorrow"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_race_day",
+        "type": "action",
+        "label": "Push Race Day - Lights out",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-06"},
+        "copy": {"headline": "Lights out at Abu Dhabi - the 2026 champion is decided"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav"},
+      {"from": "dec_has_fav", "to": "email_personalized_finale", "branch_label": "yes"},
+      {"from": "dec_has_fav", "to": "email_neutral_finale", "branch_label": "no"},
+      {"from": "email_personalized_finale", "to": "dec_push_optin"},
+      {"from": "email_neutral_finale", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_friday_fp", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_friday_fp", "to": "push_sat_quali"},
+      {"from": "push_sat_quali", "to": "push_race_day"},
+      {"from": "push_race_day", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Abu Dhabi GP viewership"}],
+      "secondary_kpis": [{"name": "Personalized vs neutral email engagement"}, {"name": "Per-race-day push CTR"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "useCaseId": "ticket-high-value",
+  "name": "High Value Ticket Purchase Journey",
+  "category": {
+    "categoryId": "ticketing",
+    "categoryName": "Ticketing"
+  },
+  "journeyTable": {
+    "journeyName": "High Value Ticket Buyers",
+    "journeyGoal": "Increase ticket purchases from high-value fans",
+    "entryTrigger": "high_value_ticket_segment",
+    "journeyCategory": "Revenue",
+    "totalDuration": "14 days",
+    "exitClause": "Exit after incremental purchase or escalation to season ticket"
+  },
+  "entryCriteria": {
+    "event": "ticket_purchase_event",
+    "eventId": "evt_ticket_001",
+    "conditions": [
+      {
+        "field": "ticketsPurchasedSeason",
+        "operator": "GREATER_THAN",
+        "value": 5
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Value_Ticket_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "VIP Match Access",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Exclusive access to upcoming matches",
+      "cta": "Book Now",
+      "tracking": {
+        "campaignId": "email_vip_ticket",
+        "deliveryId": "del_email_tvh1",
+        "trackingEvents": [
+          "email_open",
+          "ticket_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "ticket_purchase_event",
+        "eventId": "evt_ticket_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "incrementalPurchase",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_purchase",
+      "eventId": "evt_ticket_buy_001",
+      "condition": "incrementalPurchase == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "ticket_purchase"
+    ],
+    "eventMapping": {
+      "ticket_purchase": "evt_ticket_buy_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_purchase",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

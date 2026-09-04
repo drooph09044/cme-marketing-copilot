@@ -1,0 +1,540 @@
+{
+  "tables": {
+    "customer_profile": {
+      "role": "profile",
+      "description": "Customer identity and profile. One row per customer. golden_id is master key. Use for profile level filters.",
+      "row_count": 8841,
+      "columns": {
+        "subscription_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Basic",
+            "Free",
+            "Premium",
+            "VIP"
+          ]
+        },
+        "ltv_score": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            153.66,
+            1908.7
+          ]
+        },
+        "ltv_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "High",
+            "Medium",
+            "Low"
+          ]
+        },
+        "recency_days": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            18.0,
+            347.0
+          ]
+        },
+        "recency_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Inactive",
+            "Lapsing",
+            "Active"
+          ]
+        },
+        "engagement_rate": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            5.3,
+            95.4
+          ]
+        },
+        "engagement_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Medium",
+            "Low",
+            "High"
+          ]
+        },
+        "primary_affinity": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Sports",
+            "Kids",
+            "Documentary",
+            "Movies",
+            "News",
+            "Music"
+          ]
+        }
+      }
+    },
+    "streaming_activity": {
+      "role": "behavioral",
+      "description": "Raw streaming sessions. One row per session. Use for content watched, teams, live events, device type, session duration.",
+      "row_count": 69706,
+      "columns": {
+        "device_type": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Fire TV",
+            "Roku",
+            "Smart TV",
+            "Apple TV",
+            "iOS",
+            "Web",
+            "Android",
+            "Chromecast"
+          ]
+        },
+        "session_start": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "session_duration": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            16.0,
+            229.0
+          ]
+        },
+        "content_type": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Documentary",
+            "Highlights",
+            "Draft Coverage",
+            "Podcast",
+            "Training Camp",
+            "Live Game",
+            "Pre-Game Show",
+            "Interview",
+            "Fantasy Tips",
+            "Post-Game Analysis"
+          ]
+        },
+        "team": {
+          "type": "text",
+          "operators": [
+            "CONTAINS"
+          ],
+          "note": "High cardinality text. Always use CONTAINS operator. Extract keyword from user query."
+        },
+        "is_live": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "False",
+            "True"
+          ]
+        }
+      }
+    },
+    "app_events": {
+      "role": "behavioral",
+      "description": "Raw app usage events. One row per event. Use for app installs, logins, uninstalls, device platform.",
+      "row_count": 7078,
+      "columns": {
+        "event_type": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "login",
+            "re-install",
+            "update",
+            "uninstall",
+            "install"
+          ]
+        },
+        "device_platform": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Fire TV",
+            "Roku",
+            "Smart TV",
+            "Apple TV",
+            "Web",
+            "Android",
+            "iOS",
+            "Chromecast"
+          ]
+        },
+        "event_timestamp": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        }
+      }
+    },
+    "email_engagement": {
+      "role": "behavioral",
+      "description": "Raw email campaign events. One row per email. Use for email opens, clicks, unsubscribes, campaign names.",
+      "row_count": 1702,
+      "columns": {
+        "subscription_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Basic",
+            "Free",
+            "Premium",
+            "VIP"
+          ]
+        },
+        "campaign_name": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "VIP Upgrade Offer",
+            "NFL Sunday Bundle",
+            "Fantasy League Promo",
+            "Super Bowl Countdown",
+            "Welcome Series",
+            "Draft Day Special",
+            "Summer Sports Pack",
+            "Win-Back Campaign",
+            "Holiday Sports Bundle",
+            "March Madness Special",
+            "NBA Playoffs Preview",
+            "World Series Deal"
+          ]
+        },
+        "send_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "opened": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "False",
+            "True"
+          ]
+        },
+        "open_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "clicked": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "False",
+            "True"
+          ]
+        },
+        "unsubscribed": {
+          "type": "boolean",
+          "operators": [
+            "EQ"
+          ],
+          "values": [
+            "False",
+            "True"
+          ]
+        },
+        "email_client": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Outlook",
+            "Other",
+            "Gmail",
+            "Apple Mail",
+            "Yahoo Mail"
+          ]
+        }
+      }
+    },
+    "subscription_billing": {
+      "role": "transactional",
+      "description": "Raw billing records. One row per billing event. Use for account status, billing amount, payment method.",
+      "row_count": 3295,
+      "columns": {
+        "subscription_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Basic",
+            "Free",
+            "Premium",
+            "VIP"
+          ]
+        },
+        "billing_amount": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            0.0,
+            19.99
+          ]
+        },
+        "payment_method": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Apple Pay",
+            "PayPal",
+            "Amex",
+            "Mastercard",
+            "Visa"
+          ]
+        },
+        "billing_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "account_status": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Active",
+            "Cancelled",
+            "Suspended"
+          ]
+        }
+      }
+    },
+    "customer_support": {
+      "role": "transactional",
+      "description": "Raw support tickets. One row per ticket. Use for issue category, ticket status, satisfaction score.",
+      "row_count": 2493,
+      "columns": {
+        "subscription_tier": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Free",
+            "Basic",
+            "Premium",
+            "VIP"
+          ]
+        },
+        "category": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Account Recovery",
+            "Refund Request",
+            "Technical Issue",
+            "Streaming Quality",
+            "Login Problem",
+            "Subscription Change",
+            "Billing Issue",
+            "Content Request"
+          ]
+        },
+        "priority": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Medium",
+            "Low",
+            "High",
+            "Urgent"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "operators": [
+            "EQ",
+            "IN",
+            "CONTAINS"
+          ],
+          "values": [
+            "Closed",
+            "Resolved",
+            "In Progress",
+            "Open"
+          ]
+        },
+        "created_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "resolved_date": {
+          "type": "date",
+          "operators": [
+            "IN_LAST",
+            "NOT_IN_LAST",
+            "BEFORE",
+            "AFTER"
+          ],
+          "note": "Use IN_LAST N or NOT_IN_LAST N (number of days)"
+        },
+        "satisfaction_score": {
+          "type": "numeric",
+          "operators": [
+            "EQ",
+            "GT",
+            "GTE",
+            "LT",
+            "LTE"
+          ],
+          "range": [
+            2.0,
+            5.0
+          ]
+        }
+      }
+    }
+  }
+}

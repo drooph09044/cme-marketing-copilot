@@ -1,0 +1,224 @@
+{
+  "useCaseId": "new-joiner-onboarding",
+  "name": "New Joiner Onboarding Journey",
+  "category": {
+    "categoryId": "onboarding",
+    "categoryName": "Onboarding"
+  },
+  "journeyTable": {
+    "journeyName": "New Joiner Onboarding",
+    "journeyGoal": "Drive activation, feature adoption, and early satisfaction in first 90 days",
+    "entryTrigger": "sim_activation_or_account_creation",
+    "journeyCategory": "Onboarding",
+    "totalDuration": "90 days",
+    "exitClause": "No exit — journey completes full cadence"
+  },
+  "entryCriteria": {
+    "event": "account_created",
+    "eventId": "evt_onboard_001",
+    "conditions": [
+      {
+        "field": "accountStatus",
+        "operator": "EQUALS",
+        "value": "ACTIVE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "New_Joiners_90D"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Welcome Message",
+      "timing": {
+        "offsetDays": 0
+      },
+      "channel": "EMAIL_SMS",
+      "messageTheme": "Welcome to [Network] – account confirmed and getting started guide",
+      "cta": "Download the App",
+      "tracking": {
+        "campaignId": "onboard_welcome",
+        "deliveryId": "del_onboard_1",
+        "trackingEvents": [
+          "email_open",
+          "app_install"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Feature Education",
+      "timing": {
+        "offsetDays": 3
+      },
+      "channel": "PUSH_EMAIL",
+      "messageTheme": "Get more from your plan – feature discovery and usage tips",
+      "cta": "Explore My Plan",
+      "tracking": {
+        "campaignId": "onboard_features",
+        "deliveryId": "del_onboard_2",
+        "trackingEvents": [
+          "push_open",
+          "feature_engagement"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Satisfaction Check-in",
+      "timing": {
+        "offsetDays": 14
+      },
+      "channel": "EMAIL",
+      "messageTheme": "How are we doing? Quick feedback and tips tailored to your usage",
+      "cta": "Share Feedback",
+      "tracking": {
+        "campaignId": "onboard_nps",
+        "deliveryId": "del_onboard_3",
+        "trackingEvents": [
+          "nps_submit"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Upsell Recommendation",
+      "timing": {
+        "offsetDays": 45
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You might like this – personalised add-on recommendation",
+      "cta": "Add to My Plan",
+      "tracking": {
+        "campaignId": "onboard_upsell",
+        "deliveryId": "del_onboard_4",
+        "trackingEvents": [
+          "click",
+          "add_on_purchase"
+        ]
+      }
+    },
+    {
+      "tpId": "TP5",
+      "label": "Referral Milestone",
+      "timing": {
+        "offsetDays": 90
+      },
+      "channel": "EMAIL",
+      "messageTheme": "3 months in – loyalty milestone and referral invite",
+      "cta": "Refer a Friend",
+      "tracking": {
+        "campaignId": "onboard_referral",
+        "deliveryId": "del_onboard_5",
+        "trackingEvents": [
+          "referral_click",
+          "referral_submit"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "account_created",
+        "eventId": "evt_onboard_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 264
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 744
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n10",
+        "type": "WAIT",
+        "durationHours": 1080
+      },
+      {
+        "id": "n11",
+        "type": "MESSAGE",
+        "tpId": "TP5"
+      },
+      {
+        "id": "n12",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 5,
+      "timeWindowHours": 2160
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "feature_engagement",
+      "add_on_purchase",
+      "referral_submit"
+    ],
+    "eventMapping": {
+      "feature_engagement": "evt_feat_001",
+      "add_on_purchase": "evt_addon_001",
+      "referral_submit": "evt_ref_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "activation_rate",
+    "secondaryKPIs": [
+      "feature_adoption",
+      "nps_score"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 2160
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

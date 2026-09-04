@@ -1,0 +1,36 @@
+{
+  "id": "seg_low_engagement_subscribers_at",
+  "name": "Low Engagement Subscribers At",
+  "purpose": "Custom audience segment",
+  "size": "4.8K",
+  "refresh": "Daily",
+  "exclusions": "None defined",
+  "status": "Draft",
+  "rules": [
+    {
+      "id": "ai_rule_ltv",
+      "field": "LTV Tier",
+      "value": "Low",
+      "joiner": ""
+    },
+    {
+      "id": "ai_rule_eng",
+      "field": "Engagement Tier",
+      "value": "Low",
+      "joiner": "AND"
+    },
+    {
+      "id": "ai_rule_rec",
+      "field": "Recency",
+      "value": "Low",
+      "joiner": "AND"
+    },
+    {
+      "id": "ai_rule_aff",
+      "field": "Content Affinity",
+      "value": "Low",
+      "joiner": "AND"
+    }
+  ],
+  "isPreset": false
+}

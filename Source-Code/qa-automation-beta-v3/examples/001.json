@@ -1,0 +1,1129 @@
+{
+  "id": "001",
+  "matrix_row_id": 1,
+  "matrix_row_name": "Abandon Cart - NFL+ subscription",
+  "template": "tpl_abandon_cart",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "seed_replica": true,
+  "prompts": [
+    "Build an NFL+ cart abandonment journey for fans who drop off at the credit card page.",
+    "Create a cart abandonment flow for our NFL+ subscription product with five subscription-tier branches (Premium Annual, Premium Monthly, Annual, Monthly, Fallback). Audience should fan out across the four identity states (App Known, App Unknown, Web Known, Web Unknown). Cadence should be modal-first at the point of abandonment, then escalate to push and email on the next game day. Suppress current subscribers, international fans, and collapsed profiles. Allow re-entry once per month. Always-on journey through the season.",
+    "I need an always-on abandonment journey for NFL+ subscriptions. Modal at the funnel entry, push and email on game days after the fact. Routing should respect whether the fan abandoned from app vs web. Cap re-entry at once per month."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-plus-abandon-cart-2026",
+    "metadata": {
+      "name": "Abandon Cart Journey",
+      "internal_name": "NFL_AbandonCart_2026_AJO",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Recover fans who began an NFL+ subscription checkout but dropped off at the credit card page, by re-engaging them in their highest-converting channel and again on the next game day.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-06-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Convert abandon-cart fans to active NFL+ subscribers within the season.",
+          "kpi": "Subscription conversions attributed to journey",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": "2025: App Modal was the main closing channel (~75% of subs, ~28K clickers). Web Modal had highest conversion at funnel entry (10.75%) but only 6% of clickers (460K audience, 99.5% dropped pre-funnel). ~40% of conversions occur within 24 hours; the remaining ~60% over 2-30 days. Game-day conversions are concentrated: Sundays 12PM-4PM ET (67% of Sunday conversions); Mon/Thu evenings 6-10PM (78% of weekday subs).",
+        "strategy": "Lead with converting channels (modals) before awareness channels (push/email). Show first touchpoints within 24 hours of cart abandonment. Supplement with push/email. Follow up on game days to reiterate need.",
+        "timing_rationale": "Always-on through the season (Preseason through Playoffs) to capture steady, efficient conversions.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "realtime_outbound",
+        "app_modal",
+        "web_modal",
+        "push",
+        "email"
+      ],
+      "moments_that_matter": [
+        "PLAN & COMMIT",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_app_known",
+        "name": "App Known",
+        "description": "Fan has hashed email; visited NFL+ PSP on App, began subscription flow but dropped off at credit card page.",
+        "identity_state": "app_known",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_not_null"
+            },
+            {
+              "field": "drop_off_stage",
+              "op": "equals",
+              "value": "credit_card"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_web_known",
+        "name": "Web Known",
+        "description": "Fan has hashed email; visited NFL+ web page, created or logged into NFL ID, selected product, then dropped off at credit card page.",
+        "identity_state": "web_known",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "web"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_not_null"
+            },
+            {
+              "field": "drop_off_stage",
+              "op": "equals",
+              "value": "credit_card"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_app_unknown",
+        "name": "App Unknown",
+        "description": "Fan has ECID only; visited NFL+ PSP on App, began subscription flow but dropped off at credit card page.",
+        "identity_state": "app_unknown",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            },
+            {
+              "field": "identity.ecid",
+              "op": "is_not_null"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_null"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_web_unknown",
+        "name": "Web Unknown",
+        "description": "Fan has ECID only; visited NFL+ web page, dropped off at credit card page.",
+        "identity_state": "web_unknown",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "web"
+            },
+            {
+              "field": "identity.ecid",
+              "op": "is_not_null"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_null"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_tier_premium_annual",
+        "name": "Premium Annual",
+        "description": "Abandoned SKU was Premium Annual.",
+        "criteria": {
+          "field": "abandoned_sku",
+          "op": "equals",
+          "value": "premium_annual"
+        }
+      },
+      {
+        "id": "aud_tier_premium_monthly",
+        "name": "Premium Monthly",
+        "criteria": {
+          "field": "abandoned_sku",
+          "op": "equals",
+          "value": "premium_monthly"
+        }
+      },
+      {
+        "id": "aud_tier_annual",
+        "name": "Annual",
+        "criteria": {
+          "field": "abandoned_sku",
+          "op": "equals",
+          "value": "annual"
+        }
+      },
+      {
+        "id": "aud_tier_monthly",
+        "name": "Monthly",
+        "criteria": {
+          "field": "abandoned_sku",
+          "op": "equals",
+          "value": "monthly"
+        }
+      },
+      {
+        "id": "aud_tier_fallback",
+        "name": "Fallback (SKU unknown)",
+        "criteria": {
+          "field": "abandoned_sku",
+          "op": "is_null"
+        }
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_current_subscribers",
+        "name": "Current NFL+ subscribers",
+        "scope": "global",
+        "criteria": {
+          "field": "nfl_plus_subscription_status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "supp_international",
+        "name": "International / collapsed profiles / Fan Exclusion List",
+        "scope": "global",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "country",
+              "op": "not_equals",
+              "value": "US"
+            },
+            {
+              "field": "profile_status",
+              "op": "equals",
+              "value": "collapsed"
+            },
+            {
+              "field": "on_fan_exclusion_list",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "supp_known_unknown_overlap",
+        "name": "Known app/web abandon cart audience (excluded from Unknown branch)",
+        "scope": "audience",
+        "applies_to": [
+          "aud_app_unknown",
+          "aud_web_unknown"
+        ],
+        "criteria": {
+          "field": "identity.hashed_email",
+          "op": "is_not_null"
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_app_modal",
+        "type": "app_modal",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_web_modal",
+        "type": "web_modal",
+        "platform": "nfl_web"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_email",
+        "type": "email"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "PR",
+        "name": "Product (SKU)"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 1,
+        "unit": "month"
+      },
+      "max_entries": null
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: Cart Abandonment",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "checkout_abandoned",
+          "criteria": {
+            "all_of": [
+              {
+                "field": "drop_off_stage",
+                "op": "equals",
+                "value": "credit_card"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "split_tier",
+        "type": "audience_split",
+        "label": "Grab audience: tier of abandoned SKU",
+        "mode": "waterfall",
+        "audiences": [
+          "aud_tier_premium_annual",
+          "aud_tier_premium_monthly",
+          "aud_tier_annual",
+          "aud_tier_monthly",
+          "aud_tier_fallback"
+        ]
+      },
+      {
+        "id": "dec_app_or_web_premium_annual",
+        "type": "decision",
+        "label": "Premium Annual: Has NFL App OR abandoned from NFL App?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {
+              "field": "has_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            }
+          ]
+        }
+      },
+      {
+        "id": "nm_premium_annual",
+        "type": "action",
+        "label": "App Modal NM1 - Return to Cart",
+        "channel": "ch_app_modal",
+        "touch_id": "NM1",
+        "asset_ref": "Prem Annual PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Prem Annual PSP",
+              "asset_ref": "Prem Annual PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wm_premium_annual",
+        "type": "action",
+        "label": "Web Modal WM1 - Return to Cart",
+        "channel": "ch_web_modal",
+        "touch_id": "WM1",
+        "asset_ref": "Prem Annual PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Prem Annual PSP",
+              "asset_ref": "Prem Annual PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_app_or_web_premium_monthly",
+        "type": "decision",
+        "label": "Premium Monthly: Has NFL App OR abandoned from NFL App?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {
+              "field": "has_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            }
+          ]
+        }
+      },
+      {
+        "id": "nm_premium_monthly",
+        "type": "action",
+        "label": "App Modal NM2 - Return to Cart",
+        "channel": "ch_app_modal",
+        "touch_id": "NM2",
+        "asset_ref": "Prem Monthly PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Prem Monthly PSP",
+              "asset_ref": "Prem Monthly PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wm_premium_monthly",
+        "type": "action",
+        "label": "Web Modal WM2 - Return to Cart",
+        "channel": "ch_web_modal",
+        "touch_id": "WM2",
+        "asset_ref": "Prem Monthly PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Prem Monthly PSP",
+              "asset_ref": "Prem Monthly PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_app_or_web_annual",
+        "type": "decision",
+        "label": "Annual: Has NFL App OR abandoned from NFL App?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {
+              "field": "has_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            }
+          ]
+        }
+      },
+      {
+        "id": "nm_annual",
+        "type": "action",
+        "label": "App Modal NM3 - Return to Cart",
+        "channel": "ch_app_modal",
+        "touch_id": "NM3",
+        "asset_ref": "Annual PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Annual PSP",
+              "asset_ref": "Annual PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wm_annual",
+        "type": "action",
+        "label": "Web Modal WM3 - Return to Cart",
+        "channel": "ch_web_modal",
+        "touch_id": "WM3",
+        "asset_ref": "Annual PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Annual PSP",
+              "asset_ref": "Annual PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_app_or_web_monthly",
+        "type": "decision",
+        "label": "Monthly: Has NFL App OR abandoned from NFL App?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {
+              "field": "has_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            }
+          ]
+        }
+      },
+      {
+        "id": "nm_monthly",
+        "type": "action",
+        "label": "App Modal NM4 - Return to Cart",
+        "channel": "ch_app_modal",
+        "touch_id": "NM4",
+        "asset_ref": "Monthly PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Monthly PSP",
+              "asset_ref": "Monthly PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wm_monthly",
+        "type": "action",
+        "label": "Web Modal WM4 - Return to Cart",
+        "channel": "ch_web_modal",
+        "touch_id": "WM4",
+        "asset_ref": "Monthly PSP",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Monthly PSP",
+              "asset_ref": "Monthly PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_app_or_web_fallback",
+        "type": "decision",
+        "label": "Fallback: Has NFL App OR abandoned from NFL App?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {
+              "field": "has_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            }
+          ]
+        }
+      },
+      {
+        "id": "nm_fallback",
+        "type": "action",
+        "label": "App Modal NM5 - Return to Cart",
+        "channel": "ch_app_modal",
+        "touch_id": "NM5",
+        "asset_ref": "Generic PSP (Annual Default)",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Generic PSP (Annual Default)",
+              "asset_ref": "Generic PSP (Annual Default)"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wm_fallback",
+        "type": "action",
+        "label": "Web Modal WM5 - Return to Cart",
+        "channel": "ch_web_modal",
+        "touch_id": "WM5",
+        "asset_ref": "Generic PSP (Annual Default)",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Generic PSP (Annual Default)",
+              "asset_ref": "Generic PSP (Annual Default)"
+            },
+            {
+              "rank": "secondary",
+              "name": "Homepage"
+            }
+          ]
+        },
+        "personalization_used": [
+          "PR"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_current_subscriber",
+        "type": "decision",
+        "label": "Current subscriber?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "nfl_plus_subscription_status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Journey End - Converted",
+        "reason": "converted"
+      },
+      {
+        "id": "wait_until_game_day",
+        "type": "wait",
+        "label": "Wait until next Game Day",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_game_day",
+          "direction": "before",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          },
+          "time_local": "11:00 ET"
+        }
+      },
+      {
+        "id": "dec_email_optin",
+        "type": "decision",
+        "label": "Opted into email?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_ta_return_to_cart",
+        "type": "action",
+        "label": "Email TA - Return to Cart (game day)",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_game_day",
+          "direction": "before",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          },
+          "time_local": "11:00 ET"
+        },
+        "copy": {
+          "subject": "Return to Cart",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Prem Annual PSP"
+            },
+            {
+              "rank": "secondary",
+              "name": "Spring FLAG Sign-ups"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Scores & Schedules"
+            }
+          ]
+        },
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Opted into NFL App push?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_np5_get_ready",
+        "type": "action",
+        "label": "Push NP5 - Get Ready For Game Day with NFL+",
+        "channel": "ch_push",
+        "touch_id": "NP5",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_game_day",
+          "direction": "before",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          },
+          "time_local": "9:00 PM ET"
+        },
+        "copy": {
+          "headline": "Get Ready For Game Day with NFL+",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Generic PSP (Annual Default)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "wait_1_day",
+        "type": "wait",
+        "label": "Wait 1 day",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_is_game_day",
+        "type": "decision",
+        "label": "Is it a Game Day? (checks every 30 min)",
+        "decision_basis": "time",
+        "condition": {
+          "field": "calendar.is_game_day",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "wait_until_next_day",
+        "type": "wait",
+        "label": "Wait until next day",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_em1_return_get_ready",
+        "type": "action",
+        "label": "Email EM1 - Return to Cart & Get Ready For the Game",
+        "channel": "ch_email",
+        "touch_id": "EM1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_game_day",
+          "direction": "before",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          },
+          "time_local": "9:00 PM ET"
+        },
+        "copy": {
+          "subject": "Return to Cart & Get Ready For the Game",
+          "cta_label": "Return to Cart",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "PSP for SKU abandoned"
+            }
+          ]
+        },
+        "dynamic_content": true
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "split_tier"
+      },
+      {
+        "from": "split_tier",
+        "to": "dec_app_or_web_premium_annual",
+        "branch_label": "premium_annual"
+      },
+      {
+        "from": "dec_app_or_web_premium_annual",
+        "to": "nm_premium_annual",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_app_or_web_premium_annual",
+        "to": "wm_premium_annual",
+        "branch_label": "no"
+      },
+      {
+        "from": "nm_premium_annual",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "wm_premium_annual",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "split_tier",
+        "to": "dec_app_or_web_premium_monthly",
+        "branch_label": "premium_monthly"
+      },
+      {
+        "from": "dec_app_or_web_premium_monthly",
+        "to": "nm_premium_monthly",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_app_or_web_premium_monthly",
+        "to": "wm_premium_monthly",
+        "branch_label": "no"
+      },
+      {
+        "from": "nm_premium_monthly",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "wm_premium_monthly",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "split_tier",
+        "to": "dec_app_or_web_annual",
+        "branch_label": "annual"
+      },
+      {
+        "from": "dec_app_or_web_annual",
+        "to": "nm_annual",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_app_or_web_annual",
+        "to": "wm_annual",
+        "branch_label": "no"
+      },
+      {
+        "from": "nm_annual",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "wm_annual",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "split_tier",
+        "to": "dec_app_or_web_monthly",
+        "branch_label": "monthly"
+      },
+      {
+        "from": "dec_app_or_web_monthly",
+        "to": "nm_monthly",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_app_or_web_monthly",
+        "to": "wm_monthly",
+        "branch_label": "no"
+      },
+      {
+        "from": "nm_monthly",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "wm_monthly",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "split_tier",
+        "to": "dec_app_or_web_fallback",
+        "branch_label": "fallback"
+      },
+      {
+        "from": "dec_app_or_web_fallback",
+        "to": "nm_fallback",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_app_or_web_fallback",
+        "to": "wm_fallback",
+        "branch_label": "no"
+      },
+      {
+        "from": "nm_fallback",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "wm_fallback",
+        "to": "dec_current_subscriber"
+      },
+      {
+        "from": "dec_current_subscriber",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_current_subscriber",
+        "to": "wait_until_game_day",
+        "branch_label": "no"
+      },
+      {
+        "from": "wait_until_game_day",
+        "to": "dec_email_optin"
+      },
+      {
+        "from": "dec_email_optin",
+        "to": "email_ta_return_to_cart",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_email_optin",
+        "to": "dec_push_optin",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_ta_return_to_cart",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_np5_get_ready",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_1_day",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_np5_get_ready",
+        "to": "wait_1_day"
+      },
+      {
+        "from": "wait_1_day",
+        "to": "dec_is_game_day"
+      },
+      {
+        "from": "dec_is_game_day",
+        "to": "email_em1_return_get_ready",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_is_game_day",
+        "to": "wait_until_next_day",
+        "branch_label": "no"
+      },
+      {
+        "from": "wait_until_next_day",
+        "to": "dec_is_game_day"
+      },
+      {
+        "from": "email_em1_return_get_ready",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "NFL+ subscriptions attributable to journey",
+          "definition": "Conversions where last journey touch occurred within attribution window."
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Modal CTR"
+        },
+        {
+          "name": "Email open and click rate"
+        },
+        {
+          "name": "Push view and click-through rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

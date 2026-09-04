@@ -1,0 +1,169 @@
+{
+  "useCaseId": "abandoned-browsing-product",
+  "name": "Abandoned Browsing: Product Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Browsing: Product",
+    "journeyGoal": "Re-engage users who browsed a product but did not complete purchase",
+    "entryTrigger": "user_browsed_product",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after purchase or 3 days"
+  },
+  "entryCriteria": {
+    "event": "user_browsed_product",
+    "eventId": "evt_browse_002",
+    "conditions": [
+      {
+        "field": "productCategory",
+        "operator": "EQUALS",
+        "value": "Product"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Abandoned Product Browsers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Abandoned Product Alert",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "You viewed this product – grab it before it’s gone!",
+      "cta": "View Product",
+      "tracking": {
+        "campaignId": "push_abandoned_product",
+        "deliveryId": "del_push_03",
+        "trackingEvents": [
+          "push_open",
+          "product_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Follow-up Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Complete your product purchase today!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "email_abandoned_product",
+        "deliveryId": "del_email_03",
+        "trackingEvents": [
+          "email_open",
+          "purchase_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_browsed_product",
+        "eventId": "evt_browse_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_complete",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_complete",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_complete",
+      "eventId": "evt_purchase_003",
+      "condition": "purchaseCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "purchase_complete"
+    ],
+    "eventMapping": {
+      "purchase_complete": "evt_purchase_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_complete",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open",
+      "product_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

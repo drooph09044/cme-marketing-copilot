@@ -1,0 +1,145 @@
+{
+  "id": "048",
+  "matrix_row_id": 48,
+  "matrix_row_name": "MLB Postseason Wild Card Series Push",
+  "template": "tpl_playoff_push",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLB Postseason Wild Card Series push journey for early October.",
+    "Create a Wild Card Series push journey. Tournament-tree email at series start visualizing the bracket, per-fav-team push on each game night with series status ('2-0 lead' or 'win-or-go-home'), and tune-in CTAs across MLB.TV and linear broadcasters. Composite audience: active MLB fan AND (fav-team in Wild Card OR prior postseason engagement).",
+    "Need an MLB Wild Card Series cadence with bracket email and per-team game-night push reflecting series status."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-wild-card-series-push-2026",
+    "metadata": {
+      "name": "MLB Postseason Wild Card Series Push",
+      "internal_name": "MLB_Wild_Card_2026",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB.TV"},
+      "purpose": "Drive tune-in across the MLB Wild Card Series (early October) with a tournament-tree email at series start and per-fav-team game-night push reflecting series status.",
+      "archetype": "game_day",
+      "launch_date": "2026-09-30",
+      "end_date": "2026-10-05",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Wild Card Series tune-in.", "kpi": "Wild Card viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Series-start tournament tree email visualizes the eight Wild Card teams' paths. Per-fav-team push at T-2h before first pitch on each game night carries series status ('2-0 series lead', 'win-or-go-home') for narrative urgency. Tune-in CTAs split between MLB.TV (out-of-market) and linear broadcasters.",
+        "timing_rationale": "Wild Card Series early October; cadence spans the series duration.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_active_mlb_composite",
+        "name": "Active MLB fan (composite)",
+        "description": "Active MLB fan with fav team in Wild Card or prior postseason engagement.",
+        "criteria": {
+          "all_of": [
+            {"field": "mlb.activity_within_days", "op": "lte", "value": 180},
+            {
+              "any_of": [
+                {"field": "fav_team.in_wild_card_2026", "op": "equals", "value": true},
+                {"field": "mlb.postseason_engagement_last_year", "op": "equals", "value": true}
+              ]
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_wild_card_team_fan",
+        "name": "Fan with fav team in Wild Card",
+        "criteria": {"field": "fav_team.in_wild_card_2026", "op": "equals", "value": true}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Wild Card Series opens", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_bracket",
+        "type": "action",
+        "label": "Email - Tournament-tree Wild Card visualization",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-30"},
+        "copy": {
+          "subject": "The Wild Card Series is set - your tournament tree",
+          "cta_label": "See the bracket",
+          "modules": [
+            {"rank": "primary", "name": "Wild Card tournament tree"},
+            {"rank": "secondary", "name": "Tune-in info: MLB.TV + linear broadcasters"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_fav_in_wild_card",
+        "type": "decision",
+        "label": "Fav team in Wild Card?",
+        "decision_basis": "audience",
+        "condition": {"field": "fav_team.in_wild_card_2026", "op": "equals", "value": true}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLB App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_game_with_status",
+        "type": "action",
+        "label": "Push - Fav-team game night with series status",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_team_wild_card_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} {{MTC}} first pitch in 2h - series status update"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_bracket"},
+      {"from": "email_bracket", "to": "dec_fav_in_wild_card"},
+      {"from": "dec_fav_in_wild_card", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_fav_in_wild_card", "to": "end_journey", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_game_with_status", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_game_with_status", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Wild Card viewership"}],
+      "secondary_kpis": [{"name": "Per-game push click-through"}, {"name": "Bracket email click rate"}],
+      "tests": []
+    }
+  }
+}

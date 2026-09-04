@@ -1,0 +1,19 @@
+node_modules
+# The built frontend is required by the Databricks App runtime.
+!dist/
+!dist/**
+.env.local
+**/.env
+**/.env.*
+!.env.example
+.DS_Store
+coverage
+__pycache__/
+*.pyc
+.venv/
+.pydeps/
+logs/
+.tools/npm.tgz
+qa-automation-beta-v3/apps/api/.env
+qa-automation-beta-v3/apps/web/.env.local
+legacy_idres/login/*.csv

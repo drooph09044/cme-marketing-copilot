@@ -1,0 +1,671 @@
+[
+  {
+    "useCaseId": "monetize-moments-ticket-urgency",
+    "name": "Ticket Urgency Monetization Journey",
+    "category": {
+      "categoryId": "revenue",
+      "categoryName": "Monetization"
+    },
+    "journeyTable": {
+      "journeyName": "Key Ticket Urgency Campaign",
+      "journeyGoal": "Drive immediate ticket purchases during high-demand and limited availability moments",
+      "entryTrigger": "high_demand_ticket_event_detected",
+      "journeyCategory": "Revenue Growth",
+      "totalDuration": "7 days",
+      "exitClause": "Exit if ticket purchase is completed"
+    },
+    "entryCriteria": {
+      "event": "ticket_inventory_update",
+      "eventId": "evt_ticket_001",
+      "conditions": [
+        {
+          "field": "availabilityLevel",
+          "operator": "LESS_THAN_EQUALS",
+          "value": 20
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Intent_Ticket_Seekers"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Low Availability Alert Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Seats are running out for your favorite match",
+        "cta": "Book Now",
+        "tracking": {
+          "campaignId": "email_ticket_urgency_1",
+          "deliveryId": "del_ticket_urgency_1",
+          "trackingEvents": [
+            "email_open",
+            "purchase_start"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Push Notification Reminder",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "PUSH",
+        "messageTheme": "Only a few seats left!",
+        "cta": "Secure My Seat",
+        "tracking": {
+          "campaignId": "push_ticket_urgency_2",
+          "deliveryId": "del_ticket_urgency_2",
+          "trackingEvents": [
+            "push_open",
+            "purchase_start"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ticket_inventory_update",
+          "eventId": "evt_ticket_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_purchase",
+        "eventId": "evt_ticket_purchase_001",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 72
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_purchase"
+      ],
+      "eventMapping": {
+        "ticket_purchase": "evt_ticket_purchase_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_purchase",
+      "secondaryKPIs": [
+        "email_open",
+        "purchase_start"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 72
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "monetize-moments-ticket-gifting",
+    "name": "Ticket Gifting Monetization Journey",
+    "category": {
+      "categoryId": "revenue",
+      "categoryName": "Monetization"
+    },
+    "journeyTable": {
+      "journeyName": "Fan Ticket Gifting",
+      "journeyGoal": "Enable fans to gift tickets to friends and family to increase attendance and acquisition",
+      "entryTrigger": "fan_high_affinity_detected",
+      "journeyCategory": "Engagement to Acquisition",
+      "totalDuration": "10 days",
+      "exitClause": "Exit if ticket gift purchase is completed"
+    },
+    "entryCriteria": {
+      "event": "fan_affinity_event",
+      "eventId": "evt_fan_affinity_002",
+      "conditions": [
+        {
+          "field": "affinityScore",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 80
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Affinity_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Gift Ticket Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Share the experience with someone you love",
+        "cta": "Gift a Ticket",
+        "tracking": {
+          "campaignId": "email_gift_1",
+          "deliveryId": "del_gift_1",
+          "trackingEvents": [
+            "email_open",
+            "gift_start"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Reminder Push",
+        "timing": {
+          "offsetHours": 48
+        },
+        "channel": "PUSH",
+        "messageTheme": "Make someone’s day with a live match ticket",
+        "cta": "Send a Gift",
+        "tracking": {
+          "campaignId": "push_gift_2",
+          "deliveryId": "del_gift_2",
+          "trackingEvents": [
+            "push_open",
+            "gift_start"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_affinity_event",
+          "eventId": "evt_fan_affinity_002"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_gift_purchase",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_gift_purchase",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 48
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_gift_purchase",
+        "eventId": "evt_ticket_gift_001",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 240
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_gift_purchase"
+      ],
+      "eventMapping": {
+        "ticket_gift_purchase": "evt_ticket_gift_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_gift_purchase",
+      "secondaryKPIs": [
+        "gift_start"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 240
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "abandoned-ticket-purchase",
+    "name": "Abandoned Ticket Purchase Reminder",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Monetization"
+    },
+    "journeyTable": {
+      "journeyName": "Abandoned Ticket Recovery",
+      "journeyGoal": "Recover abandoned ticket purchases and increase conversion rate",
+      "entryTrigger": "checkout_abandonment_detected",
+      "journeyCategory": "Conversion",
+      "totalDuration": "2 days",
+      "exitClause": "Exit if ticket purchase is completed"
+    },
+    "entryCriteria": {
+      "event": "checkout_abandon",
+      "eventId": "evt_checkout_abandon_001",
+      "conditions": [
+        {
+          "field": "checkoutStatus",
+          "operator": "EQUALS",
+          "value": "abandoned"
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Abandoned_Buyers"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Reminder Push",
+        "timing": {
+          "offsetHours": 1
+        },
+        "channel": "PUSH",
+        "messageTheme": "You left something behind – your tickets are waiting",
+        "cta": "Complete Purchase",
+        "tracking": {
+          "campaignId": "push_abandon_1",
+          "deliveryId": "del_abandon_1",
+          "trackingEvents": [
+            "push_open",
+            "checkout_resume"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Recovery Email",
+        "timing": {
+          "offsetHours": 12
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Your seats are reserved for a short time",
+        "cta": "Return to Checkout",
+        "tracking": {
+          "campaignId": "email_abandon_2",
+          "deliveryId": "del_abandon_2",
+          "trackingEvents": [
+            "email_open",
+            "checkout_resume"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "checkout_abandon",
+          "eventId": "evt_checkout_abandon_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 1
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 11
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_purchase",
+        "eventId": "evt_ticket_purchase_001",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 48
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_purchase"
+      ],
+      "eventMapping": {
+        "ticket_purchase": "evt_ticket_purchase_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_purchase",
+      "secondaryKPIs": [
+        "checkout_resume"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 48
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "membership-tier-upgrade",
+    "name": "Membership Tier Upgrade Journey",
+    "category": {
+      "categoryId": "monetization",
+      "categoryName": "Monetization"
+    },
+    "journeyTable": {
+      "journeyName": "Membership Tier Upgrade",
+      "journeyGoal": "Encourage fans to upgrade membership tiers for better benefits and exclusivity",
+      "entryTrigger": "tier_upgrade_opportunity_detected",
+      "journeyCategory": "Upsell",
+      "totalDuration": "14 days",
+      "exitClause": "Exit if user upgrades membership tier"
+    },
+    "entryCriteria": {
+      "event": "membership_activity",
+      "eventId": "evt_membership_001",
+      "conditions": [
+        {
+          "field": "engagementScore",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 70
+        }
+      ],
+      "identity": {
+        "primaryId": "userId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Engagement_Members"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Upgrade Suggestion Email",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Unlock premium benefits",
+        "cta": "Upgrade Now",
+        "tracking": {
+          "campaignId": "email_upgrade_1",
+          "deliveryId": "del_upgrade_1",
+          "trackingEvents": [
+            "email_open",
+            "upgrade_click"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Benefit Push",
+        "timing": {
+          "offsetHours": 72
+        },
+        "channel": "PUSH",
+        "messageTheme": "See what premium members get",
+        "cta": "View Benefits",
+        "tracking": {
+          "campaignId": "push_upgrade_2",
+          "deliveryId": "del_upgrade_2",
+          "trackingEvents": [
+            "push_open",
+            "upgrade_click"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "membership_activity",
+          "eventId": "evt_membership_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "tier_upgrade",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "tier_upgrade",
+            "field": "completed",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 72
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "tier_upgrade",
+        "eventId": "evt_tier_upgrade_001",
+        "condition": "completed == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "tier_upgrade"
+      ],
+      "eventMapping": {
+        "tier_upgrade": "evt_tier_upgrade_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "tier_upgrade",
+      "secondaryKPIs": [
+        "upgrade_click"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  }
+]

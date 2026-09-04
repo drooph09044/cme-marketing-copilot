@@ -1,0 +1,163 @@
+{
+  "id": "101",
+  "matrix_row_id": 101,
+  "matrix_row_name": "F1 TV Pro annual renewal",
+  "template": "tpl_renewal",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a renewal journey for the F1 TV Pro annual subscription with a 1-SMS frequency cap.",
+    "Create an F1 TV Pro annual renewal journey aligned to pre-season testing (Jan-Feb). T-30/14/7/1-day pre-expiry cadence. Email at T-30, T-7, T-1; push at T-14 and T-7; SMS at T-1 for opted-in fans. SMS capped at 1 per window. Storyline hooks tied to car launches and silly-season driver moves.",
+    "Need a renewal cadence for F1 TV Pro — 30/14/7/1 days pre-expiry, multi-channel, capped at one SMS."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-tv-pro-renewal-2026",
+    "metadata": {
+      "name": "F1 TV Pro Annual Renewal",
+      "internal_name": "F1_TV_Pro_Renewal_2026",
+      "brand": {"vertical": "streaming", "league": "F1", "team": null, "product": "F1 TV Pro"},
+      "purpose": "Retain F1 TV Pro annual subscribers with a multi-channel pre-expiry cadence anchored to pre-season testing and car launches.",
+      "archetype": "renewal",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Retain F1 TV Pro annual subscribers.", "kpi": "Renewal rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-expiry cadence at T-30, T-14, T-7, T-1. Email + push touchpoints layered, with an SMS at T-1 for opted-in fans. SMS frequency-capped to 1 per renewal window. Storyline hooks tied to pre-season car launches, silly-season driver moves, and the season opener in Melbourne.",
+        "timing_rationale": "Most F1 TV Pro subscriptions renew Jan-Feb aligned with pre-season testing and the season-opener buildup.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "sms", "frequency_cap"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_renewing_subscriber",
+        "name": "F1 TV Pro subscriber approaching expiry",
+        "criteria": {
+          "all_of": [
+            {"field": "f1_tv_pro.status", "op": "equals", "value": "active"},
+            {"field": "f1_tv_pro.days_to_expiry", "op": "lte", "value": 30}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"},
+      {"id": "ch_sms", "type": "sms"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Driver or Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [
+      {"scope": "journey", "limit": 1, "window": {"value": 30, "unit": "day"}, "applies_to": ["ch_sms"]}
+    ],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Renewal window opens (T-30)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_t_minus_30",
+        "type": "action",
+        "label": "Email T-30 - Renewal preview with car-launch hook",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 30, "unit": "day"}},
+        "copy": {"subject": "The new {{FT}} car launches soon - renew F1 TV Pro for the season"},
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin_t14",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_f1", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_t_minus_14",
+        "type": "action",
+        "label": "Push T-14 - Renewal nudge",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 14, "unit": "day"}},
+        "copy": {"headline": "Your F1 TV Pro access expires in 2 weeks"}
+      },
+      {
+        "id": "email_t_minus_7",
+        "type": "action",
+        "label": "Email T-7 - Renewal urgency",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 7, "unit": "day"}},
+        "copy": {"subject": "One week left to renew F1 TV Pro before the season opener"}
+      },
+      {
+        "id": "push_t_minus_7",
+        "type": "action",
+        "label": "Push T-7 - One-week warning",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 7, "unit": "day"}},
+        "copy": {"headline": "7 days to renew before the Australian GP"}
+      },
+      {
+        "id": "email_t_minus_1",
+        "type": "action",
+        "label": "Email T-1 - Final-day reminder",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 1, "unit": "day"}},
+        "copy": {"subject": "Last chance to renew F1 TV Pro before your access lapses"}
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.sms", "op": "equals", "value": true}
+      },
+      {
+        "id": "sms_t_minus_1",
+        "type": "action",
+        "label": "SMS T-1 - Final-day last-chance",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 1, "unit": "day"}},
+        "copy": {"body": "{{FN}}, your F1 TV Pro access ends tomorrow. Renew: f1tv.formula1.com"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_t_minus_30"},
+      {"from": "email_t_minus_30", "to": "dec_push_optin_t14"},
+      {"from": "dec_push_optin_t14", "to": "push_t_minus_14", "branch_label": "yes"},
+      {"from": "dec_push_optin_t14", "to": "email_t_minus_7", "branch_label": "no"},
+      {"from": "push_t_minus_14", "to": "email_t_minus_7"},
+      {"from": "email_t_minus_7", "to": "push_t_minus_7"},
+      {"from": "push_t_minus_7", "to": "email_t_minus_1"},
+      {"from": "email_t_minus_1", "to": "dec_sms_optin"},
+      {"from": "dec_sms_optin", "to": "sms_t_minus_1", "branch_label": "yes"},
+      {"from": "dec_sms_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "sms_t_minus_1", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "F1 TV Pro renewal rate"}],
+      "secondary_kpis": [{"name": "Touch-level engagement by T-N"}, {"name": "SMS opt-in conversion rate"}],
+      "tests": []
+    }
+  }
+}

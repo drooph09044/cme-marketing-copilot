@@ -1,0 +1,252 @@
+{
+  "id": "020",
+  "matrix_row_id": 20,
+  "matrix_row_name": "Thursday Night Football Tune-In",
+  "template": "tpl_game_day",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Thursday Night Football tune-in cadence on Amazon Prime Video.",
+    "TNF tune-in journey: T-3h push to fans of competing teams with tune-in details (Amazon Prime Video) and an embedded acquisition CTA for non-Prime fans, plus a T-15min SMS to opted-in fans as a last-chance kickoff alert.",
+    "Need a TNF cadence \u2014 push at T-3h to fans of competing teams, SMS at T-15min for opted-in fans."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-tnf-tune-in-2026",
+    "metadata": {
+      "name": "Thursday Night Football Tune-In",
+      "internal_name": "NFL_TNF_TuneIn_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "Amazon Prime Video"
+      },
+      "purpose": "Drive TNF tune-in for fans of competing teams via T-3h push and T-15min SMS to opted-in fans.",
+      "archetype": "game_day",
+      "launch_date": "2026-09-10",
+      "end_date": "2026-12-31",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive TNF tune-in.",
+          "kpi": "Per-game push and SMS view / engagement rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "T-3h push with tune-in details (Amazon Prime Video) and embedded acquisition CTA for non-Prime fans. T-15min SMS for opted-in fans as last-chance kickoff alert.",
+        "timing_rationale": "TNF kicks off at 8:15pm ET weekly through the season.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "push",
+        "sms"
+      ],
+      "moments_that_matter": [
+        "GET PUMPED",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_tnf_team_fans",
+        "name": "Fans of TNF competing teams",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            },
+            {
+              "field": "game.is_tnf_competing_team",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [],
+    "channels": [
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_sms",
+        "type": "sms",
+        "vendor": "Attentive"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 6,
+        "unit": "day"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "TNF game day - fav-team playing",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "tnf_game_day"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_t3h",
+        "type": "action",
+        "label": "Push T-3h - TNF tune-in",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 3,
+            "unit": "hour"
+          }
+        },
+        "copy": {
+          "headline": "{{MTC}} on Amazon Prime Video - kickoff in 3h"
+        },
+        "personalization_used": [
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_t15min",
+        "type": "wait",
+        "label": "Wait to T-15min",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 15,
+            "unit": "minute"
+          }
+        }
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.sms",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "sms_t15",
+        "type": "action",
+        "label": "SMS T-15 - Kickoff alert",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "body": "TNF kickoff in 15 min - {{MTC}} on Prime"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_t3h",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_t15min",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t3h",
+        "to": "wait_t15min"
+      },
+      {
+        "from": "wait_t15min",
+        "to": "dec_sms_optin"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "sms_t15",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "sms_t15",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "TNF tune-in rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Push view rate"
+        },
+        {
+          "name": "SMS click-through rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "id": "094",
+  "matrix_row_id": 94,
+  "matrix_row_name": "EPL Final Matchday Tune-In - May 24",
+  "template": "tpl_event_tune_in",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an EPL Final Matchday tune-in journey for May 24 with title-race and relegation context.",
+    "Create an EPL Final Matchday 2026 tune-in journey on Peacock. Cadence: T-3d email, matchday-morning push, kickoff push (all 10 matches kick off simultaneously). Per-fav-club routing based on whether the club is in the title race, top-four race, mid-table, or relegation fight. Composite audience.",
+    "Need a tune-in for the simultaneous EPL final matchday — three touches across three days, with copy varied by what's on the line for fan's favorite club."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "epl-final-matchday-2026-tune-in",
+    "metadata": {
+      "name": "EPL Final Matchday Tune-In - May 24",
+      "internal_name": "EPL_Final_Matchday_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "EPL", "team": null, "product": "Peacock"},
+      "purpose": "Drive tune-in to the simultaneous final matchday of the EPL season with per-club context (title race, top four, relegation).",
+      "archetype": "event_promotion",
+      "launch_date": "2026-05-21",
+      "end_date": "2026-05-25",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Final Matchday tune-in on Peacock and Sky.", "kpi": "Final Matchday viewership lift", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Three-touch cadence with content variations driven by fan's favorite club's standing (title contender, top-four contender, mid-table, relegation candidate).",
+        "timing_rationale": "All 10 matches kick off simultaneously on the final matchday at 16:00 BST.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_epl_supporter_us",
+        "name": "US EPL supporter",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "equals", "value": "US"},
+            {"field": "favorite_club", "op": "is_not_null"},
+            {"field": "favorite_club_league", "op": "equals", "value": "EPL"}
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_title_contender",
+        "name": "Supporter of title contender",
+        "criteria": {"field": "favorite_club.title_race_status", "op": "in", "value": ["leader", "challenger"]}
+      },
+      {
+        "id": "aud_relegation_fight",
+        "name": "Supporter of club in relegation fight",
+        "criteria": {"field": "favorite_club.relegation_status", "op": "equals", "value": "in_fight"}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "peacock_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Final Matchday cadence opens (T-3d)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_club_stakes",
+        "type": "decision",
+        "label": "What's on the line for fav club?",
+        "decision_basis": "audience",
+        "condition": {
+          "any_of": [
+            {"field": "favorite_club.title_race_status", "op": "in", "value": ["leader", "challenger"]},
+            {"field": "favorite_club.top_four_status", "op": "equals", "value": "in_race"},
+            {"field": "favorite_club.relegation_status", "op": "equals", "value": "in_fight"}
+          ]
+        }
+      },
+      {
+        "id": "email_high_stakes",
+        "type": "action",
+        "label": "Email T-3d - High-stakes club variant",
+        "channel": "ch_email",
+        "touch_id": "TA1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-21"},
+        "copy": {
+          "subject": "{{FT}} have it all to play for on Final Matchday",
+          "cta_label": "See the permutations"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_mid_table",
+        "type": "action",
+        "label": "Email T-3d - Mid-table variant",
+        "channel": "ch_email",
+        "touch_id": "TA2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-21"},
+        "copy": {
+          "subject": "Final Matchday for {{FT}}: a season in review",
+          "cta_label": "Read recap"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_peacock", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_matchday_morning",
+        "type": "action",
+        "label": "Push Matchday Morning",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-24", "time_local": "09:00 ET"},
+        "copy": {"headline": "Final Matchday: all 10 matches kick off at 11am ET"}
+      },
+      {
+        "id": "push_kickoff",
+        "type": "action",
+        "label": "Push Kickoff",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-24", "time_local": "10:45 ET"},
+        "copy": {"headline": "{{FT}} kick off in 15 minutes - watch on Peacock"},
+        "personalization_used": ["FT"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_club_stakes"},
+      {"from": "dec_club_stakes", "to": "email_high_stakes", "branch_label": "yes"},
+      {"from": "dec_club_stakes", "to": "email_mid_table", "branch_label": "no"},
+      {"from": "email_high_stakes", "to": "dec_push_optin"},
+      {"from": "email_mid_table", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_matchday_morning", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_matchday_morning", "to": "push_kickoff"},
+      {"from": "push_kickoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Final Matchday viewership lift on Peacock"}],
+      "secondary_kpis": [{"name": "High-stakes vs mid-table email engagement"}, {"name": "Per-club kickoff push CTR"}],
+      "tests": []
+    }
+  }
+}

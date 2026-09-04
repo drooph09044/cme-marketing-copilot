@@ -1,0 +1,133 @@
+{
+  "id": "090",
+  "matrix_row_id": 90,
+  "matrix_row_name": "EPL fan birthday wish",
+  "template": "tpl_anniversary_milestone",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a birthday journey for EPL fans in their favorite club's voice with a kit discount.",
+    "Create a birthday wish journey for Premier League fans. Theme to fan's favorite club. Email + push touch on birthday morning. Offer a Premier League Shop discount on the club's home kit.",
+    "Need a birthday touch for our Premier League fans — wish them happy birthday from their club and offer a kit discount."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "epl-fan-birthday-2026",
+    "metadata": {
+      "name": "EPL Fan Birthday",
+      "internal_name": "EPL_Fan_Birthday_2026",
+      "brand": {"vertical": "sports_league", "league": "EPL", "team": null, "product": null},
+      "purpose": "Wish Premier League fans a happy birthday from their favorite club with a Premier League Shop kit discount.",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive engagement with EPL on fan birthdays.", "kpi": "Birthday email open / click rate", "forecast": null},
+        {"rank": "secondary", "description": "Drive Premier League Shop kit revenue.", "kpi": "Shop conversions from birthday code", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single email send on birthday morning themed to favorite club. Push follow-up at midday for push-opted-in supporters. Kit discount is 15% off for 7 days, valid only on the fan's favorite club's kits.",
+        "timing_rationale": "Birthday-morning sends maximize relevance and open rate.",
+        "notes": null
+      },
+      "considerations": ["Confirm Premier League Shop per-club kit discount codes generate per-fan."],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_epl_fan_with_birthdate_and_club",
+        "name": "EPL fan with birthdate and favorite club",
+        "criteria": {
+          "all_of": [
+            {"field": "epl.profile_active", "op": "equals", "value": true},
+            {"field": "profile.birthdate", "op": "is_not_null"},
+            {"field": "favorite_club", "op": "is_not_null"}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "premier_league_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "month"}},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Birthday trigger", "entry_criteria": {"trigger": "event", "event_name": "fan_birthday_today"}},
+      {
+        "id": "email_birthday_club",
+        "type": "action",
+        "label": "Email - Club-themed birthday wish with kit discount",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from {{FT}}",
+          "preview": "15% off your club's kit for 7 days",
+          "modules": [
+            {"rank": "primary", "name": "Club-themed birthday card in club colors"},
+            {"rank": "secondary", "name": "15% off {{FT}} home kit on Premier League Shop (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_premier_league", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_midday_reminder",
+        "type": "action",
+        "label": "Push midday - kit discount reminder",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 6, "unit": "hour"},
+          "time_local": "14:00 local"
+        },
+        "copy": {"headline": "Many happy returns from {{FT}} - tap to claim 15% off the kit"},
+        "personalization_used": ["FT"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_birthday_club"},
+      {"from": "email_birthday_club", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_midday_reminder", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_midday_reminder", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Birthday email open and click rate"}],
+      "secondary_kpis": [{"name": "Premier League Shop kit conversions from birthday code"}],
+      "tests": []
+    }
+  }
+}

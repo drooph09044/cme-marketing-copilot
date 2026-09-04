@@ -1,0 +1,163 @@
+{
+  "id": "091",
+  "matrix_row_id": 91,
+  "matrix_row_name": "Peacock Premier League annual renewal",
+  "template": "tpl_renewal",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a renewal journey for the Peacock Premier League annual subscription with a 1-SMS frequency cap.",
+    "Create a Peacock Premier League annual renewal journey. T-30/14/7/1-day pre-expiry cadence. Email at T-30, T-7, T-1; push at T-14 and T-7; SMS at T-1 for opted-in supporters. SMS capped at 1 per renewal window. Storyline hooks tied to title run-in, relegation battle, or UCL race.",
+    "Need a renewal cadence for Peacock EPL — 30/14/7/1 days before expiry, multi-channel, but only one SMS in the whole window."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "peacock-epl-renewal-2026",
+    "metadata": {
+      "name": "Peacock Premier League Annual Renewal",
+      "internal_name": "Peacock_EPL_Renewal_2026",
+      "brand": {"vertical": "streaming", "league": "EPL", "team": null, "product": "Peacock"},
+      "purpose": "Retain Peacock Premier League annual subscribers with a multi-channel pre-expiry cadence and storyline hooks tied to the EPL run-in.",
+      "archetype": "renewal",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Retain Peacock Premier League annual subscribers.", "kpi": "Renewal rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-expiry cadence at T-30, T-14, T-7, T-1. Email + push at T-30 and T-14. T-7 adds a second push. T-1 final-day email and SMS for opted-in supporters. SMS frequency-capped to 1 per renewal window. Storyline hooks adapt to where the EPL season sits when the renewal opens (title run-in, relegation battle, or UCL race).",
+        "timing_rationale": "Cadence works backward from subscription expiry date.",
+        "notes": null
+      },
+      "considerations": ["SMS opt-in capture rate is low — fall back to push + email for non-SMS supporters."],
+      "capabilities_used": ["email", "push", "sms", "frequency_cap"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_renewing_subscriber",
+        "name": "Peacock EPL subscriber approaching expiry",
+        "criteria": {
+          "all_of": [
+            {"field": "peacock.epl_addon_status", "op": "equals", "value": "active"},
+            {"field": "peacock.epl_addon_days_to_expiry", "op": "lte", "value": 30}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "peacock_app"},
+      {"id": "ch_sms", "type": "sms"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [
+      {"scope": "journey", "limit": 1, "window": {"value": 30, "unit": "day"}, "applies_to": ["ch_sms"]}
+    ],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Renewal window opens (T-30)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_t_minus_30",
+        "type": "action",
+        "label": "Email T-30 - Renewal preview with EPL storyline hook",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 30, "unit": "day"}},
+        "copy": {"subject": "{{FT}} need you on Peacock - renew for next season's run-in"},
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin_t14",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_peacock", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_t_minus_14",
+        "type": "action",
+        "label": "Push T-14 - Renewal nudge",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 14, "unit": "day"}},
+        "copy": {"headline": "Your Peacock Premier League access expires in 2 weeks"}
+      },
+      {
+        "id": "email_t_minus_7",
+        "type": "action",
+        "label": "Email T-7 - Renewal urgency",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 7, "unit": "day"}},
+        "copy": {"subject": "One week left to renew your Peacock EPL access"}
+      },
+      {
+        "id": "push_t_minus_7",
+        "type": "action",
+        "label": "Push T-7 - One-week warning",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 7, "unit": "day"}},
+        "copy": {"headline": "7 days to renew - {{FT}} are back this weekend"}
+      },
+      {
+        "id": "email_t_minus_1",
+        "type": "action",
+        "label": "Email T-1 - Final-day reminder",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 1, "unit": "day"}},
+        "copy": {"subject": "Last chance to renew before your Peacock EPL access lapses"}
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.sms", "op": "equals", "value": true}
+      },
+      {
+        "id": "sms_t_minus_1",
+        "type": "action",
+        "label": "SMS T-1 - Final-day last-chance",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {"type": "relative_to_event", "event": "subscription_expiry", "direction": "before", "offset": {"value": 1, "unit": "day"}},
+        "copy": {"body": "{{FN}}, your Peacock EPL access ends tomorrow. Renew: pck.tv/r"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_t_minus_30"},
+      {"from": "email_t_minus_30", "to": "dec_push_optin_t14"},
+      {"from": "dec_push_optin_t14", "to": "push_t_minus_14", "branch_label": "yes"},
+      {"from": "dec_push_optin_t14", "to": "email_t_minus_7", "branch_label": "no"},
+      {"from": "push_t_minus_14", "to": "email_t_minus_7"},
+      {"from": "email_t_minus_7", "to": "push_t_minus_7"},
+      {"from": "push_t_minus_7", "to": "email_t_minus_1"},
+      {"from": "email_t_minus_1", "to": "dec_sms_optin"},
+      {"from": "dec_sms_optin", "to": "sms_t_minus_1", "branch_label": "yes"},
+      {"from": "dec_sms_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "sms_t_minus_1", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Peacock EPL renewal rate"}],
+      "secondary_kpis": [{"name": "Touch-level engagement by T-N"}, {"name": "SMS opt-in conversion rate"}],
+      "tests": []
+    }
+  }
+}

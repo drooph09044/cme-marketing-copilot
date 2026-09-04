@@ -1,0 +1,171 @@
+{
+  "id": "096",
+  "matrix_row_id": 96,
+  "matrix_row_name": "January Transfer Window Reengage",
+  "template": "tpl_off_season_reengage",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a January transfer window re-engagement journey with English and Spanish variants.",
+    "Create a January transfer window re-engagement journey running Jan 1 - Feb 2, 2026. Weekly transfer-rumour roundup email, real-time push for any major signing or sale involving fan's favorite club, deadline-day live coverage push (Feb 2). Multi-language: English variant for general audience, Spanish variant for US Hispanic EPL supporters.",
+    "Need a transfer-window engagement journey for January — weekly rumour email, real-time push on fav-club signings, deadline-day push, with EN and ES email variants."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "epl-january-window-reengage-2026",
+    "metadata": {
+      "name": "EPL January Transfer Window Re-engagement - 2026",
+      "internal_name": "EPL_Jan_Window_2026",
+      "brand": {"vertical": "sports_league", "league": "EPL", "team": null, "product": "Premier League App"},
+      "purpose": "Re-engage EPL fans through the January transfer window with rumour roundups, real-time signing alerts, and deadline-day coverage. Includes Spanish-language variants for US Hispanic supporters.",
+      "archetype": "content_engagement",
+      "launch_date": "2026-01-01",
+      "end_date": "2026-02-02",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive transfer-window content engagement and Premier League App returns.", "kpi": "Active supporters in window", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Weekly transfer-rumour roundup email on Mondays. Real-time push for any major signing or sale involving fan's favorite club. Deadline Day (Feb 2) live coverage push. Spanish-language email variant deployed to US Hispanic EPL supporters and Spanish-speaking fans.",
+        "timing_rationale": "January transfer window opens Jan 1 and closes Feb 2 at 23:00 GMT.",
+        "notes": "Multi-language creative: English + Spanish."
+      },
+      "considerations": ["Confirm Spanish-language creative production is locked by Dec 15 for the Jan 5 first send."],
+      "capabilities_used": ["email", "push", "multi_lang_creative", "realtime_signal"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED"]
+    },
+    "audiences": [
+      {
+        "id": "aud_epl_fan",
+        "name": "Active EPL fan",
+        "criteria": {"field": "epl.activity_within_days", "op": "lte", "value": 365},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_spanish_speaking_fan",
+        "name": "Spanish-speaking EPL supporter",
+        "description": "EPL fan whose language preference is Spanish or who is in a US Hispanic segment.",
+        "criteria": {
+          "any_of": [
+            {"field": "profile.language", "op": "equals", "value": "es"},
+            {
+              "all_of": [
+                {"field": "country", "op": "equals", "value": "US"},
+                {"field": "profile.us_hispanic_segment", "op": "equals", "value": true}
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "premier_league_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Window opens (Jan 1)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_language",
+        "type": "decision",
+        "label": "Spanish-speaking supporter?",
+        "decision_basis": "audience",
+        "condition": {
+          "any_of": [
+            {"field": "profile.language", "op": "equals", "value": "es"},
+            {
+              "all_of": [
+                {"field": "country", "op": "equals", "value": "US"},
+                {"field": "profile.us_hispanic_segment", "op": "equals", "value": true}
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "email_weekly_en",
+        "type": "action",
+        "label": "Email - Weekly transfer rumour roundup (EN)",
+        "channel": "ch_email",
+        "touch_id": "WK-EN",
+        "timing": {"type": "scheduled", "recurrence": "weekly Monday Jan 5-26", "calendar_date": "2026-01-05"},
+        "copy": {
+          "subject": "January transfer rumours: {{FT}} latest",
+          "cta_label": "Read the latest"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_weekly_es",
+        "type": "action",
+        "label": "Email - Weekly transfer rumour roundup (ES)",
+        "channel": "ch_email",
+        "touch_id": "WK-ES",
+        "timing": {"type": "scheduled", "recurrence": "weekly Monday Jan 5-26", "calendar_date": "2026-01-05"},
+        "copy": {
+          "subject": "Rumores del mercado de enero: lo último de {{FT}}",
+          "cta_label": "Leer más"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_premier_league", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_realtime_signing",
+        "type": "action",
+        "label": "Push real-time - Fav-club signing or sale",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "realtime", "refresh_minutes": 5},
+        "copy": {"headline": "BREAKING: {{FT}} have completed a signing"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_deadline_day",
+        "type": "action",
+        "label": "Push Deadline Day - Live coverage (Feb 2)",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-02", "time_local": "09:00 GMT"},
+        "copy": {"headline": "Deadline Day is here - follow every signing live in-app"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_language"},
+      {"from": "dec_language", "to": "email_weekly_es", "branch_label": "yes"},
+      {"from": "dec_language", "to": "email_weekly_en", "branch_label": "no"},
+      {"from": "email_weekly_en", "to": "dec_push_optin"},
+      {"from": "email_weekly_es", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_realtime_signing", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "push_deadline_day", "branch_label": "no"},
+      {"from": "push_realtime_signing", "to": "push_deadline_day"},
+      {"from": "push_deadline_day", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Active supporters in window"}],
+      "secondary_kpis": [{"name": "EN vs ES email engagement"}, {"name": "Deadline Day push open rate"}],
+      "tests": []
+    }
+  }
+}

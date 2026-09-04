@@ -1,0 +1,160 @@
+{
+  "id": "047",
+  "matrix_row_id": 47,
+  "matrix_row_name": "MLB inactive fan reactivation - season touchpoints",
+  "template": "tpl_calendar_reactivation",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLB inactive-fan reactivation journey anchored to the major MLB season moments.",
+    "Create a season-long calendar reactivation journey for inactive MLB fans. Backbone touches at Spring Training, Opening Day (Mar 26), Jackie Robinson Day (Apr 15), All-Star Game / Home Run Derby, Trade Deadline (Aug 3), and World Series. Each fan also gets one personalized touch on their fav-team's divisional rivalry series.",
+    "Need to reactivate inactive MLB fans. Use the season's anchor moments as the backbone plus one personalized divisional-rivalry touch tied to fav team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-inactive-reactivation-2026",
+    "metadata": {
+      "name": "MLB Inactive Fan Reactivation - 2026 Season",
+      "internal_name": "MLB_Reactivation_2026",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB"},
+      "purpose": "Re-engage inactive MLB fans across the 2026 season using a calendar-anchored cadence at major season moments plus one personalized fav-team divisional-rivalry touch.",
+      "archetype": "reactivation",
+      "launch_date": "2026-02-15",
+      "end_date": "2026-11-05",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive MLB fans across the season.", "kpi": "Fans returning to MLB app or MLB.TV with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans email touches at MLB season anchors (Spring Training, Opening Day, Jackie Robinson Day, ASG / HR Derby, Trade Deadline, World Series). Layer in one per-fav-team divisional rivalry series touch for fans with team affinity.",
+        "timing_rationale": "Calendar-anchored to MLB 2026 season key moments. 2026 Opening Day is Mar 26.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_mlb_fan",
+        "name": "Inactive MLB fan",
+        "description": "Fan with no MLB engagement in the last 365 days.",
+        "criteria": {"field": "mlb.last_active_within_days", "op": "gt", "value": 365},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Spring Training opens", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_spring_training",
+        "type": "action",
+        "label": "Email - Spring Training opens",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-20"},
+        "copy": {"subject": "Pitchers and catchers reported - baseball is back"}
+      },
+      {
+        "id": "email_opening_day",
+        "type": "action",
+        "label": "Email - Opening Day (Mar 26)",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-26"},
+        "copy": {"subject": "Opening Day: MLB is back"}
+      },
+      {
+        "id": "email_jackie_robinson_day",
+        "type": "action",
+        "label": "Email - Jackie Robinson Day (Apr 15)",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-04-15"},
+        "copy": {"subject": "Jackie Robinson Day - honoring 42 across the league"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_personalized_rivalry",
+        "type": "action",
+        "label": "Email - Personalized divisional rivalry series for fav team",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {"type": "relative_to_event", "event": "fav_team_division_rivalry_series", "direction": "before", "offset": {"value": 3, "unit": "day"}},
+        "copy": {
+          "subject": "{{FT}} vs {{MTC}}: rivalry series at the ballpark",
+          "preview": "Three games that matter"
+        },
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_asg",
+        "type": "action",
+        "label": "Email - All-Star Game and Home Run Derby",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "recurrence": "mid july asg week"},
+        "copy": {"subject": "All-Star Game and Home Run Derby this week"}
+      },
+      {
+        "id": "email_trade_deadline",
+        "type": "action",
+        "label": "Email - Trade Deadline (Aug 3)",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "calendar_date": "2026-08-03"},
+        "copy": {"subject": "Trade Deadline: pennant race shake-ups"}
+      },
+      {
+        "id": "email_world_series",
+        "type": "action",
+        "label": "Email - World Series begins",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {"type": "scheduled", "recurrence": "late october world series start"},
+        "copy": {"subject": "The 2026 World Series tips off tonight"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_spring_training"},
+      {"from": "email_spring_training", "to": "email_opening_day"},
+      {"from": "email_opening_day", "to": "email_jackie_robinson_day"},
+      {"from": "email_jackie_robinson_day", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "email_personalized_rivalry", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_asg", "branch_label": "no"},
+      {"from": "email_personalized_rivalry", "to": "email_asg"},
+      {"from": "email_asg", "to": "email_trade_deadline"},
+      {"from": "email_trade_deadline", "to": "email_world_series"},
+      {"from": "email_world_series", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate"}],
+      "secondary_kpis": [{"name": "Per-touch open / click rate"}, {"name": "Personalized rivalry touch lift"}],
+      "tests": []
+    }
+  }
+}

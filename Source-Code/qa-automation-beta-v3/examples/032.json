@@ -1,0 +1,216 @@
+{
+  "id": "032",
+  "matrix_row_id": 32,
+  "matrix_row_name": "Emirates NBA Cup Final Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the Emirates NBA Cup Final on Dec 16 in Las Vegas.",
+    "Drive tune-in to the Emirates NBA Cup Final (Dec 16, 2025 in Las Vegas). Route current NBA League Pass subscribers to League Pass pre-game programming and post-game highlights. Route non-subscribers to the linear broadcast and embed a League Pass acquisition CTA in the day-of email and push. Hold out 10% as a control to test broadcast-CTA placement.",
+    "Need a tune-in cadence for NBA Cup Final that handles subscribers and non-subscribers differently — subs go to pre-game programming on League Pass, non-subs see the linear broadcast plus a sign-up offer. Include a 10% control holdout."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-cup-final-tune-in-2025",
+    "metadata": {
+      "name": "Emirates NBA Cup Final Tune-In",
+      "internal_name": "NBA_Cup_Final_TuneIn_2025",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA League Pass"},
+      "purpose": "Drive tune-in to the Emirates NBA Cup Final on Dec 16, 2025 in Las Vegas, routing subscribers to League Pass pre-game programming and non-subscribers to the linear broadcast with a subscription acquisition CTA.",
+      "archetype": "content_engagement",
+      "launch_date": "2025-12-09",
+      "end_date": "2025-12-17",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the Emirates NBA Cup Final.", "kpi": "# of fans who tune in to the broadcast or League Pass coverage", "forecast": null},
+        {"rank": "secondary", "description": "Drive NBA League Pass acquisitions from non-subscribers.", "kpi": "League Pass signups attributable to journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Cadence T-7d (awareness) → T-3d (preview) → T-1d (lineup reminder) → game day (tune-in push). Subscriber and non-subscriber paths diverge on copy and CTA. 10% A/B holdout on the broadcast-CTA placement (subject line vs body) to learn which lifts viewership.",
+        "timing_rationale": "Final tips off Dec 16 in Las Vegas at 8:30pm ET; cadence works backward from there.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "ab_test_holdout"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nba_fan",
+        "name": "Active NBA fan",
+        "description": "Any fan with NBA app activity or NBA.com engagement within the last 90 days.",
+        "criteria": {
+          "any_of": [
+            {"field": "nba_app.last_active_within_days", "op": "lte", "value": 90},
+            {"field": "nba_com.last_active_within_days", "op": "lte", "value": 90}
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_league_pass_subscriber",
+        "name": "Current NBA League Pass subscriber",
+        "description": "Paid NBA League Pass subscription is active.",
+        "criteria": {"field": "league_pass.status", "op": "equals", "value": "active"},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {"field": "consent.email", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nba_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Cup Final cadence opens (T-7d)",
+        "entry_criteria": {"trigger": "schedule"}
+      },
+      {
+        "id": "dec_test_control_split",
+        "type": "decision",
+        "label": "10% control holdout",
+        "decision_basis": "test_split",
+        "condition": {"field": "_random_pct", "op": "lt", "value": 10}
+      },
+      {
+        "id": "end_control",
+        "type": "end",
+        "label": "Journey End (control holdout)",
+        "reason": "completed"
+      },
+      {
+        "id": "email_awareness",
+        "type": "action",
+        "label": "Email T-7d - Cup Final Awareness",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "nba_cup_final", "direction": "before", "offset": {"value": 7, "unit": "day"}},
+        "copy": {
+          "subject": "The NBA Cup Final is one week away",
+          "preview": "Las Vegas, Dec 16 - the matchup is set",
+          "cta_label": "See the bracket"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {
+        "id": "email_preview",
+        "type": "action",
+        "label": "Email T-3d - Preview",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "relative_to_event", "event": "nba_cup_final", "direction": "before", "offset": {"value": 3, "unit": "day"}},
+        "copy": {
+          "subject": "Cup Final preview: storylines and stats",
+          "cta_label": "Read the preview"
+        }
+      },
+      {
+        "id": "dec_subscriber_routing",
+        "type": "decision",
+        "label": "Current League Pass subscriber?",
+        "decision_basis": "pull",
+        "condition": {"field": "league_pass.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_subscriber_dayof",
+        "type": "action",
+        "label": "Email Day-Of - Subscriber: League Pass pre-game programming",
+        "channel": "ch_email",
+        "touch_id": "TC1",
+        "timing": {"type": "relative_to_event", "event": "nba_cup_final", "direction": "before", "offset": {"value": 0, "unit": "hour"}, "time_local": "morning ET"},
+        "copy": {
+          "subject": "Cup Final tips off tonight - watch pre-game on League Pass",
+          "cta_label": "Open League Pass",
+          "modules": [
+            {"rank": "primary", "name": "Pre-game programming"},
+            {"rank": "secondary", "name": "Post-game highlights reminder"}
+          ]
+        }
+      },
+      {
+        "id": "email_nonsub_dayof",
+        "type": "action",
+        "label": "Email Day-Of - Non-subscriber: linear broadcast + League Pass acquisition CTA",
+        "channel": "ch_email",
+        "touch_id": "TC2",
+        "timing": {"type": "relative_to_event", "event": "nba_cup_final", "direction": "before", "offset": {"value": 0, "unit": "hour"}, "time_local": "morning ET"},
+        "copy": {
+          "subject": "Cup Final tonight on TNT - and you can stream it all season on League Pass",
+          "cta_label": "Watch tonight",
+          "modules": [
+            {"rank": "primary", "name": "Linear broadcast tune-in"},
+            {"rank": "secondary", "name": "League Pass acquisition CTA"}
+          ]
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_tipoff",
+        "type": "action",
+        "label": "Push - Tipoff alert",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "relative_to_event", "event": "nba_cup_final", "direction": "before", "offset": {"value": 15, "unit": "minute"}},
+        "copy": {"headline": "Cup Final tipping off now in Las Vegas"}
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_test_control_split"},
+      {"from": "dec_test_control_split", "to": "end_control", "branch_label": "control"},
+      {"from": "dec_test_control_split", "to": "email_awareness", "branch_label": "test"},
+      {"from": "email_awareness", "to": "email_preview"},
+      {"from": "email_preview", "to": "dec_subscriber_routing"},
+      {"from": "dec_subscriber_routing", "to": "email_subscriber_dayof", "branch_label": "yes"},
+      {"from": "dec_subscriber_routing", "to": "email_nonsub_dayof", "branch_label": "no"},
+      {"from": "email_subscriber_dayof", "to": "dec_push_optin"},
+      {"from": "email_nonsub_dayof", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_tipoff", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_tipoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Cup Final tune-in rate"}, {"name": "League Pass acquisitions (non-subscribers)"}],
+      "secondary_kpis": [{"name": "Email open / click rates"}, {"name": "Push view rate"}],
+      "tests": [
+        {
+          "name": "Broadcast-CTA placement",
+          "hypothesis": "Subject-line broadcast CTAs lift tune-in rate vs body placement.",
+          "design": "10% control holdout receives no journey touches; test arms get differing subject-vs-body CTA placement.",
+          "control_holdout_pct": 10.0
+        }
+      ]
+    }
+  }
+}

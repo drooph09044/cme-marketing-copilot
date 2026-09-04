@@ -1,0 +1,159 @@
+{
+  "id": "081",
+  "matrix_row_id": 81,
+  "matrix_row_name": "NCAA football inactive fan reactivation",
+  "template": "tpl_calendar_reactivation",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a college football inactive-fan reactivation journey anchored to the major moments of the season.",
+    "Create a season-long calendar reactivation journey for inactive NCAA football fans. Backbone touches at kickoff weekend, conference openers, rivalry week, CFP Selection Day, and CFP first-round games. Each fan with a favorite school gets one personalized touch on their school's rivalry-game week.",
+    "Need to re-engage college football fans who've gone inactive. Use the season's anchor moments as the backbone, plus an extra personalized rivalry-week touch tied to fan's favorite school."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cfb-inactive-reactivation-2026",
+    "metadata": {
+      "name": "NCAA Football Inactive Fan Reactivation - 2026 Season",
+      "internal_name": "NCAA_CFB_Reactivation_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": null},
+      "purpose": "Re-engage inactive NCAA football fans across the 2026 season using a calendar-anchored backbone plus a personalized rivalry-week touch on fan's favorite school.",
+      "archetype": "reactivation",
+      "launch_date": "2026-08-15",
+      "end_date": "2027-01-25",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive college football fans across the season.", "kpi": "Fans returning to NCAA.com or partner apps with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans touches at major college football season moments (Kickoff Weekend, conference openers, Rivalry Week, CFP Selection Day, CFP first-round). Layer one per-school personalized touch on fan's favorite school's rivalry-game week.",
+        "timing_rationale": "Calendar-anchored to canonical NCAA football season moments per the 2026 schedule.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_cfb_fan",
+        "name": "Inactive NCAA football fan",
+        "description": "Fan with a college football affinity but no NCAA digital engagement in the last 365 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "equals", "value": "US"},
+            {"field": "ncaa.football_affinity", "op": "equals", "value": true},
+            {"field": "ncaa.activity_last_active_within_days", "op": "gt", "value": 365}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [{"id": "ch_email", "type": "email"}],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"},
+      {"key": "MTC", "name": "Rivalry Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Season cadence opens", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_kickoff_weekend",
+        "type": "action",
+        "label": "Email - Kickoff Weekend (late Aug)",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-08-29"},
+        "copy": {"subject": "College football is back: Week 1 is here"}
+      },
+      {
+        "id": "email_conference_openers",
+        "type": "action",
+        "label": "Email - Conference openers",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-26"},
+        "copy": {"subject": "Conference play begins this Saturday"}
+      },
+      {
+        "id": "dec_has_fav_school",
+        "type": "decision",
+        "label": "Has favorite school?",
+        "decision_basis": "pull",
+        "condition": {"field": "ncaa.favorite_school", "op": "is_not_null"}
+      },
+      {
+        "id": "email_rivalry_personalized",
+        "type": "action",
+        "label": "Email - Personalized rivalry week for fav school",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_school_rivalry_game",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "day"}
+        },
+        "copy": {
+          "subject": "{{FT}} vs {{MTC}}: rivalry week is here",
+          "preview": "Your school's biggest game of the year"
+        },
+        "personalization_used": ["FN", "FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_rivalry_week_general",
+        "type": "action",
+        "label": "Email - Rivalry Week roundup (last Sat of Nov)",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-28"},
+        "copy": {"subject": "Rivalry Week: the biggest games on the slate"}
+      },
+      {
+        "id": "email_cfp_selection_day",
+        "type": "action",
+        "label": "Email - CFP Selection Day (Dec 7)",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-07"},
+        "copy": {"subject": "The 12-team CFP bracket is set"}
+      },
+      {
+        "id": "email_cfp_first_round",
+        "type": "action",
+        "label": "Email - CFP first round (Dec 19-20)",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-19"},
+        "copy": {"subject": "CFP first round kicks off tonight"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_kickoff_weekend"},
+      {"from": "email_kickoff_weekend", "to": "email_conference_openers"},
+      {"from": "email_conference_openers", "to": "dec_has_fav_school"},
+      {"from": "dec_has_fav_school", "to": "email_rivalry_personalized", "branch_label": "yes"},
+      {"from": "dec_has_fav_school", "to": "email_rivalry_week_general", "branch_label": "no"},
+      {"from": "email_rivalry_personalized", "to": "email_rivalry_week_general"},
+      {"from": "email_rivalry_week_general", "to": "email_cfp_selection_day"},
+      {"from": "email_cfp_selection_day", "to": "email_cfp_first_round"},
+      {"from": "email_cfp_first_round", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate", "definition": "Fans inactive at start of journey who engaged with at least one touchpoint"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rates"}, {"name": "Rivalry-week personalized touch incremental lift"}],
+      "tests": []
+    }
+  }
+}

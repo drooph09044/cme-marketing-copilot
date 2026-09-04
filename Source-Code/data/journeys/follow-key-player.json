@@ -1,0 +1,207 @@
+{
+  "useCaseId": "follow-key-player",
+  "name": "Follow Key Player Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Follow Key Player",
+    "journeyGoal": "Build long-term fan affinity by driving follows and engagement with key players",
+    "entryTrigger": "team_content_engagement_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if fan follows player or engages with player profile twice"
+  },
+  "entryCriteria": {
+    "event": "content_view",
+    "eventId": "evt_player_interest_001",
+    "conditions": [
+      {
+        "field": "playerContentViews",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 2
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Player_Interested_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Player Spotlight Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Meet your rising star player",
+      "cta": "Follow Player",
+      "tracking": {
+        "campaignId": "email_player_1",
+        "deliveryId": "del_player_1",
+        "trackingEvents": [
+          "email_open",
+          "profile_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Push Highlight Stats",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "See how your player is performing this season",
+      "cta": "View Stats",
+      "tracking": {
+        "campaignId": "push_player_2",
+        "deliveryId": "del_player_2",
+        "trackingEvents": [
+          "push_open",
+          "stats_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Video Moments Email",
+      "timing": {
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Top moments you shouldn’t miss",
+      "cta": "Watch Highlights",
+      "tracking": {
+        "campaignId": "email_player_3",
+        "deliveryId": "del_player_3",
+        "trackingEvents": [
+          "email_open",
+          "video_play"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "content_view",
+        "eventId": "evt_player_interest_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "player_follow",
+          "field": "followed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "player_follow",
+          "field": "followed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "player_follow",
+          "field": "followed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "player_follow",
+      "eventId": "evt_player_follow_001",
+      "condition": "followed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "player_follow"
+    ],
+    "eventMapping": {
+      "player_follow": "evt_player_follow_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "player_follow",
+    "secondaryKPIs": [
+      "video_play"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,64 @@
+{
+  "categoryId": "maintenance-essentials",
+  "categoryName": "Maintenance Essentials",
+  "categoryDescription": "Journeys designed around preventive maintenance milestones.",
+  "subCategoryId": "battery-care",
+  "subCategoryName": "Battery Care",
+  "slug": "battery-replacement-lifecycle-journey",
+  "name": "Battery Replacement Lifecycle Journey",
+  "active": true,
+  "brief": "Find customers who have not replaced battery in 5 years and orchestrate proactive replacement reminders before failure risk increases.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-15",
+  "journeyOverrides": {
+    "name": "Battery Replacement Lifecycle",
+    "objective": "Boost preventive battery checks and replacement appointments for aging vehicles.",
+    "audience": "Battery_5Y_No_Replacement",
+    "variantA": "Preventive maintenance education cadence",
+    "variantB": "Education plus appointment incentive"
+  },
+  "nodeOverrides": {
+    "n11": {
+      "title": ["Battery Service", "Booked?"],
+      "subtitle": ["appointment", "or follow-up"]
+    },
+    "n12": {
+      "title": ["Exit", "Booked"],
+      "subtitle": ["service", "scheduled"]
+    },
+    "n13": {
+      "title": ["Exit", "No Response"],
+      "subtitle": ["nurture", "expired"]
+    }
+  },
+  "detailOverrides": {
+    "n11": {
+      "title": "Battery Service Booked?",
+      "rows": [
+        { "key": "condition", "value": "battery replacement appointment booked or service lead submitted" },
+        { "key": "yesPath", "value": "Exit Booked" },
+        { "key": "noPath", "value": "Exit No Response" },
+        { "key": "cjaEvents", "value": "batteryServiceIntent, appointmentBooked, pathRouted" }
+      ],
+      "note": "Automotive conversion checks for a battery service booking, not a ticket purchase."
+    },
+    "n12": {
+      "title": "Exit Booked",
+      "rows": [
+        { "key": "trigger", "value": "battery appointment confirmed" },
+        { "key": "suppression", "value": "stop remaining replacement reminders" },
+        { "key": "cjaEvents", "value": "batteryAppointmentBooked, journeyConversion" },
+        { "key": "downstream", "value": "eligible for service follow-up journey" }
+      ]
+    },
+    "n13": {
+      "title": "Exit No Response",
+      "rows": [
+        { "key": "trigger", "value": "replacement reminder window expired" },
+        { "key": "status", "value": "no appointment captured" },
+        { "key": "cjaEvents", "value": "batteryJourneyExpired, noResponse" },
+        { "key": "downstream", "value": "return to maintenance nurture pool" }
+      ]
+    }
+  }
+}

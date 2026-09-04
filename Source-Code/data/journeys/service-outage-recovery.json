@@ -1,0 +1,175 @@
+{
+  "useCaseId": "service-outage-recovery",
+  "name": "Service Outage Recovery Journey",
+  "category": {
+    "categoryId": "service-recovery",
+    "categoryName": "Customer Service"
+  },
+  "journeyTable": {
+    "journeyName": "Service Outage Recovery",
+    "journeyGoal": "Maintain customer trust during outages",
+    "entryTrigger": "network_outage_detected",
+    "journeyCategory": "Service",
+    "totalDuration": "48 hours",
+    "exitClause": "Exit after outage resolved"
+  },
+  "entryCriteria": {
+    "event": "network_outage_detected",
+    "eventId": "evt_outage_001",
+    "conditions": [
+      {
+        "field": "activeServiceTicket",
+        "operator": "EQUALS",
+        "value": true
+      },
+      {
+        "field": "outageWindowHours",
+        "operator": "LESS_THAN_EQUALS",
+        "value": 48
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Affected_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Outage Notification",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "SMS",
+      "messageTheme": "We are aware of the outage in your area",
+      "cta": "View Status",
+      "tracking": {
+        "campaignId": "sms_outage_alert",
+        "deliveryId": "del_sms_o1",
+        "trackingEvents": [
+          "sms_click",
+          "status_page_visit"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Resolution Update",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Service restoration update",
+      "cta": "Track Progress",
+      "tracking": {
+        "campaignId": "email_outage_update",
+        "deliveryId": "del_email_o2",
+        "trackingEvents": [
+          "email_open",
+          "status_page_visit"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "network_outage_detected",
+        "eventId": "evt_outage_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "outage_resolved",
+          "field": "serviceRestored",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "outage_resolved",
+          "field": "serviceRestored",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "outage_resolved",
+      "eventId": "evt_outage_resolved_001",
+      "condition": "serviceRestored == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "CRITICAL"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "status_page_visit",
+      "outage_resolved"
+    ],
+    "eventMapping": {
+      "status_page_visit": "evt_status_001",
+      "outage_resolved": "evt_outage_resolved_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "outage_resolved",
+    "secondaryKPIs": [
+      "sms_click",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

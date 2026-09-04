@@ -1,0 +1,479 @@
+{
+  "id": "006",
+  "matrix_row_id": 6,
+  "matrix_row_name": "Abandon Cart - Single-game tickets (Sunday)",
+  "template": "tpl_abandon_cart",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an abandon-cart journey for NFL single-game tickets when kickoff is within 72h.",
+    "Create a single-game ticket abandon-cart journey for fans whose fav-team home game is within 72h. Fan out across the four identity states (app_known / app_unknown / web_known / web_unknown). Modal at abandonment, then push at T-48h, email at T-24h, and a final push at T-3h before kickoff. Suppress fans who already purchased.",
+    "Need an always-on, urgent ticket-cart recovery flow for Sunday games \u2014 modal first, then escalating push and email as kickoff gets closer."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-singlegame-abandon-cart",
+    "metadata": {
+      "name": "Single-Game Ticket Abandon Cart (Sunday)",
+      "internal_name": "NFL_SingleGame_AbandonCart_Sunday",
+      "brand": {
+        "vertical": "ticketing",
+        "league": "NFL",
+        "team": null,
+        "product": "Ticketmaster"
+      },
+      "purpose": "Recover fans who abandoned a single-game ticket cart when the next fav-team home game kicks off within 72h, with escalating push cadence as kickoff approaches.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-08-01",
+      "end_date": "2027-01-15",
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Recover abandoned single-game ticket purchases.",
+          "kpi": "Ticket purchases attributable to journey",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix fan-out (app_known / app_unknown / web_known / web_unknown). Modal at point of abandonment, then push and email cadence escalates as time-to-kickoff shortens (T-48h, T-24h, T-3h).",
+        "timing_rationale": "Single-game urgency window is the 72h before kickoff; push frequency increases as the game gets closer.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "app_modal",
+        "web_modal",
+        "push",
+        "email"
+      ],
+      "moments_that_matter": [
+        "PLAN & COMMIT",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_app_known",
+        "name": "App Known abandon-cart",
+        "identity_state": "app_known",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_not_null"
+            },
+            {
+              "field": "ticket.next_fav_team_home_game_hours_to_kickoff",
+              "op": "lte",
+              "value": 72
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_app_unknown",
+        "name": "App Unknown abandon-cart",
+        "identity_state": "app_unknown",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "app"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_null"
+            },
+            {
+              "field": "identity.ecid",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_web_known",
+        "name": "Web Known abandon-cart",
+        "identity_state": "web_known",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "web"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      },
+      {
+        "id": "aud_web_unknown",
+        "name": "Web Unknown abandon-cart",
+        "identity_state": "web_unknown",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "abandoned_cart_channel",
+              "op": "equals",
+              "value": "web"
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_null"
+            }
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_purchased",
+        "name": "Already purchased ticket",
+        "scope": "global",
+        "criteria": {
+          "field": "ticket.purchased_within_session",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_app_modal",
+        "type": "app_modal",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_web_modal",
+        "type": "web_modal",
+        "platform": "nfl_web"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_email",
+        "type": "email"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 24,
+        "unit": "hour"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Cart abandoned (72h before kickoff)",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "ticket_cart_abandoned"
+        }
+      },
+      {
+        "id": "split_identity",
+        "type": "audience_split",
+        "label": "Identity fan-out",
+        "audiences": [
+          "aud_app_known",
+          "aud_app_unknown",
+          "aud_web_known",
+          "aud_web_unknown"
+        ],
+        "mode": "parallel"
+      },
+      {
+        "id": "dec_channel",
+        "type": "decision",
+        "label": "App or Web abandon channel?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "abandoned_cart_channel",
+          "op": "equals",
+          "value": "app"
+        }
+      },
+      {
+        "id": "modal_app",
+        "type": "action",
+        "label": "App Modal NM1 - Return to ticket cart",
+        "channel": "ch_app_modal",
+        "touch_id": "NM1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Your seats are waiting - kickoff is soon",
+          "cta_label": "Return to cart"
+        },
+        "personalization_used": [
+          "MTC"
+        ]
+      },
+      {
+        "id": "modal_web",
+        "type": "action",
+        "label": "Web Modal WM1 - Return to ticket cart",
+        "channel": "ch_web_modal",
+        "touch_id": "WM1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Your seats are waiting - kickoff is soon",
+          "cta_label": "Return to cart"
+        },
+        "personalization_used": [
+          "MTC"
+        ]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "wait_t48",
+        "type": "wait",
+        "label": "Wait until T-48h before kickoff",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 48,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "push_t48",
+        "type": "action",
+        "label": "Push T-48h - Tickets still available",
+        "channel": "ch_push",
+        "touch_id": "P48",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 48,
+            "unit": "hour"
+          }
+        },
+        "copy": {
+          "headline": "{{MTC}} kicks off in 2 days - grab your seats"
+        }
+      },
+      {
+        "id": "wait_t24",
+        "type": "wait",
+        "label": "Wait until T-24h",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 24,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "email_t24",
+        "type": "action",
+        "label": "Email T-24h - Last call",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 24,
+            "unit": "hour"
+          }
+        },
+        "copy": {
+          "subject": "Tomorrow: {{MTC}} - your seats are one click away",
+          "cta_label": "Buy tickets"
+        },
+        "personalization_used": [
+          "FN",
+          "MTC"
+        ]
+      },
+      {
+        "id": "wait_t3",
+        "type": "wait",
+        "label": "Wait until T-3h",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 3,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "push_t3",
+        "type": "action",
+        "label": "Push T-3h - Final urgency",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "kickoff",
+          "direction": "before",
+          "offset": {
+            "value": 3,
+            "unit": "hour"
+          }
+        },
+        "copy": {
+          "headline": "Kickoff in 3 hours - last call on seats"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "split_identity"
+      },
+      {
+        "from": "split_identity",
+        "to": "dec_channel"
+      },
+      {
+        "from": "dec_channel",
+        "to": "modal_app",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_channel",
+        "to": "modal_web",
+        "branch_label": "no"
+      },
+      {
+        "from": "modal_app",
+        "to": "wait_t48"
+      },
+      {
+        "from": "modal_web",
+        "to": "wait_t48"
+      },
+      {
+        "from": "wait_t48",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_t48",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_t24",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t48",
+        "to": "wait_t24"
+      },
+      {
+        "from": "wait_t24",
+        "to": "email_t24"
+      },
+      {
+        "from": "email_t24",
+        "to": "wait_t3"
+      },
+      {
+        "from": "wait_t3",
+        "to": "push_t3"
+      },
+      {
+        "from": "push_t3",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Single-game ticket conversions attributable to journey"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Modal CTR"
+        },
+        {
+          "name": "Push view rate by touch"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

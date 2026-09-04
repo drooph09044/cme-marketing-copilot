@@ -1,0 +1,127 @@
+{
+  "useCaseId": "merch-low-value",
+  "name": "Low Value Merchandise Purchase Journey",
+  "category": {
+    "categoryId": "merchandising",
+    "categoryName": "Shop - Merchandise"
+  },
+  "journeyTable": {
+    "journeyName": "Low Value Merchandise Buyers",
+    "journeyGoal": "Increase repeat purchases from low-value merch customers",
+    "entryTrigger": "low_merch_segment",
+    "journeyCategory": "Revenue",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after second purchase or upgrade to higher tier"
+  },
+  "entryCriteria": {
+    "event": "merch_purchase_event",
+    "eventId": "evt_merch_003",
+    "conditions": [
+      {
+        "field": "averageOrderValue",
+        "operator": "LESS_THAN",
+        "value": 50
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Low_Value_Merch_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Discount Incentive Offer",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "SMS",
+      "messageTheme": "Enjoy 15% off your next merch order",
+      "cta": "Shop Now",
+      "tracking": {
+        "campaignId": "sms_merch_low",
+        "deliveryId": "del_sms_ml1",
+        "trackingEvents": [
+          "sms_click",
+          "product_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "merch_purchase_event",
+        "eventId": "evt_merch_003"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "repeatPurchase",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_purchase",
+      "eventId": "evt_product_003",
+      "condition": "repeatPurchase == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_purchase"
+    ],
+    "eventMapping": {
+      "product_purchase": "evt_product_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_purchase",
+    "secondaryKPIs": [
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "single_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

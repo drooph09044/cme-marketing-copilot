@@ -1,0 +1,210 @@
+{
+  "useCaseId": "churn-prevention",
+  "name": "Churn Prevention Journey",
+  "category": {
+    "categoryId": "retention",
+    "categoryName": "Retention"
+  },
+  "journeyTable": {
+    "journeyName": "Churn Prevention",
+    "journeyGoal": "Re-engage at-risk subscribers before cancellation through content-led and incentive-based interventions",
+    "entryTrigger": "churn_risk_detected",
+    "journeyCategory": "Retention",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if subscriber logs in and plays content within journey window"
+  },
+  "entryCriteria": {
+    "event": "engagement_score_update",
+    "eventId": "evt_eng_score_001",
+    "conditions": [
+      {
+        "field": "engagementScore",
+        "operator": "LESS_THAN_EQUALS",
+        "value": 40
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "At_Risk_Subscribers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Re-engagement Push",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "PUSH",
+      "messageTheme": "We noticed you’ve been away — here’s something you might like",
+      "cta": "Resume Watching",
+      "tracking": {
+        "campaignId": "push_churn_prevent_1",
+        "deliveryId": "del_churn_1",
+        "trackingEvents": [
+          "push_open",
+          "content_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "New Content Email",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Fresh releases picked just for you",
+      "cta": "See What’s New",
+      "tracking": {
+        "campaignId": "email_churn_prevent_2",
+        "deliveryId": "del_churn_2",
+        "trackingEvents": [
+          "email_open",
+          "content_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Retention Offer Email",
+      "timing": {
+        "offsetHours": 336
+      },
+      "channel": "EMAIL",
+      "messageTheme": "A special offer to keep you watching",
+      "cta": "Stay & Save",
+      "tracking": {
+        "campaignId": "email_churn_prevent_3",
+        "deliveryId": "del_churn_3",
+        "trackingEvents": [
+          "email_open",
+          "offer_redeem"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "engagement_score_update",
+        "eventId": "evt_eng_score_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "content_play",
+          "field": "played",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "content_play",
+          "field": "played",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "content_play",
+          "field": "played",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 216
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "content_play",
+      "eventId": "evt_content_play_001",
+      "condition": "played == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "content_play",
+      "offer_redeem"
+    ],
+    "eventMapping": {
+      "content_play": "evt_content_play_001",
+      "offer_redeem": "evt_offer_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "content_play",
+    "secondaryKPIs": [
+      "email_open",
+      "offer_redeem"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

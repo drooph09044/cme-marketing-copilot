@@ -1,0 +1,168 @@
+{
+  "useCaseId": "game-promotion-activation",
+  "name": "Game Promotion - Activation Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Game Promotion - Activation",
+    "journeyGoal": "Re-engage users who showed interest in games but did not complete engagement and activate them",
+    "entryTrigger": "user_added_game",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after game viewed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_game",
+    "eventId": "evt_add_game_001",
+    "conditions": [
+      {
+        "field": "gameType",
+        "operator": "EQUALS",
+        "value": "Game"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Game Users – Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Game Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You added a game – complete your engagement now and activate rewards!",
+      "cta": "View Game",
+      "tracking": {
+        "campaignId": "email_game_activation",
+        "deliveryId": "del_email_19",
+        "trackingEvents": [
+          "email_open",
+          "game_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Game Activation Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your game is waiting – activate now and engage!",
+      "cta": "View Game",
+      "tracking": {
+        "campaignId": "push_game_activation",
+        "deliveryId": "del_push_19",
+        "trackingEvents": [
+          "push_open",
+          "game_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_game",
+        "eventId": "evt_add_game_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "game_view",
+          "field": "gameViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "game_view",
+          "field": "gameViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "game_view",
+      "eventId": "evt_game_002",
+      "condition": "gameViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "game_view"
+    ],
+    "eventMapping": {
+      "game_view": "evt_game_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "game_view",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

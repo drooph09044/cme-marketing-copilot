@@ -1,0 +1,170 @@
+{
+  "id": "067",
+  "matrix_row_id": 67,
+  "matrix_row_name": "MLS inactive fan reactivation - season touchpoints",
+  "template": "tpl_calendar_reactivation",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLS inactive-fan reactivation journey anchored to the major moments of the season.",
+    "Create a season-long calendar reactivation journey for inactive MLS fans. Backbone touches at Opening Weekend, Concacaf Champions Cup, Leagues Cup, Decision Day, MLS Cup Playoffs, and MLS Cup Final. Each supporter gets one personalized touch on their favorite club's derby or marquee fixture during the season.",
+    "Need to re-engage MLS fans who've gone inactive. Use the season's anchor moments as the backbone, plus an extra personalized fixture-day touch tied to fan's favorite club."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-inactive-reactivation-2026",
+    "metadata": {
+      "name": "MLS Inactive Fan Reactivation - 2026 Season",
+      "internal_name": "MLS_Reactivation_2026",
+      "brand": {"vertical": "sports_league", "league": "MLS", "team": null, "product": null},
+      "purpose": "Re-engage inactive MLS fans across the 2026 season using a calendar-anchored cadence plus one personalized touch on fan's favorite club's derby or marquee fixture.",
+      "archetype": "reactivation",
+      "launch_date": "2026-02-01",
+      "end_date": "2026-12-31",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive MLS fans across the season.", "kpi": "Fans returning to MLS App or MLS Season Pass with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans touches at major season moments (Opening Weekend, Champions Cup, Leagues Cup, Decision Day, Playoffs, Cup Final). Layer one per-club personalized touch on the fan's favorite club's derby or marquee fixture for additional relevance.",
+        "timing_rationale": "Calendar-anchored to canonical MLS moments per the league's 2026 schedule.",
+        "notes": "2026 is the final spring-to-fall MLS season before the calendar shift to fall-to-spring starting mid-2027."
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_mls_fan",
+        "name": "Inactive MLS fan",
+        "description": "Fan with no MLS engagement in the last 365 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "in", "value": ["US", "CA"]},
+            {"field": "mls.activity_last_active_within_days", "op": "gt", "value": 365}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {"field": "consent.email", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [{"id": "ch_email", "type": "email"}],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Club"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Preseason kickoff", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_opening_weekend",
+        "type": "action",
+        "label": "Email - Opening Weekend (Feb 21)",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-21"},
+        "copy": {"subject": "MLS is back: 2026 Opening Weekend"}
+      },
+      {
+        "id": "email_champions_cup",
+        "type": "action",
+        "label": "Email - Concacaf Champions Cup window (Mar-May)",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "recurrence": "march-may champions cup window"}
+      },
+      {
+        "id": "dec_has_fav_club",
+        "type": "decision",
+        "label": "Has favorite MLS club?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_personalized_derby",
+        "type": "action",
+        "label": "Email - Personalized derby/marquee fixture for fav club",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_derby",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "day"}
+        },
+        "copy": {
+          "subject": "{{FT}} vs {{MTC}}: don't miss the matchup",
+          "preview": "Your club is back on the pitch"
+        },
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_leagues_cup",
+        "type": "action",
+        "label": "Email - Leagues Cup (Aug 4 - Sep 6)",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {"type": "scheduled", "calendar_date": "2026-08-04"},
+        "copy": {"subject": "Leagues Cup kicks off: MLS vs Liga MX"}
+      },
+      {
+        "id": "email_decision_day",
+        "type": "action",
+        "label": "Email - Decision Day (Nov 7)",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-07"},
+        "copy": {"subject": "Decision Day: 14 matches, the playoff picture finalized"}
+      },
+      {
+        "id": "email_playoffs",
+        "type": "action",
+        "label": "Email - Audi MLS Cup Playoffs begin",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "recurrence": "early november playoffs start"}
+      },
+      {
+        "id": "email_mls_cup",
+        "type": "action",
+        "label": "Email - MLS Cup Final (Dec 18)",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-18"},
+        "copy": {"subject": "MLS Cup Final tonight"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_opening_weekend"},
+      {"from": "email_opening_weekend", "to": "email_champions_cup"},
+      {"from": "email_champions_cup", "to": "dec_has_fav_club"},
+      {"from": "dec_has_fav_club", "to": "email_personalized_derby", "branch_label": "yes"},
+      {"from": "dec_has_fav_club", "to": "email_leagues_cup", "branch_label": "no"},
+      {"from": "email_personalized_derby", "to": "email_leagues_cup"},
+      {"from": "email_leagues_cup", "to": "email_decision_day"},
+      {"from": "email_decision_day", "to": "email_playoffs"},
+      {"from": "email_playoffs", "to": "email_mls_cup"},
+      {"from": "email_mls_cup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate", "definition": "Fans inactive at start of journey who engaged with at least one touchpoint"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rates"}, {"name": "Personalized derby touch incremental lift"}],
+      "tests": []
+    }
+  }
+}

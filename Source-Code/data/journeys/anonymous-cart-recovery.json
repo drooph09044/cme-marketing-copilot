@@ -1,0 +1,173 @@
+{
+  "useCaseId": "anonymous-cart-recovery",
+  "name": "Anonymous Cart Recovery Journey",
+  "category": {
+    "categoryId": "conversion",
+    "categoryName": "Conversion"
+  },
+  "journeyTable": {
+    "journeyName": "Anonymous Cart Recovery",
+    "journeyGoal": "Recover abandoned anonymous shopping sessions",
+    "entryTrigger": "anonymous_cart_abandonment",
+    "journeyCategory": "Conversion",
+    "totalDuration": "24 hours",
+    "exitClause": "Exit after purchase completion"
+  },
+  "entryCriteria": {
+    "event": "anonymous_cart_abandonment",
+    "eventId": "evt_cart_anon_001",
+    "conditions": [
+      {
+        "field": "authenticated",
+        "operator": "EQUALS",
+        "value": false
+      },
+      {
+        "field": "cartEngagement",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "deviceId",
+      "namespace": "COOKIE"
+    },
+    "audienceName": "Anonymous_Cart_Visitors"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Retargeting Ad",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Complete your purchase today",
+      "cta": "Return to Cart",
+      "tracking": {
+        "campaignId": "display_cart_recovery",
+        "deliveryId": "del_display_c1",
+        "trackingEvents": [
+          "ad_click",
+          "purchase_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Reminder Banner",
+      "timing": {
+        "offsetHours": 12
+      },
+      "channel": "WEB_PERSONALIZATION",
+      "messageTheme": "Your selected items are still waiting",
+      "cta": "Continue Checkout",
+      "tracking": {
+        "campaignId": "web_cart_reminder",
+        "deliveryId": "del_web_c2",
+        "trackingEvents": [
+          "banner_click",
+          "purchase_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "anonymous_cart_abandonment",
+        "eventId": "evt_cart_anon_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_complete",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_complete",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 10
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_complete",
+      "eventId": "evt_purchase_001",
+      "condition": "purchaseCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "purchase_complete"
+    ],
+    "eventMapping": {
+      "purchase_complete": "evt_purchase_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_complete",
+    "secondaryKPIs": [
+      "ad_click",
+      "banner_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

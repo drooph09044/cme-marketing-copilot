@@ -1,0 +1,20 @@
+{
+  "categoryId": "seasonal-maintenance",
+  "categoryName": "Seasonal Maintenance",
+  "categoryDescription": "Journeys aimed at planned seasonal inspections and preventive care.",
+  "subCategoryId": "maintenance-reminders",
+  "subCategoryName": "Maintenance Reminders",
+  "slug": "seasonal-maintenance-reminder-journey",
+  "name": "Seasonal Maintenance Reminder Journey",
+  "active": true,
+  "brief": "Trigger seasonal maintenance reminders for customers due for routine service, and optimize conversion with channel and copy testing.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-08-05",
+  "journeyOverrides": {
+    "name": "Seasonal Maintenance Reminder",
+    "objective": "Increase routine maintenance bookings during seasonal service windows.",
+    "audience": "Seasonal_Maintenance_Due",
+    "variantA": "Standard seasonal reminder cadence",
+    "variantB": "Reminder plus seasonal benefits message"
+  }
+}

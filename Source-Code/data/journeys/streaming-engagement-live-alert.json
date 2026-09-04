@@ -1,0 +1,127 @@
+{
+  "useCaseId": "streaming-engagement-live-alert",
+  "name": "Streaming Engagement – Live Now Alert Journey",
+  "category": {
+    "categoryId": "real-time-engagement",
+    "categoryName": "Real-Time Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Streaming Engagement – Live Now Alert",
+    "journeyGoal": "Prompt users immediately when a stream goes live to maximize live viewership",
+    "entryTrigger": "stream_scheduled",
+    "journeyCategory": "Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after stream started"
+  },
+  "entryCriteria": {
+    "event": "stream_scheduled",
+    "eventId": "evt_stream_scheduled_001",
+    "conditions": [
+      {
+        "field": "subscriptionStatus",
+        "operator": "EQUALS",
+        "value": "ACTIVE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Highly Engaged Fans – Live Alert"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Live Now Push",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "Live now – watch PGA TOUR action",
+      "cta": "Watch Live",
+      "tracking": {
+        "campaignId": "push_stream_live_2",
+        "deliveryId": "del_push_26",
+        "trackingEvents": [
+          "push_open",
+          "stream_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "stream_scheduled",
+        "eventId": "evt_stream_scheduled_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "stream_start",
+          "field": "streamStarted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "stream_start",
+      "eventId": "evt_stream_003",
+      "condition": "streamStarted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "stream_start"
+    ],
+    "eventMapping": {
+      "stream_start": "evt_stream_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "stream_start",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

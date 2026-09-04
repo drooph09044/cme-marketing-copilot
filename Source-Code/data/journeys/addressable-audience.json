@@ -1,0 +1,114 @@
+{
+  "useCaseId": "addressable-audience",
+  "name": "Addressable Advertising Audience Journey",
+  "category": {
+    "categoryId": "advertising",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Addressable Audience Activation",
+    "journeyGoal": "Increase CPM and ad targeting efficiency",
+    "entryTrigger": "addressable_segment_ready",
+    "journeyCategory": "Monetization",
+    "totalDuration": "30 days",
+    "exitClause": "Exit after campaign exposure"
+  },
+  "entryCriteria": {
+    "event": "ad_profile_ready",
+    "eventId": "evt_adprof_001",
+    "conditions": [
+      {
+        "field": "consentFlag",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Addressable_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Programmatic Ad Exposure",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Personalized ad based on your interests",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "prog_ad_addressable",
+        "deliveryId": "del_addr_1",
+        "trackingEvents": [
+          "ad_impression",
+          "ad_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "ad_profile_ready",
+        "eventId": "evt_adprof_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "consent_revoked",
+          "field": "consentFlag",
+          "operator": "EQUALS",
+          "value": false
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": false,
+      "maxMessagesPerUser": 0,
+      "timeWindowHours": 0
+    },
+    "prioritization": {
+      "priority": "LOW"
+    }
+  },
+  "tracking": {
+    "globalEvents": [],
+    "eventMapping": {}
+  },
+  "analytics": {
+    "primaryKPI": "CPM_uplift",
+    "secondaryKPIs": [],
+    "attribution": {
+      "model": "none",
+      "lookbackHours": 0
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

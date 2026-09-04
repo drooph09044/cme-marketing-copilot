@@ -1,0 +1,253 @@
+{
+  "id": "022",
+  "matrix_row_id": 22,
+  "matrix_row_name": "Playoff Merch Cross-Sell",
+  "template": "tpl_merch_cross_sell",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a playoff-clinch merch cross-sell journey.",
+    "Triggered when fan's fav-team mathematically clinches a playoff berth. Same-day push and 24h email featuring playoff-branded merchandise (locker-room t-shirts, hats, sideline gear, division-champion banners) sourced from NFLShop. Suppress fans whose fav-team has already been eliminated.",
+    "Need a clinch-triggered playoff merch cross-sell \u2014 push same-day, email 24h later, featuring locker-room and division-champion gear."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-playoff-merch-cross-sell",
+    "metadata": {
+      "name": "Playoff Merch Cross-Sell",
+      "internal_name": "NFL_Playoff_Merch_CrossSell_2026",
+      "brand": {
+        "vertical": "ecommerce",
+        "league": "NFL",
+        "team": null,
+        "product": "NFLShop"
+      },
+      "purpose": "Trigger a same-day push and 24h email cross-sell of playoff merch when fan's fav-team clinches a playoff berth.",
+      "archetype": "cross_sell",
+      "launch_date": "2026-11-15",
+      "end_date": "2027-01-15",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive playoff merch purchases.",
+          "kpi": "NFLShop conversions attributable to journey",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Triggered by clinch event for fav-team. Same-day push, then 24h email featuring playoff-branded merch (locker-room tees, hats, sideline gear, division-champion banners).",
+        "timing_rationale": "Strike while emotion is high after clinch.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "GET PUMPED",
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_fav_team_clinched",
+        "name": "Fan whose fav-team clinched a playoff berth",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            },
+            {
+              "field": "game.fav_team_clinched_playoffs",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_eliminated",
+        "name": "Fav-team eliminated from playoff contention",
+        "scope": "global",
+        "criteria": {
+          "field": "game.fav_team_eliminated",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Fav-team clinches playoffs",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "fav_team_clinched"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_clinch",
+        "type": "action",
+        "label": "Push - {{FT}} is playoff-bound",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "{{FT}} just clinched - shop playoff gear"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait 24 hours",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 24,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "email_24h",
+        "type": "action",
+        "label": "Email - Playoff merch (locker-room, sideline, banners)",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "{{FT}} playoff gear is here",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Locker-room tees and hats"
+            },
+            {
+              "rank": "secondary",
+              "name": "Sideline gear"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Division-champion banners"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_clinch",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_24h",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_clinch",
+        "to": "wait_24h"
+      },
+      {
+        "from": "wait_24h",
+        "to": "email_24h"
+      },
+      {
+        "from": "email_24h",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "NFLShop conversions attributable to journey"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Push click rate"
+        },
+        {
+          "name": "Email click rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

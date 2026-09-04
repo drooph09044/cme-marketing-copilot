@@ -1,0 +1,177 @@
+{
+  "id": "057",
+  "matrix_row_id": 57,
+  "matrix_row_name": "NHL inactive fan reactivation - season touchpoints",
+  "template": "tpl_calendar_reactivation",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NHL inactive-fan reactivation journey anchored to the season's marquee moments.",
+    "Create a season-long calendar reactivation journey for inactive NHL fans. Backbone touches at Opening Night, Winter Classic, Stadium Series, the Olympic break, Trade Deadline, the Stanley Cup Playoffs and Final, plus one personalized touch on each fan's favorite team's rivalry game.",
+    "Need to re-engage NHL fans who've gone inactive. Use the NHL calendar anchors as the backbone and layer one personalized rivalry-game touch tied to the fan's favorite team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-inactive-reactivation-2026",
+    "metadata": {
+      "name": "NHL Inactive Fan Reactivation - 2025-26 Season",
+      "internal_name": "NHL_Reactivation_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": null},
+      "purpose": "Re-engage inactive NHL fans across the 2025-26 season using a calendar-anchored cadence plus one personalized touch on fan's favorite team's rivalry game.",
+      "archetype": "reactivation",
+      "launch_date": "2025-10-01",
+      "end_date": "2026-06-30",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive NHL fans across the season.", "kpi": "Fans returning to NHL App or ESPN+ NHL content with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans touches at canonical NHL moments (Opening Night, Winter Classic, Stadium Series, Olympic break, Trade Deadline, Playoffs, Stanley Cup Final). Layer one per-team personalized touch on the fan's favorite team's rivalry game.",
+        "timing_rationale": "Calendar-anchored to canonical NHL moments per the league's 2025-26 schedule.",
+        "notes": "Olympic break is a 2025-26 specific anchor since NHL players participate in the 2026 Milan-Cortina Olympics."
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_nhl_fan",
+        "name": "Inactive NHL fan",
+        "description": "Fan with no NHL engagement in the last 365 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "country", "op": "in", "value": ["US", "CA"]},
+            {"field": "nhl.activity_last_active_within_days", "op": "gt", "value": 365}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [{"id": "ch_email", "type": "email"}],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Preseason kickoff", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_opening_night",
+        "type": "action",
+        "label": "Email - Opening Night",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2025-10-07"},
+        "copy": {"subject": "NHL is back: Opening Night is here"}
+      },
+      {
+        "id": "email_winter_classic",
+        "type": "action",
+        "label": "Email - Winter Classic (Jan 2)",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-01-02"},
+        "copy": {"subject": "The Winter Classic takes the ice tonight"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite NHL team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_personalized_rivalry",
+        "type": "action",
+        "label": "Email - Personalized rivalry game for fav team",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_team_rivalry_game",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "day"}
+        },
+        "copy": {
+          "subject": "{{FT}} vs {{MTC}}: rivalry night",
+          "preview": "Your team drops the puck against their oldest rival"
+        },
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_stadium_series",
+        "type": "action",
+        "label": "Email - Stadium Series (Feb 1)",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-01"},
+        "copy": {"subject": "Stadium Series tonight: outdoor hockey under the lights"}
+      },
+      {
+        "id": "email_olympic_break",
+        "type": "action",
+        "label": "Email - Olympic break window",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "recurrence": "feb 6-22 milan-cortina olympic break"},
+        "copy": {"subject": "NHL stars head to Milan-Cortina: who's representing your team"}
+      },
+      {
+        "id": "email_trade_deadline",
+        "type": "action",
+        "label": "Email - Trade Deadline",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-06"},
+        "copy": {"subject": "Trade Deadline today: who moved, who stayed"}
+      },
+      {
+        "id": "email_playoffs_start",
+        "type": "action",
+        "label": "Email - Stanley Cup Playoffs begin",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {"type": "scheduled", "recurrence": "mid-april stanley cup playoffs start"},
+        "copy": {"subject": "Stanley Cup Playoffs begin tonight"}
+      },
+      {
+        "id": "email_cup_final",
+        "type": "action",
+        "label": "Email - Stanley Cup Final",
+        "channel": "ch_email",
+        "touch_id": "WK8",
+        "timing": {"type": "scheduled", "recurrence": "early june stanley cup final"},
+        "copy": {"subject": "The Stanley Cup Final is set"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_opening_night"},
+      {"from": "email_opening_night", "to": "email_winter_classic"},
+      {"from": "email_winter_classic", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "email_personalized_rivalry", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_stadium_series", "branch_label": "no"},
+      {"from": "email_personalized_rivalry", "to": "email_stadium_series"},
+      {"from": "email_stadium_series", "to": "email_olympic_break"},
+      {"from": "email_olympic_break", "to": "email_trade_deadline"},
+      {"from": "email_trade_deadline", "to": "email_playoffs_start"},
+      {"from": "email_playoffs_start", "to": "email_cup_final"},
+      {"from": "email_cup_final", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate", "definition": "Fans inactive at start of journey who engaged with at least one touchpoint"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rates"}, {"name": "Personalized rivalry touch incremental lift"}],
+      "tests": []
+    }
+  }
+}

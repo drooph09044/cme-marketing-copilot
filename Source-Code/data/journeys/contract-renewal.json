@@ -1,0 +1,296 @@
+{
+  "useCaseId": "contract-renewal",
+  "name": "Contract Renewal Journey",
+  "category": {
+    "categoryId": "retention",
+    "categoryName": "Retention / Renewal"
+  },
+  "journeyTable": {
+    "journeyName": "Contract Renewal",
+    "journeyGoal": "Drive timely renewal before contract expiry; prevent churn at renewal point",
+    "entryTrigger": "contract_end_date_minus_90_days",
+    "journeyCategory": "Renewal",
+    "totalDuration": "90 days",
+    "exitClause": "Exit if customer renews or upgrades at any point"
+  },
+  "entryCriteria": {
+    "event": "contract_renewal_window_opened",
+    "eventId": "evt_contract_001",
+    "conditions": [
+      {
+        "field": "daysToContractEnd",
+        "operator": "EQUALS",
+        "value": 90
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Contract_Renewal_90D_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Renewal Options Email",
+      "timing": {
+        "offsetDays": -90
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your plan is up for renewal – personalised upgrade options",
+      "cta": "Explore My Options",
+      "tracking": {
+        "campaignId": "email_contract_renewal_90d",
+        "deliveryId": "del_contract_1",
+        "trackingEvents": [
+          "email_open",
+          "click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Loyalty Reward Offer",
+      "timing": {
+        "offsetDays": -60
+      },
+      "channel": "EMAIL_SMS",
+      "messageTheme": "Loyalty reward – exclusive renewal rate or device upgrade for existing customers",
+      "cta": "Claim My Loyalty Offer",
+      "tracking": {
+        "campaignId": "loyalty_renewal_60d",
+        "deliveryId": "del_contract_2",
+        "trackingEvents": [
+          "email_open",
+          "sms_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Urgency Renewal Reminder",
+      "timing": {
+        "offsetDays": -30
+      },
+      "channel": "PUSH_SMS",
+      "messageTheme": "30 days to go – reminder with best available plan + one-tap renewal CTA",
+      "cta": "Renew Now",
+      "tracking": {
+        "campaignId": "renewal_urgency_30d",
+        "deliveryId": "del_contract_3",
+        "trackingEvents": [
+          "push_open",
+          "renewal_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Account Manager Outreach",
+      "timing": {
+        "offsetDays": -14
+      },
+      "channel": "OUTBOUND_CALL",
+      "messageTheme": "Rep outreach – handle objections, confirm renewal or alternatives",
+      "cta": "Speak to My Account Mgr",
+      "tracking": {
+        "campaignId": "rep_outreach_14d",
+        "deliveryId": "del_contract_4",
+        "trackingEvents": [
+          "call_connected",
+          "renewal_discussion"
+        ]
+      }
+    },
+    {
+      "tpId": "TP5",
+      "label": "Final SMS Reminder",
+      "timing": {
+        "offsetDays": -3
+      },
+      "channel": "SMS",
+      "messageTheme": "Final reminder – contract expires in 3 days; renewal portal link",
+      "cta": "Renew in 60 Seconds",
+      "tracking": {
+        "campaignId": "final_sms_3d",
+        "deliveryId": "del_contract_5",
+        "trackingEvents": [
+          "sms_click",
+          "renewal_completed"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "contract_renewal_window_opened",
+        "eventId": "evt_contract_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "contract_renewed",
+          "field": "renewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "contract_renewed",
+          "field": "renewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 720
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "contract_renewed",
+          "field": "renewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 720
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "contract_renewed",
+          "field": "renewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n12"
+      },
+      {
+        "id": "n12",
+        "type": "WAIT",
+        "durationHours": 384
+      },
+      {
+        "id": "n13",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n14",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "contract_renewed",
+          "field": "renewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n15"
+      },
+      {
+        "id": "n15",
+        "type": "WAIT",
+        "durationHours": 264
+      },
+      {
+        "id": "n16",
+        "type": "MESSAGE",
+        "tpId": "TP5"
+      },
+      {
+        "id": "n17",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "contract_renewed",
+      "eventId": "evt_contract_renewal_002",
+      "condition": "renewed == true",
+      "action": "EXIT"
+    },
+    {
+      "event": "contract_upgraded",
+      "eventId": "evt_contract_upgrade_003",
+      "condition": "upgraded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 5,
+      "timeWindowHours": 2160
+    },
+    "prioritization": {
+      "priority": "CRITICAL"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "contract_renewed",
+      "contract_upgraded"
+    ],
+    "eventMapping": {
+      "contract_renewed": "evt_contract_renewal_002",
+      "contract_upgraded": "evt_contract_upgrade_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "renewal_completed",
+    "secondaryKPIs": [
+      "click_through_rate",
+      "offer_redemption"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 2160
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,127 @@
+{
+  "useCaseId": "game-promotion",
+  "name": "Game Promotion Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Game Promotion",
+    "journeyGoal": "Promote upcoming games to users and drive engagement",
+    "entryTrigger": "user_engaged",
+    "journeyCategory": "Promotion",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after game viewed or 1 day"
+  },
+  "entryCriteria": {
+    "event": "user_engaged",
+    "eventId": "evt_engagement_002",
+    "conditions": [
+      {
+        "field": "interestType",
+        "operator": "EQUALS",
+        "value": "Game"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Game Interested Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Game Promotion Push",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "Don’t miss upcoming games – check out the schedule!",
+      "cta": "View Game",
+      "tracking": {
+        "campaignId": "push_game_promo",
+        "deliveryId": "del_push_12",
+        "trackingEvents": [
+          "push_open",
+          "game_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_engaged",
+        "eventId": "evt_engagement_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "game_view",
+          "field": "gameViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "game_view",
+      "eventId": "evt_game_001",
+      "condition": "gameViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "game_view"
+    ],
+    "eventMapping": {
+      "game_view": "evt_game_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "game_view",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

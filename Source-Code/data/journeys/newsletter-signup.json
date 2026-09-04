@@ -1,0 +1,88 @@
+{
+  "useCaseId": "newsletter-signup",
+  "clientTag": "PGA",
+  "name": "Newsletter Acquisition Journey",
+  "active": false,
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "category": {
+    "categoryId": "acquisition",
+    "categoryName": "User Acquisition"
+  },
+  "journeyTable": {
+    "journeyName": "Newsletter Signup",
+    "journeyGoal": "Convert anonymous users to known profiles",
+    "entryTrigger": "website_visit",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after signup"
+  },
+  "entryCriteria": {
+    "event": "website_visit",
+    "eventId": "evt_web_001",
+    "identity": {
+      "primaryId": "anonymousId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Prospects"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "channel": "WEB",
+      "messageTheme": "Get latest updates - sign up for newsletter",
+      "cta": "Subscribe",
+      "tracking": {
+        "campaignId": "web_newsletter",
+        "deliveryId": "del_web_n1",
+        "trackingEvents": [
+          "signup_completed"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "website_visit",
+        "eventId": "evt_web_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "signup_completed",
+          "field": "signupCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "signup_completed",
+      "eventId": "evt_signup_001",
+      "condition": "subscribed == true",
+      "action": "EXIT"
+    }
+  ],
+  "analytics": {
+    "primaryKPI": "signup_completed"
+  },
+  "version": "1.0",
+  "status": "READY"
+}

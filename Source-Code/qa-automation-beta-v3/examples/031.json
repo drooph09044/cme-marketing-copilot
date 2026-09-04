@@ -1,0 +1,319 @@
+{
+  "id": "031",
+  "matrix_row_id": 31,
+  "matrix_row_name": "NBA League Pass abandon cart",
+  "template": "tpl_abandon_cart",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NBA League Pass abandon-cart journey with identity-matrix fanout.",
+    "Create an abandon-cart journey for NBA League Pass. Fan into the four identity-matrix audiences (app_known, app_unknown, web_known, web_unknown). Modal at funnel entry within minutes of abandonment, then push 1h before tipoff of the fan's next favorite-team game for opted-in app users, and a 24h email follow-up with League Pass content preview.",
+    "Need to recover League Pass cart abandoners. Lead with the modal in their abandonment channel, then push on next fav-team tipoff and email follow-up."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-league-pass-abandon-cart-2026",
+    "metadata": {
+      "name": "NBA League Pass Abandon Cart",
+      "internal_name": "NBA_LeaguePass_AbandonCart_2026",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA League Pass"},
+      "purpose": "Recover fans who began an NBA League Pass subscription checkout but dropped off before completing payment by re-engaging them in their abandonment channel and again on the next fav-team game day.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-10-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Convert abandon-cart fans to active NBA League Pass subscribers in-season.", "kpi": "League Pass subscriptions attributable to journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix fanout into app_known, app_unknown, web_known, web_unknown — each routed to the modal type that fits their abandonment surface. Modal touch is realtime within 15 minutes of abandonment, then push 1h before fav-team tipoff, then 24h email for known fans.",
+        "timing_rationale": "Always-on through NBA season (late October through June Finals). First touch within 15 minutes maximizes recovery, then game-day re-engagement leverages fav-team tipoff as the secondary trigger.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["realtime_outbound", "app_modal", "web_modal", "push", "email"],
+      "moments_that_matter": ["PLAN & COMMIT", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_app_known",
+        "name": "App Known",
+        "description": "Fan has hashed email on file and abandoned League Pass checkout from the NBA app.",
+        "identity_state": "app_known",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "app"},
+            {"field": "identity.hashed_email", "op": "is_not_null"},
+            {"field": "drop_off_stage", "op": "equals", "value": "credit_card"}
+          ]
+        }
+      },
+      {
+        "id": "aud_app_unknown",
+        "name": "App Unknown",
+        "description": "Fan has ECID only; abandoned League Pass checkout from the NBA app.",
+        "identity_state": "app_unknown",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "app"},
+            {"field": "identity.ecid", "op": "is_not_null"},
+            {"field": "identity.hashed_email", "op": "is_null"}
+          ]
+        }
+      },
+      {
+        "id": "aud_web_known",
+        "name": "Web Known",
+        "description": "Fan has hashed email on file and abandoned League Pass checkout from NBA.com.",
+        "identity_state": "web_known",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "web"},
+            {"field": "identity.hashed_email", "op": "is_not_null"},
+            {"field": "drop_off_stage", "op": "equals", "value": "credit_card"}
+          ]
+        }
+      },
+      {
+        "id": "aud_web_unknown",
+        "name": "Web Unknown",
+        "description": "Fan has ECID only; abandoned League Pass checkout from NBA.com.",
+        "identity_state": "web_unknown",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "web"},
+            {"field": "identity.ecid", "op": "is_not_null"},
+            {"field": "identity.hashed_email", "op": "is_null"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_current_subscribers",
+        "name": "Current NBA League Pass subscribers",
+        "scope": "global",
+        "criteria": {"field": "league_pass.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "supp_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {"field": "consent.email", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "nba_app"},
+      {"id": "ch_web_modal", "type": "web_modal", "platform": "nba_com"},
+      {"id": "ch_push", "type": "push", "platform": "nba_app"},
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "month"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: League Pass checkout abandonment",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "checkout_abandoned",
+          "criteria": {"field": "product", "op": "equals", "value": "nba_league_pass"}
+        }
+      },
+      {
+        "id": "split_identity",
+        "type": "audience_split",
+        "label": "Identity matrix split",
+        "mode": "waterfall",
+        "audiences": ["aud_app_known", "aud_app_unknown", "aud_web_known", "aud_web_unknown"]
+      },
+      {
+        "id": "modal_app_known",
+        "type": "action",
+        "label": "App Modal NM1 - Return to League Pass cart (known app)",
+        "channel": "ch_app_modal",
+        "touch_id": "NM1",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "headline": "Pick up where you left off",
+          "cta_label": "Return to cart",
+          "modules": [
+            {"rank": "primary", "name": "League Pass PSP"},
+            {"rank": "secondary", "name": "Fav-team upcoming games"}
+          ]
+        },
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "modal_app_unknown",
+        "type": "action",
+        "label": "App Modal NM2 - Return to League Pass cart (unknown app)",
+        "channel": "ch_app_modal",
+        "touch_id": "NM2",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "headline": "Don't miss the NBA - finish signing up",
+          "cta_label": "Return to cart"
+        }
+      },
+      {
+        "id": "modal_web_known",
+        "type": "action",
+        "label": "Web Modal WM1 - Return to League Pass cart (known web)",
+        "channel": "ch_web_modal",
+        "touch_id": "WM1",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "headline": "Pick up where you left off",
+          "cta_label": "Return to cart",
+          "modules": [
+            {"rank": "primary", "name": "League Pass PSP"},
+            {"rank": "secondary", "name": "Fav-team upcoming games"}
+          ]
+        },
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "modal_web_unknown",
+        "type": "action",
+        "label": "Web Modal WM2 - Return to League Pass cart (unknown web)",
+        "channel": "ch_web_modal",
+        "touch_id": "WM2",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "headline": "Catch the NBA - complete sign-up",
+          "cta_label": "Return to cart"
+        }
+      },
+      {
+        "id": "dec_current_subscriber",
+        "type": "decision",
+        "label": "Already subscribed after modal?",
+        "decision_basis": "pull",
+        "condition": {"field": "league_pass.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Journey End - Converted",
+        "reason": "converted"
+      },
+      {
+        "id": "wait_until_fav_tipoff",
+        "type": "wait",
+        "label": "Wait until next fav-team tipoff (T-1h)",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_fav_team_tipoff",
+          "direction": "before",
+          "offset": {"value": 1, "unit": "hour"}
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_tipoff",
+        "type": "action",
+        "label": "Push - Tipoff in 1h, return to cart",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_fav_team_tipoff",
+          "direction": "before",
+          "offset": {"value": 1, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} tip off in 1h - watch on League Pass"}
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait 24h",
+        "timing": {"type": "wait", "duration": {"value": 24, "unit": "hour"}}
+      },
+      {
+        "id": "dec_email_optin",
+        "type": "decision",
+        "label": "Known fan with email opt-in?",
+        "decision_basis": "pull",
+        "condition": {
+          "all_of": [
+            {"field": "identity.hashed_email", "op": "is_not_null"},
+            {"field": "consent.email", "op": "equals", "value": true}
+          ]
+        }
+      },
+      {
+        "id": "email_followup",
+        "type": "action",
+        "label": "Email EM1 - 24h follow-up with content preview",
+        "channel": "ch_email",
+        "touch_id": "EM1",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Your League Pass is one click away",
+          "preview": "Plus what's on this week",
+          "cta_label": "Complete sign-up",
+          "modules": [
+            {"rank": "primary", "name": "League Pass PSP"},
+            {"rank": "secondary", "name": "This week's marquee fav-team game"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_identity"},
+      {"from": "split_identity", "to": "modal_app_known", "branch_label": "app_known"},
+      {"from": "split_identity", "to": "modal_app_unknown", "branch_label": "app_unknown"},
+      {"from": "split_identity", "to": "modal_web_known", "branch_label": "web_known"},
+      {"from": "split_identity", "to": "modal_web_unknown", "branch_label": "web_unknown"},
+      {"from": "modal_app_known", "to": "dec_current_subscriber"},
+      {"from": "modal_app_unknown", "to": "dec_current_subscriber"},
+      {"from": "modal_web_known", "to": "dec_current_subscriber"},
+      {"from": "modal_web_unknown", "to": "dec_current_subscriber"},
+      {"from": "dec_current_subscriber", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_current_subscriber", "to": "wait_until_fav_tipoff", "branch_label": "no"},
+      {"from": "wait_until_fav_tipoff", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_tipoff", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_24h", "branch_label": "no"},
+      {"from": "push_tipoff", "to": "wait_24h"},
+      {"from": "wait_24h", "to": "dec_email_optin"},
+      {"from": "dec_email_optin", "to": "email_followup", "branch_label": "yes"},
+      {"from": "dec_email_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "email_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "League Pass subscriptions attributable to journey"}],
+      "secondary_kpis": [{"name": "Modal CTR"}, {"name": "Email open / click rate"}, {"name": "Push click-through rate"}],
+      "tests": []
+    }
+  }
+}

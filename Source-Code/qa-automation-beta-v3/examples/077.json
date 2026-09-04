@@ -1,0 +1,211 @@
+{
+  "id": "077",
+  "matrix_row_id": 77,
+  "matrix_row_name": "ESPN+ college football season renewal",
+  "template": "tpl_renewal",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an ESPN+ renewal journey aligned to college football season.",
+    "Create a 30/14/7/1-day renewal cadence for ESPN+ subscribers with college football affinity. Email at T-30/T-7/T-1, push at T-14 and T-7, SMS at T-1 for opted-in fans. Cap SMS at 1 in window. Content hooks timed around fall kickoff and CFP.",
+    "Need a CFB-themed ESPN+ renewal sequence anchored to subscription expiry around fall kickoff."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cfb-espn-plus-renewal",
+    "metadata": {
+      "name": "ESPN+ College Football Season Renewal",
+      "internal_name": "NCAA_CFB_ESPNPlus_Renewal_2026",
+      "brand": {"vertical": "streaming", "league": "NCAA", "team": null, "product": "ESPN+"},
+      "purpose": "Drive ESPN+ renewals among CFB-affinity subscribers at 30/14/7/1 days before expiry with fall-kickoff and CFP content hooks.",
+      "archetype": "renewal",
+      "launch_date": "2026-07-01",
+      "end_date": "2027-01-31",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Maximize ESPN+ annual renewal rate among CFB-affinity subscribers.", "kpi": "Renewal rate among approaching-expiry CFB-affinity subscribers", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-expiry renewal sequence at 30/14/7/1 days. Email leads T-30/T-7/T-1; push at T-14 and T-7; SMS at T-1 for opted-in fans. SMS frequency cap: 1 in window. Content hooks rotate between fall kickoff, conference championship races, and CFP storylines depending on date.",
+        "timing_rationale": "Anchored to ESPN+ annual subscription expiry, timed around fall kickoff (late August) and CFP run (Dec-Jan).",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "sms", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_cfb_approaching_expiry",
+        "name": "ESPN+ subscriber with CFB affinity approaching expiry",
+        "criteria": {
+          "all_of": [
+            {"field": "espn_plus.status", "op": "equals", "value": "active"},
+            {"field": "espn_plus.plan", "op": "equals", "value": "annual"},
+            {"field": "espn_plus.days_until_expiry", "op": "lte", "value": 30},
+            {"field": "ncaa.cfb_content_engagement_last_year", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}},
+      {"id": "supp_already_renewed", "name": "Already renewed", "scope": "global", "criteria": {"field": "espn_plus.renewal_status", "op": "equals", "value": "renewed"}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "espn_app"},
+      {"id": "ch_sms", "type": "sms"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [
+      {"scope": "channel", "limit": 1, "window": {"value": 30, "unit": "day"}, "applies_to": ["ch_sms"]}
+    ],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 30 days before expiry",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {"field": "espn_plus.days_until_expiry", "op": "equals", "value": 30}
+        }
+      },
+      {
+        "id": "email_t30",
+        "type": "action",
+        "label": "Email T-30 - Renew with CFB storyline hook",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Your ESPN+ renews in 30 days - keep watching {{FT}} football",
+          "cta_label": "Renew now",
+          "modules": [
+            {"rank": "primary", "name": "Fall kickoff / conference championship race / CFP hook (dynamic)"},
+            {"rank": "secondary", "name": "Fav-school upcoming games on ESPN+"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_t14",
+        "type": "wait",
+        "label": "Wait 16 days to T-14",
+        "timing": {"type": "wait", "duration": {"value": 16, "unit": "day"}}
+      },
+      {
+        "id": "dec_push_optin_t14",
+        "type": "decision",
+        "label": "Push opted in (ESPN App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_espn_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_t14",
+        "type": "action",
+        "label": "Push T-14 - Renewal reminder",
+        "channel": "ch_push",
+        "touch_id": "P14",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Two weeks left on ESPN+ - keep watching {{FT}}"}
+      },
+      {
+        "id": "wait_to_t7",
+        "type": "wait",
+        "label": "Wait 7 days to T-7",
+        "timing": {"type": "wait", "duration": {"value": 7, "unit": "day"}}
+      },
+      {
+        "id": "email_t7",
+        "type": "action",
+        "label": "Email T-7 - Renew this week",
+        "channel": "ch_email",
+        "touch_id": "T7",
+        "timing": {"type": "realtime"},
+        "copy": {"subject": "One week left on ESPN+", "cta_label": "Renew now"}
+      },
+      {
+        "id": "dec_push_optin_t7",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_espn_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_t7",
+        "type": "action",
+        "label": "Push T-7",
+        "channel": "ch_push",
+        "touch_id": "P7",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Renew ESPN+ to keep watching {{FT}}"}
+      },
+      {
+        "id": "wait_to_t1",
+        "type": "wait",
+        "label": "Wait 6 days to T-1",
+        "timing": {"type": "wait", "duration": {"value": 6, "unit": "day"}}
+      },
+      {
+        "id": "email_t1",
+        "type": "action",
+        "label": "Email T-1 - Last chance",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {"type": "realtime"},
+        "copy": {"subject": "Last chance: your ESPN+ renews tomorrow", "cta_label": "Renew now"}
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.sms", "op": "equals", "value": true}
+      },
+      {
+        "id": "sms_t1",
+        "type": "action",
+        "label": "SMS T-1 - Last chance (1/window cap)",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {"type": "realtime"},
+        "copy": {"body": "ESPN+: Renewal due tomorrow. Renew: plus.espn.com/renew"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_t30"},
+      {"from": "email_t30", "to": "wait_to_t14"},
+      {"from": "wait_to_t14", "to": "dec_push_optin_t14"},
+      {"from": "dec_push_optin_t14", "to": "push_t14", "branch_label": "yes"},
+      {"from": "dec_push_optin_t14", "to": "wait_to_t7", "branch_label": "no"},
+      {"from": "push_t14", "to": "wait_to_t7"},
+      {"from": "wait_to_t7", "to": "email_t7"},
+      {"from": "email_t7", "to": "dec_push_optin_t7"},
+      {"from": "dec_push_optin_t7", "to": "push_t7", "branch_label": "yes"},
+      {"from": "dec_push_optin_t7", "to": "wait_to_t1", "branch_label": "no"},
+      {"from": "push_t7", "to": "wait_to_t1"},
+      {"from": "wait_to_t1", "to": "email_t1"},
+      {"from": "email_t1", "to": "dec_sms_optin"},
+      {"from": "dec_sms_optin", "to": "sms_t1", "branch_label": "yes"},
+      {"from": "dec_sms_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "sms_t1", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Renewal rate among approaching-expiry CFB-affinity subscribers"}],
+      "secondary_kpis": [{"name": "Per-touch click and conversion rate"}, {"name": "SMS T-1 incremental lift"}],
+      "tests": []
+    }
+  }
+}

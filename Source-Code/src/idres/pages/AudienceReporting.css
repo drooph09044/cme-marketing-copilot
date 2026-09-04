@@ -1,0 +1,1049 @@
+.rp-report[data-page="audiences"] .rp-aud-market-grid,
+.rp-report[data-page="audiences"] .rp-aud-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-natural-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 14px;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-report-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+  align-self: start;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-report-slot { min-width: 0; }
+.rp-report[data-page="audiences"] .rp-aud-report-slot > .rp-panel { height: 100%; }
+
+.rp-report[data-page="audiences"] .rp-aud-report-slot[data-report-key="size"] > .rp-panel { min-height: 430px; }
+.rp-report[data-page="audiences"] .rp-aud-report-slot[data-report-key="performance"] > .rp-panel { min-height: 430px; }
+.rp-report[data-page="audiences"] .rp-aud-report-slot[data-report-key="revenue"] > .rp-panel { min-height: 340px; }
+.rp-report[data-page="audiences"] .rp-aud-report-slot[data-report-key="opportunities"] > .rp-panel { min-height: 340px; }
+
+.rp-report[data-page="audiences"] .rp-kpi {
+  min-height: 86px;
+  padding: 12px 13px 20px;
+  border-color: var(--rp-border);
+  background: var(--rp-bg);
+  box-shadow: none;
+}
+.rp-report[data-page="audiences"] .rp-kpi::after { display: none; }
+.rp-report[data-page="audiences"] .rp-kpi.is-clickable:hover {
+  border-color: color-mix(in srgb, #4da3ff 44%, var(--rp-border));
+  box-shadow: none;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-size-panel .rp-aud-reach-row { min-height: 42px; }
+.rp-report[data-page="audiences"] .rp-aud-size-panel .rp-aud-readiness-composition { min-height: 150px; }
+.rp-report[data-page="audiences"] .rp-aud-size-panel .rp-aud-readiness-radial {
+  width: 108px;
+  height: 108px;
+}
+.rp-report[data-page="audiences"] .rp-aud-size-panel .rp-aud-readiness-center { inset: 25px; }
+.rp-report[data-page="audiences"] .rp-aud-size-panel .rp-aud-readiness-center b { font-size: 20px; }
+
+.rp-report[data-page="audiences"] .rp-aud-engagement-panel .rp-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-panel .rp-aud-engagement-chart {
+  flex: 1;
+  align-content: space-evenly;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-panel .rp-panel-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-market-grid > .rp-panel {
+  min-height: 300px;
+  align-self: start;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-reach-panel { grid-column: span 8; }
+.rp-report[data-page="audiences"] .rp-aud-readiness-panel { grid-column: span 6; }
+.rp-report[data-page="audiences"] .rp-aud-intent-panel,
+.rp-report[data-page="audiences"] .rp-aud-evidence-panel,
+.rp-report[data-page="audiences"] .rp-aud-revenue-panel,
+.rp-report[data-page="audiences"] .rp-aud-roi-panel,
+.rp-report[data-page="audiences"] .rp-aud-risk-panel,
+.rp-report[data-page="audiences"] .rp-aud-engagement-panel { grid-column: span 6; }
+
+.rp-report[data-page="audiences"] .rp-aud-reach-panel .rp-panel-body,
+.rp-report[data-page="audiences"] .rp-aud-readiness-panel .rp-panel-body { min-height: 0; }
+.rp-report[data-page="audiences"] .rp-aud-intent-panel .rp-panel-body,
+.rp-report[data-page="audiences"] .rp-aud-evidence-panel .rp-panel-body { min-height: 0; }
+.rp-report[data-page="audiences"] .rp-aud-outcome-grid .rp-panel-body { min-height: 0; }
+.rp-report[data-page="audiences"] .rp-aud-table-panel { margin-top: 14px; }
+
+.rp-report[data-page="audiences"] .rp-aud-explain-action {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border: 1px solid rgba(85, 194, 255, .34);
+  border-radius: 7px;
+  color: #8ed8ff;
+  background: rgba(77, 163, 255, .07);
+  font: inherit;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+.rp-report[data-page="audiences"] .rp-aud-explain-action:hover,
+.rp-report[data-page="audiences"] .rp-aud-explain-action:focus-visible {
+  border-color: rgba(85, 194, 255, .68);
+  color: #dff5ff;
+  background: rgba(77, 163, 255, .14);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.rp-report[data-page="audiences"] .rp-aud-caption {
+  margin: 13px 0 0;
+  color: var(--rp-muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+.rp-report[data-page="audiences"] .rp-aud-caption strong { color: #bfeaff; }
+.rp-report[data-page="audiences"] .rp-aud-caption.is-warning { color: #d8ab67; }
+
+/* Portfolio reach board */
+.rp-report[data-page="audiences"] .rp-aud-reach-board {
+  position: relative;
+  padding: 18px 0 2px;
+}
+.rp-report[data-page="audiences"] .rp-aud-threshold-label {
+  position: absolute;
+  left: calc(190px + (100% - 300px) * .3);
+  top: -2px;
+  transform: translateX(-50%);
+  color: #8cb0cf;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-row {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 178px minmax(0, 1fr) 98px;
+  align-items: center;
+  gap: 12px;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-label { min-width: 0; }
+.rp-report[data-page="audiences"] .rp-aud-reach-label strong {
+  display: block;
+  overflow: hidden;
+  color: #e9f4fd;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-label span {
+  display: block;
+  margin-top: 4px;
+  color: var(--rp-status);
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-track {
+  position: relative;
+  height: 11px;
+  border: 1px solid rgba(143, 167, 189, .16);
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(77, 163, 255, .025), rgba(77, 163, 255, .07)),
+    repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), rgba(143, 167, 189, .1) 25%);
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-track::after {
+  display: none;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-fill {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: var(--rp-coverage);
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--rp-reach) 74%, #fff);
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rp-reach) 30%, #172a43), var(--rp-reach));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--rp-reach) 24%, transparent);
+  transform-origin: left;
+  cursor: pointer;
+  animation: rpAudBarIn .78s var(--rp-delay) cubic-bezier(.2, .85, .2, 1) backwards;
+  transition: filter .18s ease;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-fill:hover,
+.rp-report[data-page="audiences"] .rp-aud-reach-fill:focus-visible {
+  filter: brightness(1.18);
+  outline: none;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-fill::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%);
+  border: 2px solid #e3f8ff;
+  border-radius: 50%;
+  background: var(--rp-reach);
+  box-shadow: 0 0 11px var(--rp-reach);
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-value {
+  color: #eff8ff;
+  font-size: 11px;
+  font-weight: 850;
+  text-align: right;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-value small {
+  display: block;
+  margin-top: 3px;
+  color: var(--rp-muted);
+  font-size: 7px;
+  font-weight: 700;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-axis {
+  display: grid;
+  grid-template-columns: 178px minmax(0, 1fr) 98px;
+  gap: 12px;
+  margin-top: 4px;
+  color: #718da7;
+  font-size: 7px;
+}
+.rp-report[data-page="audiences"] .rp-aud-reach-axis div {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Derived readiness */
+.rp-report[data-page="audiences"] .rp-aud-readiness-composition {
+  min-height: 250px;
+  display: grid;
+  grid-template-columns: 164px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-radial {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-radial svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 7px rgba(43, 217, 240, .1));
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-arc {
+  fill: none;
+  stroke: var(--rp-arc);
+  stroke-width: 14;
+  stroke-linecap: round;
+  animation: rpAudArcIn .9s var(--rp-delay) cubic-bezier(.2, .8, .2, 1) backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-center {
+  position: absolute;
+  inset: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(143, 167, 189, .18);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(43, 217, 240, .1), rgba(12, 24, 40, .96));
+  text-align: center;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-center b {
+  color: #eff9ff;
+  font-size: 27px;
+  letter-spacing: -.05em;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-center span {
+  display: block;
+  margin-top: -9px;
+  color: #829bb3;
+  font-size: 7px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-legend { display: grid; gap: 10px; }
+.rp-report[data-page="audiences"] .rp-aud-readiness-item {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(143, 167, 189, .12);
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-item > i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rp-item);
+  box-shadow: 0 0 9px var(--rp-item);
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-item span {
+  color: #c8d9e9;
+  font-size: 9px;
+  font-weight: 750;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-item b {
+  color: #f2f8ff;
+  font-size: 14px;
+  text-align: right;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-item small {
+  display: block;
+  margin-top: 2px;
+  color: var(--rp-muted);
+  font-size: 8px;
+  font-weight: 650;
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-lock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 7px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(180, 147, 255, .32);
+  border-radius: 9px;
+  background: rgba(180, 147, 255, .055);
+}
+.rp-report[data-page="audiences"] .rp-aud-readiness-lock strong { color: #d6c9ff; font-size: 10px; }
+.rp-report[data-page="audiences"] .rp-aud-readiness-lock span { color: #a195ce; font-size: 8px; text-align: right; }
+
+/* Channel intent */
+.rp-report[data-page="audiences"] .rp-aud-intent-scroll { overflow-x: auto; }
+.rp-report[data-page="audiences"] .rp-aud-intent-matrix {
+  min-width: 590px;
+  display: grid;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid rgba(143, 167, 189, .15);
+  border-radius: 11px;
+  background: rgba(14, 25, 42, .46);
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-head,
+.rp-report[data-page="audiences"] .rp-aud-intent-label,
+.rp-report[data-page="audiences"] .rp-aud-intent-cell,
+.rp-report[data-page="audiences"] .rp-aud-intent-total {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid rgba(143, 167, 189, .1);
+  border-bottom: 1px solid rgba(143, 167, 189, .1);
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-head {
+  min-height: 36px;
+  padding: 6px;
+  color: #83a2be;
+  background: rgba(24, 39, 58, .68);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-label {
+  place-items: center start;
+  padding: 7px 11px;
+  color: #dbe8f4;
+  font-size: 9px;
+  font-weight: 750;
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-label small {
+  display: block;
+  margin-top: 3px;
+  color: var(--rp-muted);
+  font-size: 8px;
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-cell { position: relative; }
+.rp-report[data-page="audiences"] .rp-aud-intent-cell::before {
+  content: "";
+  width: 19px;
+  height: 19px;
+  border: 1px solid rgba(143, 167, 189, .17);
+  border-radius: 6px;
+  background: rgba(23, 37, 57, .72);
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-cell.is-on::before {
+  border-color: color-mix(in srgb, var(--rp-intent) 68%, #fff);
+  background: color-mix(in srgb, var(--rp-intent) 22%, #17263b);
+  box-shadow: 0 0 13px color-mix(in srgb, var(--rp-intent) 34%, transparent);
+  animation: rpAudCellIn .5s var(--rp-delay) cubic-bezier(.2, 1.1, .3, 1) backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-cell.is-on::after {
+  content: "✓";
+  position: absolute;
+  color: #effcff;
+  font-size: 9px;
+  font-weight: 900;
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-total {
+  color: #edf7ff;
+  font-size: 10px;
+  font-weight: 850;
+}
+.rp-report[data-page="audiences"] .rp-aud-intent-label.is-footer,
+.rp-report[data-page="audiences"] .rp-aud-intent-total.is-footer {
+  color: #839eb6;
+  background: rgba(21, 34, 52, .68);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* Evidence rail */
+.rp-report[data-page="audiences"] .rp-aud-evidence-rail {
+  position: relative;
+  display: grid;
+  padding-left: 5px;
+}
+.rp-report[data-page="audiences"] .rp-aud-evidence-rail::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 22px;
+  bottom: 22px;
+  width: 1px;
+  background: linear-gradient(#24d69b 0 28%, rgba(143, 167, 189, .22) 28% 100%);
+}
+.rp-report[data-page="audiences"] .rp-aud-evidence-step {
+  position: relative;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 0;
+}
+.rp-report[data-page="audiences"] .rp-aud-evidence-node {
+  width: 29px;
+  height: 29px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rp-node);
+  border-radius: 9px;
+  background: #192a41;
+  color: var(--rp-node);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rp-node) 18%, transparent);
+  font-size: 10px;
+  font-weight: 900;
+}
+.rp-report[data-page="audiences"] .rp-aud-evidence-step strong { color: #e3eef8; font-size: 10px; }
+.rp-report[data-page="audiences"] .rp-aud-evidence-step p {
+  margin: 3px 0 0;
+  color: var(--rp-muted);
+  font-size: 8px;
+  line-height: 1.35;
+}
+.rp-report[data-page="audiences"] .rp-aud-evidence-badge {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--rp-node) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rp-node) 8%, transparent);
+  color: var(--rp-node);
+  font-size: 8px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-activity-na {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 11px 12px;
+  border-top: 1px solid rgba(143, 167, 189, .14);
+  color: #a7bdd1;
+  font-size: 9px;
+}
+.rp-report[data-page="audiences"] .rp-aud-activity-na b { color: var(--rp-amber, #ffb547); }
+
+/* Outcome panels */
+.rp-report[data-page="audiences"] .rp-aud-outcome-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 13px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--rp-hero) 30%, transparent);
+  border-radius: 11px;
+  background: linear-gradient(105deg, color-mix(in srgb, var(--rp-hero) 11%, transparent), rgba(15, 27, 44, .68));
+}
+.rp-report[data-page="audiences"] .rp-aud-outcome-hero span {
+  color: #93adc4;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-outcome-hero b {
+  display: block;
+  margin-top: 4px;
+  color: #f4f9ff;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: -.03em;
+}
+.rp-report[data-page="audiences"] .rp-aud-outcome-hero small {
+  display: block;
+  max-width: 245px;
+  color: #819bb2;
+  font-size: 8px;
+  line-height: 1.4;
+  text-align: right;
+}
+.rp-report[data-page="audiences"] .rp-aud-outcome-hero strong { color: var(--rp-hero); }
+
+.rp-report[data-page="audiences"] .rp-aud-value-spectrum {
+  height: 16px;
+  display: flex;
+  overflow: hidden;
+  margin-bottom: 13px;
+  border: 1px solid rgba(143, 167, 189, .17);
+  border-radius: 999px;
+  background: #122139;
+}
+.rp-report[data-page="audiences"] .rp-aud-value-spectrum > i {
+  width: var(--rp-share);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rp-value) 72%, #fff), var(--rp-value));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rp-value) 42%, transparent);
+  transform-origin: left;
+  animation: rpAudBarIn .75s var(--rp-delay) cubic-bezier(.2, .8, .2, 1) backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-value-list { display: grid; gap: 9px; }
+.rp-report[data-page="audiences"] .rp-aud-value-row {
+  display: grid;
+  grid-template-columns: minmax(138px, .95fr) minmax(90px, 1.2fr) 84px;
+  align-items: center;
+  gap: 9px;
+}
+.rp-report[data-page="audiences"] .rp-aud-value-label { min-width: 0; }
+.rp-report[data-page="audiences"] .rp-aud-value-label strong,
+.rp-report[data-page="audiences"] .rp-aud-value-label small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rp-report[data-page="audiences"] .rp-aud-value-label strong { color: #d6e6f3; font-size: 9px; }
+.rp-report[data-page="audiences"] .rp-aud-value-label small { margin-top: 2px; color: #7791a9; font-size: 7px; }
+.rp-report[data-page="audiences"] .rp-aud-value-track {
+  position: relative;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(11, 23, 39, .74);
+  box-shadow: inset 0 0 0 1px rgba(143, 167, 189, .11);
+}
+.rp-report[data-page="audiences"] .rp-aud-value-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--rp-width);
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rp-value) 72%, #fff), var(--rp-value));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rp-value) 45%, transparent);
+  transform-origin: left;
+  animation: rpAudBarIn .72s var(--rp-delay) cubic-bezier(.2, .85, .2, 1) backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-value-number {
+  color: #f1f8ff;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: right;
+}
+.rp-report[data-page="audiences"] .rp-aud-value-number small {
+  display: block;
+  margin-top: 2px;
+  color: var(--rp-value);
+  font-size: 7px;
+  font-weight: 800;
+}
+
+/* Revenue-efficiency bubble matrix */
+.rp-report[data-page="audiences"] .rp-aud-efficiency-plot {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  border: 1px solid rgba(78, 127, 169, .2);
+  border-radius: 11px;
+  background: linear-gradient(145deg, rgba(11, 25, 43, .62), rgba(22, 35, 53, .32));
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-stage {
+  position: absolute;
+  left: 52px;
+  right: 18px;
+  top: 17px;
+  bottom: 34px;
+  border-left: 1px solid rgba(143, 167, 189, .22);
+  border-bottom: 1px solid rgba(143, 167, 189, .22);
+  background-image:
+    linear-gradient(to right, rgba(143, 167, 189, .08) 1px, transparent 1px),
+    linear-gradient(to top, rgba(143, 167, 189, .08) 1px, transparent 1px);
+  background-size: 25% 25%;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-benchmark {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: var(--rp-benchmark);
+  border-top: 1px dashed rgba(255, 255, 255, .4);
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point {
+  position: absolute;
+  z-index: 2;
+  left: var(--rp-x);
+  bottom: var(--rp-y);
+  width: var(--rp-size);
+  height: var(--rp-size);
+  padding: 0;
+  border: 0;
+  appearance: none;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  transform: translate(-50%, 50%);
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point:focus-visible > i {
+  outline: 2px solid #e7f8ff;
+  outline-offset: 4px;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point > i {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  border: 2px solid color-mix(in srgb, var(--rp-bubble) 76%, #fff);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, color-mix(in srgb, var(--rp-bubble) 56%, #fff 12%),
+    color-mix(in srgb, var(--rp-bubble) 31%, #10243a 69%) 56%, rgba(8, 20, 34, .95));
+  box-shadow: 0 0 19px color-mix(in srgb, var(--rp-bubble) 34%, transparent);
+  font-style: normal;
+  text-align: center;
+  animation: rpAudNodeIn .58s var(--rp-delay) cubic-bezier(.2, 1.05, .3, 1) backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point > i::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border: 1px solid color-mix(in srgb, var(--rp-bubble) 22%, transparent);
+  border-radius: 50%;
+  animation: rpAudHalo 4.8s var(--rp-delay) ease-in-out infinite;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point b { color: #f5fbff; font-size: 10px; }
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point small { margin-top: 2px; color: #d3e7f5; font-size: 8px; }
+.rp-report[data-page="audiences"] .rp-aud-efficiency-point > strong {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 5px);
+  width: 110px;
+  overflow: hidden;
+  transform: translateX(-50%);
+  color: #9fb8cd;
+  font-size: 8px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-y {
+  position: absolute;
+  left: 7px;
+  top: 14px;
+  bottom: 34px;
+  width: 39px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  color: #7692aa;
+  font-size: 7px;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-y strong {
+  position: absolute;
+  left: -34px;
+  top: 51%;
+  width: 102px;
+  transform: rotate(-90deg);
+  color: #8ca7bd;
+  font-size: 7px;
+  letter-spacing: .04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-x {
+  position: absolute;
+  left: 52px;
+  right: 18px;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #7692aa;
+  font-size: 7px;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-x strong {
+  color: #8ca7bd;
+  font-size: 7px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-key {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+  color: #7894ab;
+  font-size: 8px;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-key i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #2bd9f0;
+  border-radius: 50%;
+  box-shadow: 0 0 9px rgba(43, 217, 240, .35);
+}
+.rp-report[data-page="audiences"] .rp-aud-efficiency-key b { color: #9ab6cb; font-size: 8px; }
+
+.rp-report[data-page="audiences"] .rp-aud-contract-warning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 9px 10px;
+  border: 1px dashed rgba(255, 181, 71, .3);
+  border-radius: 8px;
+  background: rgba(255, 181, 71, .05);
+  color: #95acbf;
+  font-size: 8px;
+}
+.rp-report[data-page="audiences"] .rp-aud-contract-warning b { color: #ffbd5c; font-size: 8px; text-align: right; }
+
+/* Duplicate-risk ring */
+.rp-report[data-page="audiences"] .rp-aud-risk-layout {
+  min-height: 242px;
+  display: grid;
+  grid-template-columns: 174px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-ring {
+  position: relative;
+  width: 174px;
+  height: 174px;
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-ring svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-arc {
+  fill: none;
+  stroke: var(--rp-risk);
+  stroke-width: 16;
+  stroke-linecap: butt;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--rp-risk) 24%, transparent));
+  animation: rpAudArcIn .9s var(--rp-delay) cubic-bezier(.2, .8, .2, 1) backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-center {
+  position: absolute;
+  inset: 45px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(143, 167, 189, .18);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(77, 163, 255, .09), #122239 70%);
+  text-align: center;
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-center b { color: #f0f8ff; font-size: 21px; }
+.rp-report[data-page="audiences"] .rp-aud-risk-center span {
+  display: block;
+  margin-top: -11px;
+  color: #829bb2;
+  font-size: 7px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-legend { display: grid; gap: 9px; }
+.rp-report[data-page="audiences"] .rp-aud-risk-row {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(143, 167, 189, .11);
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-row > i {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background: var(--rp-risk);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--rp-risk) 45%, transparent);
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-row span { color: #c1d4e4; font-size: 9px; }
+.rp-report[data-page="audiences"] .rp-aud-risk-row b { color: #f1f8ff; font-size: 11px; text-align: right; }
+.rp-report[data-page="audiences"] .rp-aud-risk-row small { display: block; color: var(--rp-risk); font-size: 8px; }
+.rp-report[data-page="audiences"] .rp-aud-risk-spectrum {
+  height: 13px;
+  display: flex;
+  overflow: hidden;
+  margin-top: 10px;
+  border: 1px solid rgba(143, 167, 189, .15);
+  border-radius: 999px;
+  background: #142238;
+}
+.rp-report[data-page="audiences"] .rp-aud-risk-spectrum > i {
+  width: var(--rp-share);
+  background: var(--rp-risk);
+  transform-origin: left;
+  animation: rpAudBarIn .72s var(--rp-delay) ease backwards;
+}
+
+/* Click-rate engagement lollipops */
+.rp-report[data-page="audiences"] .rp-aud-engagement-chart { display: grid; gap: 10px; }
+.rp-report[data-page="audiences"] .rp-aud-engagement-row {
+  display: grid;
+  grid-template-columns: minmax(132px, .9fr) minmax(120px, 1.3fr) 74px;
+  align-items: center;
+  gap: 9px;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-row > span {
+  overflow: hidden;
+  color: #c9dbea;
+  font-size: 9px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-row > span small {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  color: #7690a7;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rp-report[data-page="audiences"] .rp-aud-lollipop { position: relative; height: 22px; }
+.rp-report[data-page="audiences"] .rp-aud-lollipop::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(143, 167, 189, .14);
+}
+.rp-report[data-page="audiences"] .rp-aud-lollipop::after {
+  content: "";
+  position: absolute;
+  left: var(--rp-benchmark);
+  top: 2px;
+  bottom: 2px;
+  border-left: 1px dashed rgba(255, 255, 255, .36);
+}
+.rp-report[data-page="audiences"] .rp-aud-lollipop > i {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: var(--rp-position);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rp-metric) 72%, #fff), var(--rp-metric));
+  box-shadow: 0 0 9px color-mix(in srgb, var(--rp-metric) 35%, transparent);
+  transform-origin: left;
+  animation: rpAudBarIn .72s var(--rp-delay) ease backwards;
+}
+.rp-report[data-page="audiences"] .rp-aud-lollipop > i::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #eaf8ff;
+  border-radius: 50%;
+  background: var(--rp-metric);
+  box-shadow: 0 0 11px var(--rp-metric);
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-row > b {
+  color: var(--rp-metric);
+  font-size: 10px;
+  font-weight: 900;
+  text-align: right;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-row > b small {
+  display: block;
+  margin-top: 2px;
+  color: #7892aa;
+  font-size: 7px;
+  font-weight: 750;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-axis {
+  display: grid;
+  grid-template-columns: minmax(132px, .9fr) minmax(120px, 1.3fr) 74px;
+  gap: 9px;
+  margin-top: 2px;
+  color: #6f8ba3;
+  font-size: 7px;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-axis div {
+  display: flex;
+  justify-content: space-between;
+}
+.rp-report[data-page="audiences"] .rp-aud-engagement-axis strong { color: #abc2d5; font-weight: 800; }
+
+/* Evidence table */
+.rp-report[data-page="audiences"] .rp-aud-table-panel .rp-panel-body { min-height: 0; padding: 0; }
+.rp-report[data-page="audiences"] .rp-aud-table-scroll { overflow-x: auto; }
+.rp-report[data-page="audiences"] .rp-aud-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  color: #bcd0df;
+  font-size: 9px;
+}
+.rp-report[data-page="audiences"] .rp-aud-table th {
+  padding: 11px 15px;
+  border-bottom: 1px solid rgba(143, 167, 189, .16);
+  color: #819db6;
+  background: rgba(15, 29, 47, .4);
+  font-size: 8px;
+  letter-spacing: .05em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.rp-report[data-page="audiences"] .rp-aud-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(143, 167, 189, .1);
+}
+.rp-report[data-page="audiences"] .rp-aud-table tbody tr:hover { background: rgba(77, 163, 255, .035); }
+.rp-report[data-page="audiences"] .rp-aud-table td strong { display: block; color: #e2edf7; font-size: 10px; }
+.rp-report[data-page="audiences"] .rp-aud-table td small {
+  display: block;
+  margin-top: 3px;
+  color: #7790a7;
+  font-size: 8px;
+}
+.rp-report[data-page="audiences"] .rp-aud-status {
+  display: inline-flex;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--rp-status) 38%, transparent);
+  border-radius: 999px;
+  color: var(--rp-status);
+  background: color-mix(in srgb, var(--rp-status) 8%, transparent);
+  font-size: 8px;
+  font-weight: 850;
+}
+
+@keyframes rpAudBarIn {
+  from { transform: scaleX(0); opacity: .35; }
+}
+@keyframes rpAudArcIn {
+  from { stroke-dasharray: 0 100; opacity: .3; }
+}
+@keyframes rpAudNodeIn {
+  from { opacity: 0; transform: scale(.35); }
+}
+@keyframes rpAudCellIn {
+  from { opacity: 0; transform: scale(.25); }
+}
+@keyframes rpAudHalo {
+  0%, 100% { transform: scale(.94); opacity: .45; }
+  50% { transform: scale(1.08); opacity: .8; }
+}
+
+@media (max-width: 1280px) {
+  .rp-report[data-page="audiences"] .rp-aud-reach-panel,
+  .rp-report[data-page="audiences"] .rp-aud-readiness-panel { grid-column: span 6; }
+  .rp-report[data-page="audiences"] .rp-aud-reach-row,
+  .rp-report[data-page="audiences"] .rp-aud-reach-axis {
+    grid-template-columns: 150px minmax(0, 1fr) 92px;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-threshold-label {
+    left: calc(163px + (100% - 268px) * .3);
+  }
+}
+
+@media (max-width: 1100px) {
+  .rp-report[data-page="audiences"] .rp-aud-market-grid > *,
+  .rp-report[data-page="audiences"] .rp-aud-outcome-grid > * { grid-column: 1 / -1; }
+  .rp-report[data-page="audiences"] .rp-aud-natural-columns {
+    display: flex;
+    flex-direction: column;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-report-column { display: contents; }
+  .rp-report[data-page="audiences"] .rp-aud-report-slot > .rp-panel,
+  .rp-report[data-page="audiences"] .rp-aud-market-grid > .rp-panel { min-height: 0; }
+  .rp-report[data-page="audiences"] .rp-aud-report-slot > .rp-panel { height: auto; }
+  .rp-report[data-page="audiences"] .rp-aud-outcome-grid .rp-panel-body { min-height: 0; }
+}
+
+@media (max-width: 700px) {
+  .rp-report[data-page="audiences"] .rp-aud-reach-row,
+  .rp-report[data-page="audiences"] .rp-aud-reach-axis {
+    grid-template-columns: 120px minmax(110px, 1fr) 82px;
+    gap: 8px;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-threshold-label { display: none; }
+  .rp-report[data-page="audiences"] .rp-aud-readiness-composition {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-readiness-legend { width: 100%; }
+  .rp-report[data-page="audiences"] .rp-aud-outcome-hero {
+    grid-template-columns: 1fr;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-outcome-hero small { text-align: left; }
+  .rp-report[data-page="audiences"] .rp-aud-value-row {
+    grid-template-columns: minmax(120px, 1fr) 84px;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-value-track { display: none; }
+  .rp-report[data-page="audiences"] .rp-aud-risk-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-risk-legend { width: 100%; }
+  .rp-report[data-page="audiences"] .rp-aud-engagement-row,
+  .rp-report[data-page="audiences"] .rp-aud-engagement-axis {
+    grid-template-columns: minmax(110px, .9fr) minmax(100px, 1.2fr) 78px;
+  }
+  .rp-report[data-page="audiences"] .rp-aud-contract-warning,
+  .rp-report[data-page="audiences"] .rp-aud-activity-na,
+  .rp-report[data-page="audiences"] .rp-aud-efficiency-key {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

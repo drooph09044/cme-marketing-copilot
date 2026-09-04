@@ -1,0 +1,173 @@
+{
+  "useCaseId": "abandoned-browsing-reservation-reminder",
+  "name": "Abandoned Browsing: Reservation – Reminder Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Browsing: Reservation – Reminder",
+    "journeyGoal": "Remind users who browsed reservations but did not engage to return",
+    "entryTrigger": "user_browsed_reservation",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after reservation completed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_browsed_reservation",
+    "eventId": "evt_browse_reservation_001",
+    "conditions": [
+      {
+        "field": "reservationStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      },
+      {
+        "field": "reservationCompleted",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Browsed Reservation Users – Reminder"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Reservation Reminder Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "You recently browsed this reservation – don’t miss out!",
+      "cta": "Complete Reservation",
+      "tracking": {
+        "campaignId": "push_reservation_reminder",
+        "deliveryId": "del_push_38",
+        "trackingEvents": [
+          "push_open",
+          "reservation_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Reservation Reminder Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your reservation is waiting – complete it now!",
+      "cta": "Complete Reservation",
+      "tracking": {
+        "campaignId": "email_reservation_reminder",
+        "deliveryId": "del_email_38",
+        "trackingEvents": [
+          "email_open",
+          "reservation_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_browsed_reservation",
+        "eventId": "evt_browse_reservation_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "reservation_complete",
+      "eventId": "evt_reservation_006",
+      "condition": "reservationCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "reservation_complete"
+    ],
+    "eventMapping": {
+      "reservation_complete": "evt_reservation_006"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "reservation_complete",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

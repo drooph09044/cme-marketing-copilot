@@ -1,0 +1,189 @@
+{
+  "id": "069",
+  "matrix_row_id": 69,
+  "matrix_row_name": "Single-Match Ticket Post-Purchase",
+  "template": "tpl_post_purchase",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a single-match ticket post-purchase journey for MLS supporters.",
+    "Create a multi-channel post-purchase journey for an MLS single-match ticket. Order confirmation email immediately, match-day prep email 2 days prior with stadium logistics and broadcast info, post-match recap email Day +1 with highlights, season-ticket upsell email Day +14 for supporters who've attended more than one match this season.",
+    "Need a post-purchase journey for MLS single-match buyers covering order confirmation, prep email, post-match recap, and a season-ticket upsell for repeat attendees."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-single-match-postpurchase",
+    "metadata": {
+      "name": "MLS Single-Match Ticket Post-Purchase",
+      "internal_name": "MLS_SingleMatch_PostPurchase_2026",
+      "brand": {"vertical": "ticketing", "league": "MLS", "team": null, "product": "MLS Tickets"},
+      "purpose": "Deliver order confirmation, match-day logistics, recap, and season-ticket upsell to single-match ticket purchasers.",
+      "archetype": "transactional",
+      "launch_date": "2026-02-21",
+      "end_date": "2026-12-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive matchday attendance and convert repeat buyers to season tickets.", "kpi": "Season ticket upsell conversion rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Trigger on ticket purchase. Confirmation email immediately, prep email 2 days before kickoff, post-match recap Day +1, season-ticket upsell at Day +14 conditional on having attended more than one match this season.",
+        "timing_rationale": "Anchored to match kickoff date with relative offsets.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET READY", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_single_match_buyer",
+        "name": "Single-match ticket purchaser",
+        "criteria": {"field": "mls_tickets.last_purchase_type", "op": "equals", "value": "single_match"},
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"},
+      {"key": "OPP", "name": "Opponent"},
+      {"key": "VEN", "name": "Venue"},
+      {"key": "MD", "name": "Match Date"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "day"}, "max_entries": 30},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: single-match ticket purchase",
+        "entry_criteria": {"trigger": "event", "event_name": "single_match_ticket_purchase"}
+      },
+      {
+        "id": "email_confirmation",
+        "type": "action",
+        "label": "Email - Order confirmation",
+        "channel": "ch_email",
+        "touch_id": "T0",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Your tickets are confirmed: {{FC}} vs {{OPP}}",
+          "cta_label": "View your tickets"
+        },
+        "personalization_used": ["FN", "FC", "OPP", "VEN", "MD"]
+      },
+      {
+        "id": "wait_until_t2",
+        "type": "wait",
+        "label": "Wait until T-2d before kickoff",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "match_kickoff",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "day"}
+        }
+      },
+      {
+        "id": "email_prep",
+        "type": "action",
+        "label": "Email T-2d - Stadium prep and broadcast info",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "match_kickoff",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "day"}
+        },
+        "copy": {
+          "subject": "Match-day prep: {{VEN}} logistics for {{FC}} vs {{OPP}}",
+          "preview": "Parking, gates, weather, and broadcast info"
+        },
+        "personalization_used": ["FN", "FC", "OPP", "VEN"]
+      },
+      {
+        "id": "wait_until_post_match",
+        "type": "wait",
+        "label": "Wait until Day +1 post-match",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "match_kickoff",
+          "direction": "after",
+          "offset": {"value": 1, "unit": "day"}
+        }
+      },
+      {
+        "id": "email_recap",
+        "type": "action",
+        "label": "Email Day +1 - Match recap and highlights",
+        "channel": "ch_email",
+        "touch_id": "T2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "match_kickoff",
+          "direction": "after",
+          "offset": {"value": 1, "unit": "day"}
+        },
+        "copy": {
+          "subject": "Thanks for being there: {{FC}} vs {{OPP}} recap",
+          "cta_label": "Watch highlights"
+        },
+        "personalization_used": ["FN", "FC", "OPP"]
+      },
+      {
+        "id": "wait_to_d14",
+        "type": "wait",
+        "label": "Wait 13 days to Day +14",
+        "timing": {"type": "wait", "duration": {"value": 13, "unit": "day"}}
+      },
+      {
+        "id": "dec_repeat_attendee",
+        "type": "decision",
+        "label": "Attended more than one match this season?",
+        "decision_basis": "behavior",
+        "condition": {"field": "mls.match_attendance_this_season", "op": "gt", "value": 1}
+      },
+      {
+        "id": "email_season_ticket_upsell",
+        "type": "action",
+        "label": "Email Day +14 - Season ticket upsell",
+        "channel": "ch_email",
+        "touch_id": "T3",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "You're a regular - here's what season tickets get you",
+          "cta_label": "Explore season tickets"
+        },
+        "personalization_used": ["FN", "FC"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_confirmation"},
+      {"from": "email_confirmation", "to": "wait_until_t2"},
+      {"from": "wait_until_t2", "to": "email_prep"},
+      {"from": "email_prep", "to": "wait_until_post_match"},
+      {"from": "wait_until_post_match", "to": "email_recap"},
+      {"from": "email_recap", "to": "wait_to_d14"},
+      {"from": "wait_to_d14", "to": "dec_repeat_attendee"},
+      {"from": "dec_repeat_attendee", "to": "email_season_ticket_upsell", "branch_label": "yes"},
+      {"from": "dec_repeat_attendee", "to": "end_journey", "branch_label": "no"},
+      {"from": "email_season_ticket_upsell", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Season ticket upsell conversion rate"}],
+      "secondary_kpis": [{"name": "Prep email open rate"}, {"name": "Recap email engagement"}],
+      "tests": []
+    }
+  }
+}

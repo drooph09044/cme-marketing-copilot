@@ -1,0 +1,258 @@
+{
+  "useCaseId": "fuel-fans-insider-packages",
+  "name": "Insider Fan Packages Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Fan Monetization"
+  },
+  "journeyTable": {
+    "journeyName": "Insider Access & Packages",
+    "journeyGoal": "Increase fan spend by promoting exclusive insider experiences, VIP access, and premium packages",
+    "entryTrigger": "high_affinity_fan_detected",
+    "journeyCategory": "Upsell",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if fan purchases insider package or VIP upgrade"
+  },
+  "entryCriteria": {
+    "event": "fan_affinity_score_update",
+    "eventId": "evt_fan_affinity_001",
+    "conditions": [
+      {
+        "field": "affinityScore",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 75
+      },
+      {
+        "field": "isActiveFan",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Affinity_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Insider Access Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Get closer to the action than ever before",
+      "cta": "Explore Insider Packages",
+      "tracking": {
+        "campaignId": "email_insider_1",
+        "deliveryId": "del_insider_1",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "VIP Experience Push Notification",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "PUSH",
+      "messageTheme": "Unlock VIP stadium experiences & backstage access",
+      "cta": "View VIP Options",
+      "tracking": {
+        "campaignId": "push_insider_2",
+        "deliveryId": "del_insider_2",
+        "trackingEvents": [
+          "push_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Personalized Package Comparison Email",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Choose your perfect fan experience",
+      "cta": "Compare Packages",
+      "tracking": {
+        "campaignId": "email_insider_3",
+        "deliveryId": "del_insider_3",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Limited-Time VIP Upgrade Offer",
+      "timing": {
+        "offsetHours": 240
+      },
+      "channel": "SMS",
+      "messageTheme": "Last chance to unlock exclusive access",
+      "cta": "Upgrade Now",
+      "tracking": {
+        "campaignId": "sms_insider_4",
+        "deliveryId": "del_insider_4",
+        "trackingEvents": [
+          "sms_click",
+          "purchase_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_affinity_score_update",
+        "eventId": "evt_fan_affinity_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "package_purchase",
+          "field": "purchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "package_purchase",
+          "field": "purchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "package_purchase",
+          "field": "purchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "package_purchase",
+          "field": "purchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n12"
+      },
+      {
+        "id": "n12",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n13",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n14",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "package_purchase",
+      "eventId": "evt_package_purchase_001",
+      "condition": "purchased == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "email_open",
+      "push_open",
+      "content_click",
+      "purchase_start"
+    ],
+    "eventMapping": {
+      "package_purchase": "evt_package_purchase_001",
+      "purchase_start": "evt_purchase_start_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "package_purchase",
+    "secondaryKPIs": [
+      "content_click",
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,271 @@
+{
+  "id": "041",
+  "matrix_row_id": 41,
+  "matrix_row_name": "MLB.TV subscription abandon cart",
+  "template": "tpl_abandon_cart",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLB.TV abandon-cart journey with identity-matrix fanout.",
+    "Create an abandon-cart journey for MLB.TV. Fan into four identity-matrix audiences (app_known, app_unknown, web_known, web_unknown). Modal at funnel entry within 15 minutes of abandonment, push 2h before first pitch on next fav-team home game for opted-in app users, and email follow-up 24h after for known fans.",
+    "Need to recover MLB.TV cart abandoners. Identity matrix fanout — modal in their abandonment surface, push before next fav-team home first pitch, email follow-up."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-tv-abandon-cart-2026",
+    "metadata": {
+      "name": "MLB.TV Abandon Cart",
+      "internal_name": "MLB_TV_AbandonCart_2026",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB.TV"},
+      "purpose": "Recover fans who began an MLB.TV subscription checkout but dropped off, by re-engaging them in their abandonment channel and again before their fav team's next home first pitch.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-03-01",
+      "end_date": "2026-10-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Convert abandon-cart fans to active MLB.TV subscribers in-season.", "kpi": "MLB.TV subscriptions attributable to journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix fanout (app_known/app_unknown/web_known/web_unknown). Modal first within 15 min of abandonment, then push 2h before fav-team home first pitch (ballpark anchor), then email follow-up for known fans 24h later.",
+        "timing_rationale": "Always-on through MLB season. First-pitch anchor uses fav-team home schedule for relevance to in-market fans.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["realtime_outbound", "app_modal", "web_modal", "push", "email"],
+      "moments_that_matter": ["PLAN & COMMIT", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_app_known",
+        "name": "App Known",
+        "description": "Fan has hashed email; abandoned MLB.TV checkout from MLB app.",
+        "identity_state": "app_known",
+        "refresh": "realtime",
+        "refresh_cadence": "every 15 min",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "app"},
+            {"field": "identity.hashed_email", "op": "is_not_null"},
+            {"field": "drop_off_stage", "op": "equals", "value": "credit_card"}
+          ]
+        }
+      },
+      {
+        "id": "aud_app_unknown",
+        "name": "App Unknown",
+        "identity_state": "app_unknown",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "app"},
+            {"field": "identity.ecid", "op": "is_not_null"},
+            {"field": "identity.hashed_email", "op": "is_null"}
+          ]
+        }
+      },
+      {
+        "id": "aud_web_known",
+        "name": "Web Known",
+        "identity_state": "web_known",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "web"},
+            {"field": "identity.hashed_email", "op": "is_not_null"}
+          ]
+        }
+      },
+      {
+        "id": "aud_web_unknown",
+        "name": "Web Unknown",
+        "identity_state": "web_unknown",
+        "refresh": "realtime",
+        "criteria": {
+          "all_of": [
+            {"field": "abandoned_cart_channel", "op": "equals", "value": "web"},
+            {"field": "identity.ecid", "op": "is_not_null"},
+            {"field": "identity.hashed_email", "op": "is_null"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_current_subscribers", "name": "Current MLB.TV subscribers", "scope": "global", "criteria": {"field": "mlb_tv.status", "op": "equals", "value": "active"}},
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "mlb_app"},
+      {"id": "ch_web_modal", "type": "web_modal", "platform": "mlb_com"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"},
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "month"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: MLB.TV checkout abandonment",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "checkout_abandoned",
+          "criteria": {"field": "product", "op": "equals", "value": "mlb_tv"}
+        }
+      },
+      {
+        "id": "split_identity",
+        "type": "audience_split",
+        "label": "Identity matrix split",
+        "mode": "waterfall",
+        "audiences": ["aud_app_known", "aud_app_unknown", "aud_web_known", "aud_web_unknown"]
+      },
+      {
+        "id": "modal_app_known",
+        "type": "action",
+        "label": "App Modal NM1 - Known app",
+        "channel": "ch_app_modal",
+        "touch_id": "NM1",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Finish your MLB.TV sign-up", "cta_label": "Return to cart"}
+      },
+      {
+        "id": "modal_app_unknown",
+        "type": "action",
+        "label": "App Modal NM2 - Unknown app",
+        "channel": "ch_app_modal",
+        "touch_id": "NM2",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Don't miss the season - finish sign-up", "cta_label": "Return to cart"}
+      },
+      {
+        "id": "modal_web_known",
+        "type": "action",
+        "label": "Web Modal WM1 - Known web",
+        "channel": "ch_web_modal",
+        "touch_id": "WM1",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Finish your MLB.TV sign-up", "cta_label": "Return to cart"}
+      },
+      {
+        "id": "modal_web_unknown",
+        "type": "action",
+        "label": "Web Modal WM2 - Unknown web",
+        "channel": "ch_web_modal",
+        "touch_id": "WM2",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Catch the season - complete sign-up", "cta_label": "Return to cart"}
+      },
+      {
+        "id": "dec_current_subscriber",
+        "type": "decision",
+        "label": "Already subscribed?",
+        "decision_basis": "pull",
+        "condition": {"field": "mlb_tv.status", "op": "equals", "value": "active"}
+      },
+      {"id": "end_converted", "type": "end", "label": "Journey End - Converted", "reason": "converted"},
+      {
+        "id": "wait_until_fav_home_first_pitch",
+        "type": "wait",
+        "label": "Wait until next fav-team home first pitch (T-2h)",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_fav_team_home_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLB App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_first_pitch",
+        "type": "action",
+        "label": "Push - First pitch in 2h at the ballpark",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_fav_team_home_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} first pitch in 2h at the ballpark - watch on MLB.TV"}
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait 24h",
+        "timing": {"type": "wait", "duration": {"value": 24, "unit": "hour"}}
+      },
+      {
+        "id": "dec_email_optin",
+        "type": "decision",
+        "label": "Known fan with email opt-in?",
+        "decision_basis": "pull",
+        "condition": {
+          "all_of": [
+            {"field": "identity.hashed_email", "op": "is_not_null"},
+            {"field": "consent.email", "op": "equals", "value": true}
+          ]
+        }
+      },
+      {
+        "id": "email_followup",
+        "type": "action",
+        "label": "Email EM1 - 24h follow-up",
+        "channel": "ch_email",
+        "touch_id": "EM1",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Your MLB.TV is one click away",
+          "cta_label": "Complete sign-up",
+          "modules": [
+            {"rank": "primary", "name": "MLB.TV PSP"},
+            {"rank": "secondary", "name": "This week's fav-team games"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_identity"},
+      {"from": "split_identity", "to": "modal_app_known", "branch_label": "app_known"},
+      {"from": "split_identity", "to": "modal_app_unknown", "branch_label": "app_unknown"},
+      {"from": "split_identity", "to": "modal_web_known", "branch_label": "web_known"},
+      {"from": "split_identity", "to": "modal_web_unknown", "branch_label": "web_unknown"},
+      {"from": "modal_app_known", "to": "dec_current_subscriber"},
+      {"from": "modal_app_unknown", "to": "dec_current_subscriber"},
+      {"from": "modal_web_known", "to": "dec_current_subscriber"},
+      {"from": "modal_web_unknown", "to": "dec_current_subscriber"},
+      {"from": "dec_current_subscriber", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_current_subscriber", "to": "wait_until_fav_home_first_pitch", "branch_label": "no"},
+      {"from": "wait_until_fav_home_first_pitch", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_first_pitch", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_24h", "branch_label": "no"},
+      {"from": "push_first_pitch", "to": "wait_24h"},
+      {"from": "wait_24h", "to": "dec_email_optin"},
+      {"from": "dec_email_optin", "to": "email_followup", "branch_label": "yes"},
+      {"from": "dec_email_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "email_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "MLB.TV subscriptions attributable to journey"}],
+      "secondary_kpis": [{"name": "Modal CTR"}, {"name": "Push click-through"}, {"name": "Email open / click rate"}],
+      "tests": []
+    }
+  }
+}

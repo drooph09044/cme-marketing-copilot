@@ -1,0 +1,172 @@
+{
+  "useCaseId": "brand-collaboration",
+  "name": "Brand Publisher Data Collaboration Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Audience Monetisation"
+  },
+  "journeyTable": {
+    "journeyName": "Brand Collaboration Audience",
+    "journeyGoal": "Enable monetization via brand partnerships",
+    "entryTrigger": "brand_collaboration_ready",
+    "journeyCategory": "Monetization",
+    "totalDuration": "Ongoing",
+    "exitClause": "Exit after campaign completion"
+  },
+  "entryCriteria": {
+    "event": "consent_verified",
+    "eventId": "evt_consent_001",
+    "conditions": [
+      {
+        "field": "optIn",
+        "operator": "EQUALS",
+        "value": true
+      },
+      {
+        "field": "brandSafetyFlag",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Brand_Safe_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Branded Content Delivery",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Exclusive partner offers",
+      "cta": "Explore",
+      "tracking": {
+        "campaignId": "brand_collab",
+        "deliveryId": "del_brand_1",
+        "trackingEvents": [
+          "ad_impression",
+          "conversion"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Follow-up Email",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "EMAIL",
+      "messageTheme": "More from our brand partners",
+      "cta": "Shop Now",
+      "tracking": {
+        "campaignId": "email_brand_followup",
+        "deliveryId": "del_brand_2",
+        "trackingEvents": [
+          "email_open",
+          "conversion"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "consent_verified",
+        "eventId": "evt_consent_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "conversion",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "conversion",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "conversion",
+      "eventId": "evt_conv_001",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 720
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "conversion"
+    ],
+    "eventMapping": {
+      "conversion": "evt_conv_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "revenue_uplift",
+    "secondaryKPIs": [
+      "ad_impression"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

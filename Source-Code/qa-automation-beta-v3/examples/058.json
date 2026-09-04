@@ -1,0 +1,165 @@
+{
+  "id": "058",
+  "matrix_row_id": 58,
+  "matrix_row_name": "Stanley Cup Playoffs Round 1 Push",
+  "template": "tpl_playoff_push",
+  "league": "NHL",
+  "sport": "hockey",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Stanley Cup Playoffs Round 1 tune-in push journey.",
+    "Create a Round 1 Stanley Cup Playoffs push journey. Bracket reveal email at the end of the regular season's final week, then nightly per-series push to fans of playing teams on game nights with series-status updates and win-or-go-home messaging as series progress. Composite audience splits by fav-team participation. Broadcast across ESPN+ and ABC.",
+    "Need an NHL playoff push for Round 1: bracket reveal email at the start, then per-game pushes routed by favorite team with series-status copy."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nhl-playoffs-r1-2026",
+    "metadata": {
+      "name": "Stanley Cup Playoffs Round 1 Push",
+      "internal_name": "NHL_SCP_R1_2026",
+      "brand": {"vertical": "sports_league", "league": "NHL", "team": null, "product": "ESPN+"},
+      "purpose": "Drive tune-in for Stanley Cup Playoffs Round 1 with bracket reveal and per-series push cadence to fans of playing teams.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-04-13",
+      "end_date": "2026-05-05",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive Round 1 tune-in viewership across ESPN+ and ABC.", "kpi": "Round 1 game tune-in rate among fav-team fans", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Bracket reveal email at the end of the regular season's final week with all 16 playoff teams and series matchups. Composite audience: route fav-team fans into a per-series push cadence on each game night with series-status updates ('series tied 1-1', 'down 1-2', 'win-or-go-home'). All other NHL fans receive only the bracket reveal email.",
+        "timing_rationale": "Round 1 begins mid-April; cadence runs through end of Round 1 (~3 weeks).",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nhl_fan",
+        "name": "Active NHL fan",
+        "criteria": {"field": "nhl.activity_within_days", "op": "lte", "value": 180},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_fav_team_in_playoffs",
+        "name": "Fan of a Round 1 playoff team",
+        "description": "Fan whose favorite NHL team is one of the 16 playoff teams.",
+        "criteria": {
+          "all_of": [
+            {"field": "favorite_team", "op": "is_not_null"},
+            {"field": "favorite_team.in_playoff_bracket", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nhl_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "OP", "name": "Opponent"},
+      {"key": "SS", "name": "Series Status"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Regular-season final week ends", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_bracket_reveal",
+        "type": "action",
+        "label": "Email - Round 1 bracket reveal",
+        "channel": "ch_email",
+        "touch_id": "BR",
+        "timing": {"type": "scheduled", "calendar_date": "2026-04-13"},
+        "copy": {
+          "subject": "The 2026 Stanley Cup Playoffs bracket is set",
+          "cta_label": "View the bracket",
+          "modules": [
+            {"rank": "primary", "name": "Full Round 1 bracket"},
+            {"rank": "secondary", "name": "Fav-team series spotlight"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_fav_team_in_playoffs",
+        "type": "decision",
+        "label": "Fav team in Round 1 bracket?",
+        "decision_basis": "audience",
+        "condition": {"field": "favorite_team.in_playoff_bracket", "op": "equals", "value": true}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NHL App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nhl_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_game_night",
+        "type": "action",
+        "label": "Push - Per-series game night (recurring through Round 1)",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_team_playoff_game",
+          "direction": "before",
+          "offset": {"value": 1, "unit": "hour"}
+        },
+        "copy": {
+          "headline": "{{FT}} vs {{OP}} - puck drops in 1h",
+          "body": "Series status: {{SS}}. Watch on ESPN+."
+        },
+        "personalization_used": ["FT", "OP", "SS"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_until_round_end",
+        "type": "wait",
+        "label": "Wait until Round 1 ends",
+        "timing": {"type": "wait_until", "until": {"field": "nhl.round_1_complete", "op": "equals", "value": true}, "check_every": {"value": 1, "unit": "day"}, "max_wait": {"value": 25, "unit": "day"}}
+      },
+      {
+        "id": "email_series_recap",
+        "type": "action",
+        "label": "Email - Round 1 series recap and Round 2 preview",
+        "channel": "ch_email",
+        "touch_id": "TR",
+        "timing": {"type": "realtime"},
+        "copy": {"subject": "Round 1 in the books - here's your Round 2 schedule", "cta_label": "View the bracket"},
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_bracket_reveal"},
+      {"from": "email_bracket_reveal", "to": "dec_fav_team_in_playoffs"},
+      {"from": "dec_fav_team_in_playoffs", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_fav_team_in_playoffs", "to": "end_journey", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_game_night", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_until_round_end", "branch_label": "no"},
+      {"from": "push_game_night", "to": "wait_until_round_end"},
+      {"from": "wait_until_round_end", "to": "email_series_recap"},
+      {"from": "email_series_recap", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Round 1 tune-in rate among fav-team fans"}],
+      "secondary_kpis": [{"name": "Bracket reveal email open rate"}, {"name": "Per-game push open rate"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,345 @@
+{
+  "id": "018",
+  "matrix_row_id": 18,
+  "matrix_row_name": "Lapsed Fantasy Player Win-back",
+  "template": "tpl_win_back",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a pre-season win-back for lapsed NFL Fantasy players.",
+    "Pre-season win-back targeting fans who played NFL Fantasy at least one prior season but haven't registered for 2026. July-September cadence: open email late July, draft-prep email + push mid-August, 'bring your league back together' email early September. Suppress fans who register mid-flow.",
+    "Need a pre-season Fantasy win-back across email + push, tied to draft prep and league setup."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-fantasy-winback-2026",
+    "metadata": {
+      "name": "Lapsed Fantasy Player Win-Back",
+      "internal_name": "NFL_Fantasy_WinBack_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL Fantasy"
+      },
+      "purpose": "Re-engage lapsed NFL Fantasy players ahead of the 2026 season with draft-prep, league-setup, and 'bring your league back' messaging.",
+      "archetype": "win_back",
+      "launch_date": "2026-07-20",
+      "end_date": "2026-09-10",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Reactivate lapsed Fantasy players for the new season.",
+          "kpi": "Fantasy season-2026 registration rate among lapsed",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Late July open with 'season is coming' email. Mid-August: 'draft is coming - get ready' email + push for opted-in. Early September: 'bring your league back together' email.",
+        "timing_rationale": "Pre-season Fantasy registration window peaks Aug-early Sep.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "PLAN & COMMIT"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_fantasy",
+        "name": "Lapsed Fantasy player (1+ prior season, 0 current)",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "fantasy.prior_seasons_registered",
+              "op": "gte",
+              "value": 1
+            },
+            {
+              "field": "fantasy.season_2026_registered",
+              "op": "equals",
+              "value": false
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_now_registered",
+        "name": "Now registered for season",
+        "scope": "global",
+        "criteria": {
+          "field": "fantasy.season_2026_registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "LN",
+        "name": "League Name"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Late July open",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "email_open",
+        "type": "action",
+        "label": "Email - Fantasy season is coming",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-07-22"
+        },
+        "copy": {
+          "subject": "Fantasy season starts in 6 weeks - get ready"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_3w",
+        "type": "wait",
+        "label": "Wait 3 weeks",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 3,
+            "unit": "week"
+          }
+        }
+      },
+      {
+        "id": "dec_registered_mid",
+        "type": "decision",
+        "label": "Registered?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "fantasy.season_2026_registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_draft",
+        "type": "action",
+        "label": "Email - Draft prep",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-08-12"
+        },
+        "copy": {
+          "subject": "Draft season is here - lock in your league"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_draft",
+        "type": "action",
+        "label": "Push - Draft your team",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-08-15"
+        },
+        "copy": {
+          "headline": "Set up your Fantasy league for 2026"
+        }
+      },
+      {
+        "id": "wait_3w_2",
+        "type": "wait",
+        "label": "Wait to Sep",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 3,
+            "unit": "week"
+          }
+        }
+      },
+      {
+        "id": "dec_registered_late",
+        "type": "decision",
+        "label": "Registered?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "fantasy.season_2026_registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_league_back",
+        "type": "action",
+        "label": "Email - Bring your league back",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-09-03"
+        },
+        "copy": {
+          "subject": "Bring {{LN}} back together for 2026",
+          "cta_label": "Restart your league"
+        },
+        "personalization_used": [
+          "FN",
+          "LN"
+        ]
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Registered",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_open"
+      },
+      {
+        "from": "email_open",
+        "to": "wait_3w"
+      },
+      {
+        "from": "wait_3w",
+        "to": "dec_registered_mid"
+      },
+      {
+        "from": "dec_registered_mid",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_registered_mid",
+        "to": "email_draft",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_draft",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_draft",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_3w_2",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_draft",
+        "to": "wait_3w_2"
+      },
+      {
+        "from": "wait_3w_2",
+        "to": "dec_registered_late"
+      },
+      {
+        "from": "dec_registered_late",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_registered_late",
+        "to": "email_league_back",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_league_back",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Fantasy season-2026 registration rate among lapsed"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Email open / click rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

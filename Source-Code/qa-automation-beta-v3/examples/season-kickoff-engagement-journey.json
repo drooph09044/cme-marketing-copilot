@@ -1,0 +1,219 @@
+{
+  "useCaseId": "season-kickoff-engagement-journey",
+  "name": "Season Kickoff & Schedule Engagement Journey",
+  "category": {
+    "categoryId": "engagements",
+    "categoryName": "Engagements"
+  },
+  "journeyTable": {
+    "journeyName": "Season Kickoff & Schedule Engagement Journey",
+    "journeyGoal": "Drive early-season engagement, ticket sales, and content interaction around schedule release and season start",
+    "entryTrigger": "schedule_released",
+    "journeyCategory": "Fan Engagement & Awareness",
+    "totalDuration": "30 days",
+    "exitClause": "Exit when journey completed OR purchase_completed"
+  },
+  "entryCriteria": {
+    "event": "schedule_released",
+    "eventId": "evt_schedule_released_001",
+    "conditions": [
+      {
+        "field": "isSubscribedFan",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Active_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 0",
+      "timing": {
+        "relativeDay": 0,
+        "description": "Immediately after schedule release"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "The Schedule is Here – personalised game calendar with fan's most likely attending games highlighted",
+      "cta": "View My Schedule",
+      "tracking": {
+        "campaignId": "email_schedule_release",
+        "deliveryId": "del_email_701",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "favoriteTeam",
+        "recommendedGames"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 5",
+      "timing": {
+        "relativeDay": 5,
+        "description": "5 days after schedule release"
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Draft Day is Coming – player spotlight content, prediction content, link to fantasy product",
+      "cta": "Explore Draft Content",
+      "tracking": {
+        "campaignId": "multi_draft_content",
+        "deliveryId": "del_push_email_702",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "favoritePlayers",
+        "draftPredictions"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 14",
+      "timing": {
+        "relativeDay": 14,
+        "description": "14 days after schedule release"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Early Access: Single-Game Tickets – on-sale early access offer for members before public",
+      "cta": "Get Early Access",
+      "tracking": {
+        "campaignId": "email_early_access_tickets",
+        "deliveryId": "del_email_703",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "earlyAccessCode",
+        "recommendedGames"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 30",
+      "timing": {
+        "relativeDay": 30,
+        "description": "30 days after schedule release"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Get Ready – season opener countdown, stadium guide refresher, merch new arrivals",
+      "cta": "Shop New Arrivals",
+      "tracking": {
+        "campaignId": "email_season_opener",
+        "deliveryId": "del_email_704",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "seasonOpenerDate",
+        "merchRecommendations"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "scheduleReleaseDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "schedule_released",
+        "eventId": "evt_schedule_released_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n6",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_completed",
+      "eventId": "evt_purchase_completed_002",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowDays": 30
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "purchase_completed == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "purchase_completed"
+    ],
+    "eventMapping": {
+      "schedule_released": "evt_schedule_released_001",
+      "purchase_completed": "evt_purchase_completed_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_completed",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 30
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

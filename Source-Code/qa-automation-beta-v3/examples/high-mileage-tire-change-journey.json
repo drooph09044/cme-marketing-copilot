@@ -1,0 +1,20 @@
+{
+  "categoryId": "maintenance-essentials",
+  "categoryName": "Maintenance Essentials",
+  "categoryDescription": "Journeys designed around preventive maintenance milestones.",
+  "subCategoryId": "tire-maintenance",
+  "subCategoryName": "Tire Replacement",
+  "slug": "high-mileage-tire-change-journey",
+  "name": "High Mileage Tire Change Journey",
+  "active": true,
+  "brief": "Find customers with more than 50K miles and no tire replacement event, then drive inspection and tire-change bookings through email and push.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-08",
+  "journeyOverrides": {
+    "name": "High Mileage Tire Change",
+    "objective": "Increase tire inspection and replacement bookings for high-mileage customers.",
+    "audience": "Mileage_50K_No_Tire_Change",
+    "variantA": "Safety-first reminder messaging",
+    "variantB": "Reminder with limited-time service bundle offer"
+  }
+}

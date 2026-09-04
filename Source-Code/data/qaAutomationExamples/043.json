@@ -1,0 +1,115 @@
+{
+  "id": "043",
+  "matrix_row_id": 43,
+  "matrix_row_name": "Marquee Sunday Game Push",
+  "template": "tpl_game_day",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a per-game push for marquee Sunday MLB games like Sunday Night Baseball.",
+    "Create a push journey for Sunday marquee MLB games. Send T-2h before first pitch to fans of either playing team with broadcast info (ESPN Sunday Night Baseball or FOX Saturday/Sunday windows) and a tune-in CTA into MLB.TV for out-of-market viewers.",
+    "Need a Sunday marquee-game push for MLB fans. Pre-first-pitch push with broadcast info and MLB.TV CTA for out-of-market fans."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-marquee-sunday-push-2026",
+    "metadata": {
+      "name": "MLB Marquee Sunday Game Push",
+      "internal_name": "MLB_Marquee_Sunday_2026",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB.TV"},
+      "purpose": "Drive tune-in to marquee nationally televised Sunday MLB games (Sunday Night Baseball, FOX windows) with a T-2h push to fans of competing teams.",
+      "archetype": "game_day",
+      "launch_date": "2026-03-29",
+      "end_date": "2026-09-27",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to marquee Sunday MLB games.", "kpi": "Sunday marquee-game viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Per-marquee-game push (Sunday Night Baseball on ESPN; FOX Saturday/Sunday windows). T-2h before first pitch. Single-channel: push. Suppresses fans without a fav-team interest in either competing team.",
+        "timing_rationale": "T-2h tipoff is the canonical pre-first-pitch window for fan tune-in.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_competing_team_fan",
+        "name": "Fan of either competing team",
+        "description": "Fan whose favorite team is one of the two teams in the marquee Sunday matchup.",
+        "criteria": {"field": "fav_team.in_marquee_sunday_matchup", "op": "equals", "value": true}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "week"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: Marquee Sunday game (per game)",
+        "entry_criteria": {"trigger": "schedule", "criteria": {"field": "calendar.is_marquee_sunday", "op": "equals", "value": true}}
+      },
+      {
+        "id": "dec_fan_of_competing_team",
+        "type": "decision",
+        "label": "Fav team is in marquee matchup?",
+        "decision_basis": "audience",
+        "condition": {"field": "fav_team.in_marquee_sunday_matchup", "op": "equals", "value": true}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLB App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_pre_first_pitch",
+        "type": "action",
+        "label": "Push T-2h - Pre-first pitch tune-in",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "marquee_sunday_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} {{MTC}} first pitch in 2h - watch on broadcaster or MLB.TV (out-of-market)"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"},
+      {"id": "end_no_fav_match", "type": "end", "label": "Journey End - No fan-team match", "reason": "suppressed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_fan_of_competing_team"},
+      {"from": "dec_fan_of_competing_team", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_fan_of_competing_team", "to": "end_no_fav_match", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_pre_first_pitch", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_pre_first_pitch", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Sunday marquee-game viewership"}],
+      "secondary_kpis": [{"name": "Push click-through rate"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "id": "103",
+  "matrix_row_id": 103,
+  "matrix_row_name": "F1 inactive fan reactivation - season touchpoints",
+  "template": "tpl_calendar_reactivation",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an F1 inactive-fan reactivation journey anchored to the season's major moments.",
+    "Create a season-long calendar reactivation journey for inactive F1 fans. Backbone touches at pre-season testing, Australian GP opener, Monaco, Summer Break, Madrid debut, Las Vegas, and Abu Dhabi finale. Each fan gets one personalized touch on their favorite driver's or team's milestone (race win, podium, pole) during the season.",
+    "Need to re-engage F1 fans who've gone inactive. Use the season's anchor moments as the backbone, plus an extra personalized touch tied to fan's favorite driver or team milestone."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-inactive-reactivation-2026",
+    "metadata": {
+      "name": "F1 Inactive Fan Reactivation - 2026 Season",
+      "internal_name": "F1_Reactivation_2026",
+      "brand": {"vertical": "sports_league", "league": "F1", "team": null, "product": null},
+      "purpose": "Re-engage inactive F1 fans across the 2026 season using a calendar-anchored backbone plus one personalized milestone touch.",
+      "archetype": "reactivation",
+      "launch_date": "2026-02-01",
+      "end_date": "2026-12-15",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate inactive F1 fans across the season.", "kpi": "Fans returning to F1 App or F1 TV with engagement", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Backbone of all-fans touches at canonical F1 season moments. Layer one personalized touch on fan's favorite driver or team milestone (race win, podium, pole position).",
+        "timing_rationale": "Calendar-anchored to canonical F1 2026 season moments.",
+        "notes": "2026 marks the start of the new regulation era with updated power units and aero rules."
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["LEARN & FOLLOW", "GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_inactive_f1_fan",
+        "name": "Inactive F1 fan",
+        "description": "Fan with no F1 engagement in the last 365 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "f1.activity_last_active_within_days", "op": "gt", "value": 365}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [{"id": "ch_email", "type": "email"}],
+    "personalization_tokens": [
+      {"key": "FT", "name": "Favorite Driver or Team"},
+      {"key": "MILE", "name": "Recent Milestone"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Season cadence opens", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_preseason_testing",
+        "type": "action",
+        "label": "Email - Pre-season testing (Feb)",
+        "channel": "ch_email",
+        "touch_id": "WK1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-23"},
+        "copy": {"subject": "Pre-season testing underway - the 2026 cars hit the track"}
+      },
+      {
+        "id": "email_australian_gp",
+        "type": "action",
+        "label": "Email - Australian GP opener (Mar 8)",
+        "channel": "ch_email",
+        "touch_id": "WK2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-08"},
+        "copy": {"subject": "Lights out: the 2026 F1 season opens in Melbourne"}
+      },
+      {
+        "id": "email_monaco",
+        "type": "action",
+        "label": "Email - Monaco GP (May)",
+        "channel": "ch_email",
+        "touch_id": "WK3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-24"},
+        "copy": {"subject": "Monaco: the jewel of the F1 calendar"}
+      },
+      {
+        "id": "dec_has_fav",
+        "type": "decision",
+        "label": "Has favorite driver or team?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {"field": "f1.favorite_driver", "op": "is_not_null"},
+            {"field": "f1.favorite_team", "op": "is_not_null"}
+          ]
+        }
+      },
+      {
+        "id": "email_personalized_milestone",
+        "type": "action",
+        "label": "Email - Personalized fav driver/team milestone",
+        "channel": "ch_email",
+        "touch_id": "WK4",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_driver_or_team_milestone",
+          "direction": "after",
+          "offset": {"value": 1, "unit": "day"}
+        },
+        "copy": {
+          "subject": "{{FT}} just {{MILE}} - here's the moment",
+          "preview": "Don't miss the next race weekend"
+        },
+        "personalization_used": ["FT", "MILE"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_summer_break",
+        "type": "action",
+        "label": "Email - Summer Break recap (Aug)",
+        "channel": "ch_email",
+        "touch_id": "WK5",
+        "timing": {"type": "scheduled", "calendar_date": "2026-08-10"},
+        "copy": {"subject": "Summer Break: the season so far in 5 storylines"}
+      },
+      {
+        "id": "email_madrid_debut",
+        "type": "action",
+        "label": "Email - Madrid GP debut (Sep 13)",
+        "channel": "ch_email",
+        "touch_id": "WK6",
+        "timing": {"type": "scheduled", "calendar_date": "2026-09-13"},
+        "copy": {"subject": "Madrid debuts on the calendar - a new chapter for F1"}
+      },
+      {
+        "id": "email_las_vegas",
+        "type": "action",
+        "label": "Email - Las Vegas GP (Nov)",
+        "channel": "ch_email",
+        "touch_id": "WK7",
+        "timing": {"type": "scheduled", "calendar_date": "2026-11-21"},
+        "copy": {"subject": "Las Vegas under the lights - the showcase race"}
+      },
+      {
+        "id": "email_abu_dhabi",
+        "type": "action",
+        "label": "Email - Abu Dhabi finale (Dec 6)",
+        "channel": "ch_email",
+        "touch_id": "WK8",
+        "timing": {"type": "scheduled", "calendar_date": "2026-12-06"},
+        "copy": {"subject": "The 2026 championship is decided at Yas Marina"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_preseason_testing"},
+      {"from": "email_preseason_testing", "to": "email_australian_gp"},
+      {"from": "email_australian_gp", "to": "email_monaco"},
+      {"from": "email_monaco", "to": "dec_has_fav"},
+      {"from": "dec_has_fav", "to": "email_personalized_milestone", "branch_label": "yes"},
+      {"from": "dec_has_fav", "to": "email_summer_break", "branch_label": "no"},
+      {"from": "email_personalized_milestone", "to": "email_summer_break"},
+      {"from": "email_summer_break", "to": "email_madrid_debut"},
+      {"from": "email_madrid_debut", "to": "email_las_vegas"},
+      {"from": "email_las_vegas", "to": "email_abu_dhabi"},
+      {"from": "email_abu_dhabi", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Reactivated fan rate"}],
+      "secondary_kpis": [{"name": "Per-touch open and click rates"}, {"name": "Personalized milestone touch incremental lift"}],
+      "tests": []
+    }
+  }
+}

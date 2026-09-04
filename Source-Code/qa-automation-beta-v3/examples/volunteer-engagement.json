@@ -1,0 +1,76 @@
+{
+  "useCaseId": "volunteer-engagement",
+  "clientTag": "PGA",
+  "name": "Volunteer Recruitment Journey",
+  "subCategoryId": "engagements",
+  "subCategoryName": "Engagements",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Community Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Volunteer Engagement",
+    "journeyGoal": "Drive volunteer sign-ups",
+    "entryTrigger": "event_announced",
+    "totalDuration": "5 days",
+    "exitClause": "Exit after signup"
+  },
+  "entryCriteria": {
+    "event": "event_announced",
+    "eventId": "evt_event_001",
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Engaged_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "channel": "EMAIL",
+      "messageTheme": "Be part of the action - volunteer today",
+      "cta": "Sign Up",
+      "tracking": {
+        "campaignId": "email_volunteer",
+        "deliveryId": "del_email_v1",
+        "trackingEvents": [
+          "email_open",
+          "volunteer_signup"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "event_announced",
+        "eventId": "evt_event_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "volunteer_signup",
+      "eventId": "evt_volunteer_001",
+      "condition": "signedUp == true",
+      "action": "EXIT"
+    }
+  ],
+  "analytics": {
+    "primaryKPI": "volunteer_signup"
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,165 @@
+{
+  "id": "071",
+  "matrix_row_id": 71,
+  "matrix_row_name": "ESPN+ college football streaming abandon cart",
+  "template": "tpl_abandon_cart",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an ESPN+ college football abandon-cart journey with identity-matrix routing.",
+    "Create an identity-matrix abandon cart for the ESPN+ college sports subscription for fans with college football affinity (favorite-school set plus CBF content engagement). Modal within 15 minutes of abandonment, push on the next Saturday football slate for opted-in alumni and fans of the fav school, and an email follow-up within 24h with football-season content preview.",
+    "Need an ESPN+ CBF abandon cart. Use identity matrix routing across app/web and known/unknown, and time the push to the next Saturday's college football slate."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cfb-espn-plus-abandon-cart",
+    "metadata": {
+      "name": "ESPN+ College Football Abandon Cart",
+      "internal_name": "NCAA_CFB_ESPNPlus_AbandonCart_2026",
+      "brand": {"vertical": "streaming", "league": "NCAA", "team": null, "product": "ESPN+"},
+      "purpose": "Recover abandoned ESPN+ subscription funnels among fans with college football affinity, using identity-matrix routing.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-07-01",
+      "end_date": "2027-01-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Convert abandoned ESPN+ funnel sessions to paid subscriptions among CFB-affinity fans.", "kpi": "Recovery rate among CFB-affinity abandoners", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix routing across app/web × known/unknown. Modal at funnel within 15min; for known fans push on the next Saturday football slate (opted-in only) and a 24h email follow-up with football-season content preview tailored to the fan's favorite school.",
+        "timing_rationale": "Modal real-time; push timed to next Saturday slate; email 24h post-abandonment.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["app_modal", "web_modal", "email", "push", "identity_matrix"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {"id": "aud_app_known", "name": "App-known CFB-affinity abandoner", "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "app"}, {"field": "identity.state", "op": "equals", "value": "known"}, {"field": "ncaa.cfb_content_engagement_last_year", "op": "equals", "value": true}]}, "identity_state": "app_known"},
+      {"id": "aud_app_unknown", "name": "App-unknown CFB-affinity abandoner", "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "app"}, {"field": "identity.state", "op": "equals", "value": "unknown"}]}, "identity_state": "app_unknown"},
+      {"id": "aud_web_known", "name": "Web-known CFB-affinity abandoner", "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "web"}, {"field": "identity.state", "op": "equals", "value": "known"}, {"field": "ncaa.cfb_content_engagement_last_year", "op": "equals", "value": true}]}, "identity_state": "web_known"},
+      {"id": "aud_web_unknown", "name": "Web-unknown CFB-affinity abandoner", "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "web"}, {"field": "identity.state", "op": "equals", "value": "unknown"}]}, "identity_state": "web_unknown"}
+    ],
+    "suppressions": [
+      {"id": "supp_already_subscribed", "name": "Already subscribed", "scope": "global", "criteria": {"field": "espn_plus.status", "op": "equals", "value": "active"}}
+    ],
+    "channels": [
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "espn_app"},
+      {"id": "ch_web_modal", "type": "web_modal"},
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "espn_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 7, "unit": "day"}, "max_entries": 3},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: ESPN+ funnel abandoned by CFB-affinity fan",
+        "entry_criteria": {"trigger": "event", "event_name": "espn_plus_funnel_abandoned"}
+      },
+      {
+        "id": "split_identity",
+        "type": "audience_split",
+        "label": "Identity matrix split",
+        "audiences": ["aud_app_known", "aud_app_unknown", "aud_web_known", "aud_web_unknown"],
+        "mode": "parallel"
+      },
+      {
+        "id": "app_modal",
+        "type": "action",
+        "label": "App Modal - ESPN+ in-funnel",
+        "channel": "ch_app_modal",
+        "touch_id": "M1",
+        "timing": {"type": "realtime", "refresh_minutes": 15},
+        "copy": {"headline": "{{FT}} kicks off this Saturday - finish signing up for ESPN+"}
+      },
+      {
+        "id": "web_modal",
+        "type": "action",
+        "label": "Web Modal - ESPN+ in-funnel",
+        "channel": "ch_web_modal",
+        "touch_id": "M2",
+        "timing": {"type": "realtime", "refresh_minutes": 15},
+        "copy": {"headline": "Catch every {{FT}} game - finish signing up for ESPN+"}
+      },
+      {
+        "id": "dec_known",
+        "type": "decision",
+        "label": "Identity known?",
+        "decision_basis": "audience",
+        "condition": {"field": "identity.state", "op": "equals", "value": "known"}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (ESPN App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_espn_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_saturday_slate",
+        "type": "action",
+        "label": "Push - Next Saturday CFB slate",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "next_saturday_kickoff",
+          "direction": "before",
+          "offset": {"value": 3, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} kicks off in 3h - watch on ESPN+"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait 24h",
+        "timing": {"type": "wait", "duration": {"value": 24, "unit": "hour"}}
+      },
+      {
+        "id": "email_followup",
+        "type": "action",
+        "label": "Email - 24h CFB-season content preview",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Don't miss kickoff: {{FT}} on ESPN+",
+          "cta_label": "Complete sign-up"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_identity"},
+      {"from": "split_identity", "to": "app_modal", "branch_label": "app"},
+      {"from": "split_identity", "to": "web_modal", "branch_label": "web"},
+      {"from": "app_modal", "to": "dec_known"},
+      {"from": "web_modal", "to": "dec_known"},
+      {"from": "dec_known", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_known", "to": "end_journey", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_saturday_slate", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_24h", "branch_label": "no"},
+      {"from": "push_saturday_slate", "to": "wait_24h"},
+      {"from": "wait_24h", "to": "email_followup"},
+      {"from": "email_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Recovery rate among CFB-affinity abandoners"}],
+      "secondary_kpis": [{"name": "Modal CTR by surface"}, {"name": "Saturday push view rate"}],
+      "tests": []
+    }
+  }
+}

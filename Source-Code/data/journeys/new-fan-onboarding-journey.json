@@ -1,0 +1,312 @@
+{
+  "useCaseId": "new-fan-onboarding-journey",
+  "name": "New Fan Onboarding Journey",
+  "category": {
+    "categoryId": "engagements",
+    "categoryName": "Engagements"
+  },
+  "journeyTable": {
+    "journeyName": "New Fan Onboarding Journey",
+    "journeyGoal": "Onboard new fans and drive engagement, app adoption, and early monetization",
+    "entryTrigger": "new_subscription",
+    "journeyCategory": "Fan Engagement & Onboarding",
+    "totalDuration": "21 days",
+    "exitClause": "Exit when journey completed OR unsubscribe event"
+  },
+  "entryCriteria": {
+    "event": "new_subscription",
+    "eventId": "evt_new_subscription_001",
+    "conditions": [
+      {
+        "field": "productType",
+        "operator": "EQUALS",
+        "value": "SEASON_TICKET"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "New_Season_Ticket_Holders"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 0",
+      "timing": {
+        "description": "Immediately after purchase",
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Welcome to the family – team intro, what to expect, app download CTA + stadium guide",
+      "cta": "Download the App",
+      "tracking": {
+        "campaignId": "email_welcome_onboarding",
+        "deliveryId": "del_email_201",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "favoriteTeam"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 2",
+      "timing": {
+        "description": "2 days after purchase",
+        "offsetHours": 48
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Know Before You Go – parking, gates, bag policy, F&B, digital ticket walkthrough",
+      "cta": "Plan My Visit",
+      "tracking": {
+        "campaignId": "multi_visit_prep",
+        "deliveryId": "del_push_email_202",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 5",
+      "timing": {
+        "description": "5 days after purchase",
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Gear Up – 10% off first merch purchase; player spotlight to drive affinity",
+      "cta": "Shop Now",
+      "tracking": {
+        "campaignId": "email_merch_offer",
+        "deliveryId": "del_email_203",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "favoritePlayer",
+        "discountCode"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 10",
+      "timing": {
+        "description": "10 days after purchase",
+        "offsetHours": 240
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Meet Your Players – top 3 player profiles + link to content hub / podcast",
+      "cta": "Explore Content",
+      "tracking": {
+        "campaignId": "email_player_content",
+        "deliveryId": "del_email_204",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "favoriteTeam"
+      ]
+    },
+    {
+      "tpId": "TP5",
+      "label": "Day 21",
+      "timing": {
+        "description": "21 days after purchase",
+        "offsetHours": 504
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Bring a Friend – group ticket offer for upcoming home game; referral incentive",
+      "cta": "Get Group Tickets",
+      "tracking": {
+        "campaignId": "email_referral_offer",
+        "deliveryId": "del_email_205",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "referralCode",
+        "upcomingMatch"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "subscriptionStartDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "new_subscription",
+        "eventId": "evt_new_subscription_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "unsubscribe",
+          "field": "unsubscribe",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n4"
+      },
+      {
+        "id": "n4",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n6",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "unsubscribe",
+          "field": "unsubscribe",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n7"
+      },
+      {
+        "id": "n7",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n8",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n9",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "unsubscribe",
+          "field": "unsubscribe",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n10"
+      },
+      {
+        "id": "n10",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n11",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n12",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "unsubscribe",
+          "field": "unsubscribe",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n13"
+      },
+      {
+        "id": "n13",
+        "type": "WAIT",
+        "durationHours": 264
+      },
+      {
+        "id": "n14",
+        "type": "MESSAGE",
+        "tpId": "TP5"
+      },
+      {
+        "id": "n15",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "unsubscribe",
+      "eventId": "evt_unsubscribe_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 5,
+      "timeWindowDays": 21
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "unsubscribed_users",
+        "condition": "unsubscribe == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "app_download",
+      "purchase_completed"
+    ],
+    "eventMapping": {
+      "new_subscription": "evt_new_subscription_001",
+      "unsubscribe": "evt_unsubscribe_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "app_download",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "purchase_completed"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 21
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,168 @@
+{
+  "useCaseId": "product-promotion-push-email",
+  "name": "Product Promotion – Push & Email Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Product Promotion – Push & Email",
+    "journeyGoal": "Promote products to users to drive engagement and sales",
+    "entryTrigger": "user_browsed_product",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after product viewed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_browsed_product",
+    "eventId": "evt_browse_product_001",
+    "conditions": [
+      {
+        "field": "productCategory",
+        "operator": "EQUALS",
+        "value": "Product"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Browsed Product Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Product Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "Check out our latest products – don’t miss out!",
+      "cta": "View Product",
+      "tracking": {
+        "campaignId": "push_product_promo",
+        "deliveryId": "del_push_29",
+        "trackingEvents": [
+          "push_open",
+          "product_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Product Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Explore our exclusive product collection now!",
+      "cta": "View Product",
+      "tracking": {
+        "campaignId": "email_product_promo",
+        "deliveryId": "del_email_29",
+        "trackingEvents": [
+          "email_open",
+          "product_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_browsed_product",
+        "eventId": "evt_browse_product_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_view",
+          "field": "productViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_view",
+          "field": "productViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_view",
+      "eventId": "evt_product_001",
+      "condition": "productViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_view"
+    ],
+    "eventMapping": {
+      "product_view": "evt_product_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_view",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

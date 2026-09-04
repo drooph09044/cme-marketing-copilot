@@ -1,0 +1,192 @@
+{
+  "useCaseId": "playoff-presale-conversion-journey",
+  "name": "Playoff Presale Conversion Journey",
+  "category": {
+    "categoryId": "conversions",
+    "categoryName": "Conversions"
+  },
+  "journeyTable": {
+    "journeyName": "Playoff Presale Conversion Journey",
+    "journeyGoal": "Drive playoff ticket conversions through personalization, urgency, and ongoing engagement",
+    "entryTrigger": "eligible_for_presale",
+    "journeyCategory": "Conversion & Sales",
+    "totalDuration": "14 days",
+    "exitClause": "Exit when playoff_ticket_purchased OR journey completed"
+  },
+  "entryCriteria": {
+    "event": "eligible_for_presale",
+    "eventId": "evt_presale_eligible_001",
+    "conditions": [
+      {
+        "field": "isEligible",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Presale_Eligible_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 2",
+      "timing": {
+        "relativeDay": 2,
+        "description": "2 days after presale eligibility"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your Seats Are Waiting – personalised seat recommendation based on past purchases",
+      "cta": "Secure My Seats",
+      "tracking": {
+        "campaignId": "email_presale_seats",
+        "deliveryId": "del_email_601",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "seatPreferences",
+        "recommendedSection"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 5",
+      "timing": {
+        "relativeDay": 5,
+        "description": "5 days after presale eligibility"
+      },
+      "channel": [
+        "PUSH",
+        "SMS"
+      ],
+      "messageTheme": "Last chance for presale – general sale opens in 48 hrs; current member pricing advantage",
+      "cta": "Buy Now",
+      "tracking": {
+        "campaignId": "presale_last_call",
+        "deliveryId": "del_push_sms_602",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "pricingTier",
+        "timeRemaining"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 14",
+      "timing": {
+        "relativeDay": 14,
+        "description": "14 days after presale eligibility"
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Still in it – round-by-round engagement update + merchandise offer tied to playoff run",
+      "cta": "Shop Playoff Gear",
+      "tracking": {
+        "campaignId": "email_playoff_engagement",
+        "deliveryId": "del_email_603",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "favoriteTeam",
+        "playoffProgress",
+        "merchOffer"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "presaleStartDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "eligible_for_presale",
+        "eventId": "evt_presale_eligible_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "playoff_ticket_purchased",
+      "eventId": "evt_playoff_ticket_purchased_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowDays": 14
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_purchased",
+        "condition": "playoff_ticket_purchased == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "playoff_ticket_purchased"
+    ],
+    "eventMapping": {
+      "eligible_for_presale": "evt_presale_eligible_001",
+      "playoff_ticket_purchased": "evt_playoff_ticket_purchased_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "playoff_ticket_purchased",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 14
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,151 @@
+{
+  "id": "042",
+  "matrix_row_id": 42,
+  "matrix_row_name": "MLB Opening Day Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for MLB Opening Day on Mar 26, 2026.",
+    "Create an Opening Day tune-in journey for MLB.TV. Per-fav-team morning push on game day with broadcast info, an evening email with a linear tune-in CTA for night-game fans, plus an all-fans Opening Day landing-page push featuring the full slate. Composite audience: active MLB fans AND (have fav-team OR have prior MLB.TV engagement).",
+    "Need an Opening Day cadence — all-fans slate push, then per-fav-team broadcast info push in the morning, then a night-game tune-in email."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-opening-day-2026-tune-in",
+    "metadata": {
+      "name": "MLB Opening Day Tune-In",
+      "internal_name": "MLB_Opening_Day_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB.TV"},
+      "purpose": "Drive tune-in to MLB Opening Day on Mar 26, 2026 (earliest traditional Opening Day in MLB history) with all-fans slate awareness plus per-fav-team morning push and night-game evening email.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-03-26",
+      "end_date": "2026-03-27",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to Opening Day games on MLB.TV and linear broadcasters.", "kpi": "Opening Day viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single-day cadence. Morning push to all-fans with the full slate, per-fav-team push with their game's broadcast info, evening email driving night-game tune-in. Composite audience criteria gate the journey on active engagement plus team or product affinity.",
+        "timing_rationale": "Mar 26 Opening Day; morning push at 8am ET, fav-team push 2h before each first pitch, evening email at 5pm ET for night-game tune-in.",
+        "notes": "2026 Opening Day Mar 26 is the earliest traditional Opening Day in MLB history."
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_mlb_fan_composite",
+        "name": "Active MLB fan (composite)",
+        "description": "Active MLB fan with team affinity or prior MLB.TV engagement.",
+        "criteria": {
+          "all_of": [
+            {"field": "mlb.activity_within_days", "op": "lte", "value": 180},
+            {
+              "any_of": [
+                {"field": "favorite_team", "op": "is_not_null"},
+                {"field": "mlb_tv.lifetime_subscription_months", "op": "gt", "value": 0}
+              ]
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Opening Day - morning", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_push_optin_morning",
+        "type": "decision",
+        "label": "Push opted in (MLB App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_allfans_slate",
+        "type": "action",
+        "label": "Push - Opening Day all-fans slate",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-26", "time_local": "08:00 ET"},
+        "copy": {"headline": "MLB is back: Opening Day slate - see all 15 games"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "push_fav_team_broadcast",
+        "type": "action",
+        "label": "Push - Fav-team game broadcast info (T-2h to first pitch)",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_team_opening_first_pitch",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} first pitch in 2h: {{MTC}} on broadcaster - or watch on MLB.TV"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_evening_tunein",
+        "type": "action",
+        "label": "Email - Night-game tune-in",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-26", "time_local": "17:00 ET"},
+        "copy": {
+          "subject": "Opening Day still going - night games on MLB.TV",
+          "preview": "Tune in to tonight's slate",
+          "cta_label": "Watch tonight",
+          "modules": [
+            {"rank": "primary", "name": "Night-game slate"},
+            {"rank": "secondary", "name": "MLB.TV acquisition CTA for non-subscribers"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_push_optin_morning"},
+      {"from": "dec_push_optin_morning", "to": "push_allfans_slate", "branch_label": "yes"},
+      {"from": "dec_push_optin_morning", "to": "dec_has_fav_team", "branch_label": "no"},
+      {"from": "push_allfans_slate", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "push_fav_team_broadcast", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_evening_tunein", "branch_label": "no"},
+      {"from": "push_fav_team_broadcast", "to": "email_evening_tunein"},
+      {"from": "email_evening_tunein", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Opening Day viewership"}],
+      "secondary_kpis": [{"name": "Per-fav-team push CTR"}, {"name": "Night-game email open rate"}],
+      "tests": []
+    }
+  }
+}

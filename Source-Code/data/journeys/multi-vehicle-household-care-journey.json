@@ -1,0 +1,91 @@
+{
+  "categoryId": "household-growth",
+  "categoryName": "Household Retention & Growth",
+  "categoryDescription": "Journeys to increase share of wallet across households with multiple vehicles.",
+  "subCategoryId": "multi-vehicle-care",
+  "subCategoryName": "Multi-Vehicle Care",
+  "slug": "multi-vehicle-household-care-journey",
+  "name": "Multi-Vehicle Household Care Journey",
+  "active": true,
+  "brief": "Identify households with multiple vehicles and coordinate maintenance nudges to consolidate servicing with one provider.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-22",
+  "journeyOverrides": {
+    "name": "Multi-Vehicle Household Care",
+    "objective": "Increase repeat service visits by bundling maintenance reminders across household vehicles.",
+    "audience": "Household_Multi_Vehicle",
+    "variantA": "Coordinated maintenance scheduling",
+    "variantB": "Scheduling plus household loyalty benefits"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Identify households with multiple vehicles and coordinate maintenance nudges to consolidate servicing with one provider.",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "multi_vehicle_household_care_journey_qualified",
+    "eventId": "evt_multi_vehicle_household_care_journey_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Household_Multi_Vehicle"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Household_Multi_Vehicle"
+  },
+  "exitConditions": [
+    {
+      "event": "journey_goal_achieved",
+      "eventId": "evt_journey_goal_achieved_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "multi_vehicle_household_care_journey_qualified",
+        "eventId": "evt_multi_vehicle_household_care_journey_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "multi-vehicle-household-care-journey"
+}

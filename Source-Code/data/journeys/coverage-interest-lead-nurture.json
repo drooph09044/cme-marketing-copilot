@@ -1,0 +1,173 @@
+{
+  "useCaseId": "coverage-interest-lead-nurture",
+  "name": "Coverage Interest Lead Nurture Journey",
+  "category": {
+    "categoryId": "lead-generation",
+    "categoryName": "Lead Generation"
+  },
+  "journeyTable": {
+    "journeyName": "Coverage Interest Lead Nurture",
+    "journeyGoal": "Convert coverage map visitors into prospects",
+    "entryTrigger": "coverage_map_visit",
+    "journeyCategory": "Acquisition",
+    "totalDuration": "14 days",
+    "exitClause": "Exit after lead conversion"
+  },
+  "entryCriteria": {
+    "event": "coverage_map_visit",
+    "eventId": "evt_cov_001",
+    "conditions": [
+      {
+        "field": "highConversionZip",
+        "operator": "EQUALS",
+        "value": true
+      },
+      {
+        "field": "existingCustomer",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "deviceId",
+      "namespace": "COOKIE"
+    },
+    "audienceName": "Coverage_Interested_Visitors"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Coverage Offer",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Reliable coverage now available in your area",
+      "cta": "Check Plans",
+      "tracking": {
+        "campaignId": "display_coverage_offer",
+        "deliveryId": "del_display_cov1",
+        "trackingEvents": [
+          "ad_click",
+          "lead_submit"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Lead Capture Reminder",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "WEB_PERSONALIZATION",
+      "messageTheme": "Find the best plan for your location",
+      "cta": "Get Started",
+      "tracking": {
+        "campaignId": "web_lead_capture",
+        "deliveryId": "del_web_cov2",
+        "trackingEvents": [
+          "banner_click",
+          "lead_submit"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "coverage_map_visit",
+        "eventId": "evt_cov_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "lead_submit",
+          "field": "leadSubmitted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 4
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "lead_submit",
+          "field": "leadSubmitted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 44
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "lead_submit",
+      "eventId": "evt_lead_001",
+      "condition": "leadSubmitted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "lead_submit"
+    ],
+    "eventMapping": {
+      "lead_submit": "evt_lead_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "lead_submit",
+    "secondaryKPIs": [
+      "ad_click",
+      "banner_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

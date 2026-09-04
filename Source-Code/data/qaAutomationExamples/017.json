@@ -1,0 +1,411 @@
+{
+  "id": "017",
+  "matrix_row_id": 17,
+  "matrix_row_name": "Lapsed NFL+ Win-back",
+  "template": "tpl_win_back",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NFL+ win-back at 30/60/90 days with a Day-120 handoff to calendar reactivation.",
+    "Win-back sequence for lapsed NFL+ subscribers. Day 30 'we miss you' email featuring recent fav-team highlights. Day 60 value-reminder email plus a fav-team game-night push for opted-in fans. Day 90 incentive email with a 30% renewal discount. Day 120: hand off non-converters to the calendar-reactivation journey via a new_journey node. Suppress fans who already re-subscribed.",
+    "Need a lapsed NFL+ win-back with cross-journey handoff at Day 120 to the calendar reactivation flow."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-plus-winback-2026",
+    "metadata": {
+      "name": "Lapsed NFL+ Win-Back",
+      "internal_name": "NFL_Plus_WinBack_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Win back lapsed NFL+ subscribers across 30/60/90 days, with a Day-120 handoff to the calendar-reactivation journey.",
+      "archetype": "win_back",
+      "launch_date": "2026-08-01",
+      "end_date": "2027-03-01",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Reactivate lapsed NFL+ subscribers.",
+          "kpi": "Re-subscription rate among lapsed users",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Day 30 'we miss you' email with recent fav-team highlights. Day 60 value-reminder email with content the fan missed. Day 90 incentive email with a renewal discount. Day 120: hand off to calendar-reactivation journey for fans who haven't returned.",
+        "timing_rationale": "30/60/90/120 anchor on subscription expiry.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_nfl_plus",
+        "name": "Lapsed NFL+ subscriber",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "nfl_plus.status",
+              "op": "equals",
+              "value": "churned"
+            },
+            {
+              "field": "nfl_plus.days_since_lapse",
+              "op": "between",
+              "value": [
+                30,
+                120
+              ]
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_resubscribed",
+        "name": "Already re-subscribed",
+        "scope": "global",
+        "criteria": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Day 30 post-lapse",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {
+            "field": "nfl_plus.days_since_lapse",
+            "op": "equals",
+            "value": 30
+          }
+        }
+      },
+      {
+        "id": "email_d30",
+        "type": "action",
+        "label": "Email Day 30 - We miss you",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "{{FT}} highlights you missed",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Fav-team highlights since lapse"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_30d",
+        "type": "wait",
+        "label": "Wait 30 days",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 30,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_back_d60",
+        "type": "decision",
+        "label": "Re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "email_d60",
+        "type": "action",
+        "label": "Email Day 60 - Value reminder",
+        "channel": "ch_email",
+        "touch_id": "T60",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "What NFL+ has on right now"
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_d60",
+        "type": "action",
+        "label": "Push Day 60 - Fav-team game tonight",
+        "channel": "ch_push",
+        "touch_id": "P60",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "{{FT}} on NFL+ tonight - come back"
+        },
+        "personalization_used": [
+          "FT"
+        ]
+      },
+      {
+        "id": "wait_30d_2",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 30,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_back_d90",
+        "type": "decision",
+        "label": "Re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "email_d90",
+        "type": "action",
+        "label": "Email Day 90 - 30% off incentive",
+        "channel": "ch_email",
+        "touch_id": "T90",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "30% off NFL+ - come back this season",
+          "cta_label": "Renew at 30% off"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_30d_3",
+        "type": "wait",
+        "label": "Wait to Day 120",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 30,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_back_d120",
+        "type": "decision",
+        "label": "Re-subscribed by Day 120?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "handoff_calendar",
+        "type": "new_journey",
+        "label": "Handoff to calendar-reactivation journey",
+        "target_journey_id": "nfl-us-fanbase-reactivation",
+        "target_journey_name": "US Fanbase Reactivation"
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Reactivated",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_d30"
+      },
+      {
+        "from": "email_d30",
+        "to": "wait_30d"
+      },
+      {
+        "from": "wait_30d",
+        "to": "dec_back_d60"
+      },
+      {
+        "from": "dec_back_d60",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_back_d60",
+        "to": "email_d60",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_d60",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_d60",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_30d_2",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_d60",
+        "to": "wait_30d_2"
+      },
+      {
+        "from": "wait_30d_2",
+        "to": "dec_back_d90"
+      },
+      {
+        "from": "dec_back_d90",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_back_d90",
+        "to": "email_d90",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_d90",
+        "to": "wait_30d_3"
+      },
+      {
+        "from": "wait_30d_3",
+        "to": "dec_back_d120"
+      },
+      {
+        "from": "dec_back_d120",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_back_d120",
+        "to": "handoff_calendar",
+        "branch_label": "no"
+      },
+      {
+        "from": "handoff_calendar",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Re-subscription rate among lapsed users"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Email open / click by touch"
+        },
+        {
+          "name": "% handed off to calendar reactivation"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

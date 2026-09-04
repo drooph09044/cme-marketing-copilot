@@ -1,0 +1,167 @@
+{
+  "useCaseId": "membership-tier-upgrade",
+  "name": "Membership Tier Upgrade Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Monetization"
+  },
+  "journeyTable": {
+    "journeyName": "Membership Tier Upgrade",
+    "journeyGoal": "Encourage fans to upgrade membership tiers for better benefits and exclusivity",
+    "entryTrigger": "tier_upgrade_opportunity_detected",
+    "journeyCategory": "Upsell",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if user upgrades membership tier"
+  },
+  "entryCriteria": {
+    "event": "membership_activity",
+    "eventId": "evt_membership_001",
+    "conditions": [
+      {
+        "field": "engagementScore",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 70
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Engagement_Members"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Upgrade Suggestion Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Unlock premium benefits",
+      "cta": "Upgrade Now",
+      "tracking": {
+        "campaignId": "email_upgrade_1",
+        "deliveryId": "del_upgrade_1",
+        "trackingEvents": [
+          "email_open",
+          "upgrade_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Benefit Push",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "See what premium members get",
+      "cta": "View Benefits",
+      "tracking": {
+        "campaignId": "push_upgrade_2",
+        "deliveryId": "del_upgrade_2",
+        "trackingEvents": [
+          "push_open",
+          "upgrade_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "membership_activity",
+        "eventId": "evt_membership_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "tier_upgrade",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "tier_upgrade",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "tier_upgrade",
+      "eventId": "evt_tier_upgrade_001",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "tier_upgrade"
+    ],
+    "eventMapping": {
+      "tier_upgrade": "evt_tier_upgrade_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "tier_upgrade",
+    "secondaryKPIs": [
+      "upgrade_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

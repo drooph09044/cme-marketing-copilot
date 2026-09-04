@@ -1,0 +1,276 @@
+{
+  "useCaseId": "season-ticket-upsell-journey",
+  "name": "Season Ticket Upsell Journey",
+  "category": {
+    "categoryId": "conversions",
+    "categoryName": "Conversions"
+  },
+  "journeyTable": {
+    "journeyName": "Season Ticket Upsell Journey",
+    "journeyGoal": "Convert high-value fans into season ticket holders through education, ROI justification, and sales outreach",
+    "entryTrigger": "high_engagement_fan",
+    "journeyCategory": "Conversion & Upsell",
+    "totalDuration": "21 days",
+    "exitClause": "Exit when season_ticket_purchased OR journey completed"
+  },
+  "entryCriteria": {
+    "event": "high_engagement_fan",
+    "eventId": "evt_high_engagement_001",
+    "conditions": [
+      {
+        "field": "gamesAttended",
+        "operator": "GREATER_THAN",
+        "value": 5
+      },
+      {
+        "field": "isSeasonTicketHolder",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Value_Fans_Non_STH"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 2",
+      "timing": {
+        "description": "2 days after entering journey",
+        "offsetHours": 48
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You're a Top Fan – recognition; introduce season ticket benefits vs per-game cost breakdown",
+      "cta": "Learn About Season Tickets",
+      "tracking": {
+        "campaignId": "email_upsell_intro",
+        "deliveryId": "del_email_501",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "gamesAttended",
+        "favoriteTeam"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 7",
+      "timing": {
+        "description": "7 days after entering journey",
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "See the Numbers – personalised ROI visual: season ticket cost vs buying individually",
+      "cta": "Calculate My Savings",
+      "tracking": {
+        "campaignId": "email_upsell_roi",
+        "deliveryId": "del_email_502",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "estimatedSavings",
+        "gamesAttended",
+        "avgTicketPrice"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 14",
+      "timing": {
+        "description": "14 days after entering journey",
+        "offsetHours": 336
+      },
+      "channel": "CALL",
+      "messageTheme": "Rep outreach – answer questions, offer trial game or stadium tour, introduce payment plan",
+      "cta": "Speak to a Rep",
+      "tracking": {
+        "campaignId": "call_upsell_outreach",
+        "deliveryId": "del_call_503",
+        "trackingEvents": [
+          "call_attempted",
+          "call_connected"
+        ]
+      },
+      "personalization": [
+        "repName",
+        "paymentPlanOptions"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 21",
+      "timing": {
+        "description": "21 days after entering journey",
+        "offsetHours": 504
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Final Offer – limited inventory + flexible payment plan; urgency close",
+      "cta": "Reserve My Seats",
+      "tracking": {
+        "campaignId": "email_upsell_final",
+        "deliveryId": "del_email_504",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "seatAvailability",
+        "paymentPlanOptions"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "lastEngagementDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "high_engagement_fan",
+        "eventId": "evt_high_engagement_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "season_ticket_purchased",
+          "field": "seasonTicketPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "season_ticket_purchased",
+          "field": "seasonTicketPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 168
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "season_ticket_purchased",
+          "field": "seasonTicketPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n11"
+      },
+      {
+        "id": "n11",
+        "type": "WAIT",
+        "durationHours": 168
+      },
+      {
+        "id": "n12",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n13",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "season_ticket_purchased",
+      "eventId": "evt_season_ticket_purchased_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowDays": 21
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "season_ticket_purchased == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "season_ticket_purchased"
+    ],
+    "eventMapping": {
+      "high_engagement_fan": "evt_high_engagement_001",
+      "season_ticket_purchased": "evt_season_ticket_purchased_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "season_ticket_purchased",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "call_connected"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 21
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

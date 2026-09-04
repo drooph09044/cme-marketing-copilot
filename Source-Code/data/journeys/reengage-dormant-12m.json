@@ -1,0 +1,137 @@
+{
+  "useCaseId": "reengage-dormant-12m",
+  "name": "Re-engage Dormant Fans Journey (12 Months)",
+  "category": {
+    "categoryId": "reengagement",
+    "categoryName": "Re-engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Re-engage Dormant Fans (12 Months)",
+    "journeyGoal": "Bring back fans inactive for 12 months",
+    "entryTrigger": "fan_dormant_12m_detected",
+    "journeyCategory": "Re-engagement",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after reactivation or any engagement event"
+  },
+  "entryCriteria": {
+    "event": "fan_inactive_detected",
+    "eventId": "evt_inactive_001",
+    "conditions": [
+      {
+        "field": "daysSinceLastActivity",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 365
+      },
+      {
+        "field": "appOpens",
+        "operator": "EQUALS",
+        "value": 0
+      },
+      {
+        "field": "purchases",
+        "operator": "EQUALS",
+        "value": 0
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Dormant_12M_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "We Miss You Message",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We’ve missed you — see what’s new",
+      "cta": "Explore Updates",
+      "tracking": {
+        "campaignId": "email_reengage_12m",
+        "deliveryId": "del_email_r12",
+        "trackingEvents": [
+          "email_open",
+          "app_open"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_inactive_detected",
+        "eventId": "evt_inactive_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "app_open",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "app_open",
+      "eventId": "evt_app_open_001",
+      "condition": "engaged == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "app_open"
+    ],
+    "eventMapping": {
+      "app_open": "evt_app_open_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "app_open",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "single_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

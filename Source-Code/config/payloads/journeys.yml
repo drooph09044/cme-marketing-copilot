@@ -1,0 +1,491 @@
+{
+  "journey_templates": {
+    "sports_renewal": {
+      "name": "Season Ticket Renewal",
+      "industry": "Sports / NFL",
+      "goal": "Re-engage existing holders before renewal window; reduce Year-2+ churn",
+      "trigger": "90 days before contract renewal deadline",
+      "duration": "90 days",
+      "trigger_segment": "sth_active",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day -90",
+          "channel": "Email",
+          "theme": "Early Bird Renewal",
+          "cta": "Renew Now"
+        },
+        {
+          "tp": 2,
+          "timing": "Day -60",
+          "channel": "Email",
+          "theme": "Season Highlights Reel",
+          "cta": "Lock In Your Seats"
+        },
+        {
+          "tp": 3,
+          "timing": "Day -45",
+          "channel": "Push",
+          "theme": "Countdown reminder",
+          "cta": "Renew in App"
+        },
+        {
+          "tp": 4,
+          "timing": "Day -30",
+          "channel": "SMS",
+          "theme": "Urgency nudge",
+          "cta": "Renew Online"
+        },
+        {
+          "tp": 5,
+          "timing": "Day -14",
+          "channel": "Email",
+          "theme": "Personal rep outreach",
+          "cta": "Confirm Renewal"
+        }
+      ]
+    },
+    "sports_onboarding": {
+      "name": "New Fan Onboarding",
+      "industry": "Sports / NFL",
+      "goal": "Welcome first-time buyers; drive app adoption, merch first purchase & repeat attendance",
+      "trigger": "First ticket purchase or app install",
+      "duration": "21 days",
+      "trigger_segment": "single_game",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 0",
+          "channel": "Email",
+          "theme": "Welcome to the family",
+          "cta": "Download the App"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 2",
+          "channel": "Push",
+          "theme": "Know Before You Go",
+          "cta": "Plan My Visit"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 5",
+          "channel": "Email",
+          "theme": "Gear Up",
+          "cta": "Shop Now"
+        },
+        {
+          "tp": 4,
+          "timing": "Day 10",
+          "channel": "Email",
+          "theme": "Meet Your Players",
+          "cta": "Explore Content"
+        },
+        {
+          "tp": 5,
+          "timing": "Day 21",
+          "channel": "Email",
+          "theme": "Bring a Friend",
+          "cta": "Get Group Tickets"
+        }
+      ]
+    },
+    "sports_gameday": {
+      "name": "Game-Day Engagement",
+      "industry": "Sports / NFL",
+      "goal": "Maximise in-stadium fan experience; drive F&B, merch & social engagement",
+      "trigger": "Day of home game",
+      "duration": "Game day",
+      "trigger_segment": "sth_active",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Morning",
+          "channel": "Push",
+          "theme": "Game Day is Here!",
+          "cta": "View Stadium Map"
+        },
+        {
+          "tp": 2,
+          "timing": "2hrs pre-kickoff",
+          "channel": "Push",
+          "theme": "Beat the rush",
+          "cta": "Claim Offer"
+        },
+        {
+          "tp": 3,
+          "timing": "Halftime",
+          "channel": "Push",
+          "theme": "Halftime Flash Sale",
+          "cta": "Shop Now"
+        },
+        {
+          "tp": 4,
+          "timing": "Post-game",
+          "channel": "Email",
+          "theme": "Thanks for being there",
+          "cta": "Get Next Game Tickets"
+        }
+      ]
+    },
+    "sports_winback": {
+      "name": "Win-Back: Lapsed Fans",
+      "industry": "Sports / NFL",
+      "goal": "Re-engage fans with no purchase activity in 12+ months",
+      "trigger": "12 months since last purchase",
+      "duration": "45 days",
+      "trigger_segment": "winback_lapsed",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 1",
+          "channel": "Email",
+          "theme": "We Miss You",
+          "cta": "See What You Missed"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 7",
+          "channel": "Email",
+          "theme": "Come Back for Less",
+          "cta": "Claim Your Offer"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 21",
+          "channel": "SMS",
+          "theme": "Last chance",
+          "cta": "Get Tickets"
+        },
+        {
+          "tp": 4,
+          "timing": "Day 45",
+          "channel": "Email",
+          "theme": "One last thing",
+          "cta": "Stay Connected"
+        }
+      ]
+    },
+    "sports_vip_upsell": {
+      "name": "VIP Upsell: Single-Game to Season",
+      "industry": "Sports / NFL",
+      "goal": "Convert high-value single-game buyers into season ticket holders",
+      "trigger": "2 days after high-value single-game purchase",
+      "duration": "21 days",
+      "trigger_segment": "single_game",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 2",
+          "channel": "Email",
+          "theme": "You're a Top Fan",
+          "cta": "Learn About Season Tickets"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 7",
+          "channel": "Email",
+          "theme": "See the Numbers",
+          "cta": "Calculate My Savings"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 14",
+          "channel": "SMS",
+          "theme": "Rep outreach",
+          "cta": "Speak to a Rep"
+        },
+        {
+          "tp": 4,
+          "timing": "Day 21",
+          "channel": "Email",
+          "theme": "Final Offer",
+          "cta": "Reserve My Seats"
+        }
+      ]
+    },
+    "media_onboarding": {
+      "name": "Subscriber Onboarding",
+      "industry": "Media & OTT",
+      "goal": "Welcome new subscribers; drive content habit formation in first 7 days",
+      "trigger": "Subscription activation",
+      "duration": "7 days",
+      "trigger_segment": "active_subs",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 0",
+          "channel": "Email",
+          "theme": "Welcome",
+          "cta": "Start Watching"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 1",
+          "channel": "Push",
+          "theme": "Trending Now",
+          "cta": "Keep Watching"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 3",
+          "channel": "Email",
+          "theme": "Did you know?",
+          "cta": "Explore Features"
+        },
+        {
+          "tp": 4,
+          "timing": "Day 7",
+          "channel": "Email",
+          "theme": "Your Week 1 Recap",
+          "cta": "Rate & Discover More"
+        }
+      ]
+    },
+    "media_churn_prev": {
+      "name": "Churn Prevention",
+      "industry": "Media & OTT",
+      "goal": "Intervene before cancellation for subscribers showing disengagement signals",
+      "trigger": "Engagement score drops below threshold",
+      "duration": "14 days",
+      "trigger_segment": "at_risk_subs",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 1",
+          "channel": "Push",
+          "theme": "We noticed you've been away",
+          "cta": "Resume Watching"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 5",
+          "channel": "Email",
+          "theme": "Here's what's new",
+          "cta": "See What's New"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 14",
+          "channel": "SMS",
+          "theme": "Special offer just for you",
+          "cta": "Stay & Save"
+        }
+      ]
+    },
+    "media_winback": {
+      "name": "Win-Back: Churned Subscribers",
+      "industry": "Media & OTT",
+      "goal": "Re-engage subscribers who cancelled within the last 90 days",
+      "trigger": "Cancellation date",
+      "duration": "60 days",
+      "trigger_segment": "churned_subs",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 7",
+          "channel": "Email",
+          "theme": "We've added something new",
+          "cta": "See What's New"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 30",
+          "channel": "Email",
+          "theme": "Come back with a discount",
+          "cta": "Restart My Subscription"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 60",
+          "channel": "Email",
+          "theme": "Last chance offer",
+          "cta": "Rejoin Now"
+        }
+      ]
+    },
+    "media_free_paid": {
+      "name": "Free-to-Paid Conversion",
+      "industry": "Media & OTT",
+      "goal": "Convert free-tier users into paid subscribers",
+      "trigger": "User hits paywall 3x",
+      "duration": "14 days",
+      "trigger_segment": "free_to_paid",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 0",
+          "channel": "In-App",
+          "theme": "Unlock everything",
+          "cta": "Start Free Trial"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 5",
+          "channel": "Push",
+          "theme": "Here's what you're missing",
+          "cta": "Unlock Now"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 14",
+          "channel": "Email",
+          "theme": "Limited offer",
+          "cta": "Claim Offer"
+        }
+      ]
+    },
+    "tel_renewal": {
+      "name": "Contract Renewal",
+      "industry": "Telecom",
+      "goal": "Drive timely renewal before contract expiry",
+      "trigger": "Contract end date minus 90 days",
+      "duration": "90 days",
+      "trigger_segment": "contract_renewal",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day -90",
+          "channel": "Email",
+          "theme": "Your plan is up for renewal",
+          "cta": "Explore My Options"
+        },
+        {
+          "tp": 2,
+          "timing": "Day -60",
+          "channel": "SMS",
+          "theme": "Loyalty reward",
+          "cta": "Claim My Loyalty Offer"
+        },
+        {
+          "tp": 3,
+          "timing": "Day -30",
+          "channel": "Push",
+          "theme": "30 days to go",
+          "cta": "Renew Now"
+        },
+        {
+          "tp": 4,
+          "timing": "Day -14",
+          "channel": "Call",
+          "theme": "Rep outreach",
+          "cta": "Speak to My Account Mgr"
+        },
+        {
+          "tp": 5,
+          "timing": "Day -3",
+          "channel": "SMS",
+          "theme": "Final reminder",
+          "cta": "Renew in 60 Seconds"
+        }
+      ]
+    },
+    "tel_onboarding": {
+      "name": "New Joiner Onboarding",
+      "industry": "Telecom",
+      "goal": "Welcome new customers; drive activation and feature adoption",
+      "trigger": "SIM activation",
+      "duration": "90 days",
+      "trigger_segment": "new_joiners",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 0",
+          "channel": "Email",
+          "theme": "Welcome to the network",
+          "cta": "Download the App"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 3",
+          "channel": "Push",
+          "theme": "Get more from your plan",
+          "cta": "Explore My Plan"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 14",
+          "channel": "Email",
+          "theme": "How are we doing?",
+          "cta": "Share Feedback"
+        },
+        {
+          "tp": 4,
+          "timing": "Day 45",
+          "channel": "Email",
+          "theme": "You might like this",
+          "cta": "Add to My Plan"
+        },
+        {
+          "tp": 5,
+          "timing": "Day 90",
+          "channel": "Email",
+          "theme": "3 months in",
+          "cta": "Refer a Friend"
+        }
+      ]
+    },
+    "tel_churn_risk": {
+      "name": "Churn Risk Intervention",
+      "industry": "Telecom",
+      "goal": "Proactively retain customers flagged as high churn risk",
+      "trigger": "Churn risk score exceeds threshold",
+      "duration": "21 days",
+      "trigger_segment": "churn_risk_tel",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 1",
+          "channel": "Email",
+          "theme": "We want to make things right",
+          "cta": "Talk to Us"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 7",
+          "channel": "Call",
+          "theme": "Rep outreach",
+          "cta": "Speak to a Specialist"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 21",
+          "channel": "Email",
+          "theme": "We'd hate to see you go",
+          "cta": "Stay & Save"
+        }
+      ]
+    },
+    "tel_crosssell": {
+      "name": "Cross-Sell / Upsell",
+      "industry": "Telecom",
+      "goal": "Introduce relevant additional products to single-product customers",
+      "trigger": "Customer reaches 6-month tenure milestone",
+      "duration": "30 days",
+      "trigger_segment": "multi_product",
+      "touchpoints": [
+        {
+          "tp": 1,
+          "timing": "Day 1",
+          "channel": "Email",
+          "theme": "You're getting great value",
+          "cta": "See What Fits"
+        },
+        {
+          "tp": 2,
+          "timing": "Day 10",
+          "channel": "Push",
+          "theme": "Customers like you also have",
+          "cta": "Build My Bundle"
+        },
+        {
+          "tp": 3,
+          "timing": "Day 30",
+          "channel": "SMS",
+          "theme": "Limited-time bundle offer",
+          "cta": "Add Now"
+        }
+      ]
+    }
+  }
+}

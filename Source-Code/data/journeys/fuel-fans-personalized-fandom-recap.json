@@ -1,0 +1,196 @@
+{
+  "useCaseId": "fuel-fans-personalized-fandom-recap",
+  "name": "Personalized Fandom Recap Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Fandom Recap Experience",
+    "journeyGoal": "Deepen emotional connection by summarizing fan engagement, attendance, and content consumption",
+    "entryTrigger": "season_or_monthly_fan_recap_ready",
+    "journeyCategory": "Engagement",
+    "totalDuration": "5 days",
+    "exitClause": "No exit – journey completes for all eligible fans"
+  },
+  "entryCriteria": {
+    "event": "fan_engagement_snapshot",
+    "eventId": "evt_fan_recap_001",
+    "conditions": [
+      {
+        "field": "recapEligible",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Fan_Engagement_Recap_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Personalized Fandom Recap Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your fandom story this season",
+      "cta": "View My Recap",
+      "tracking": {
+        "campaignId": "email_fan_recap_1",
+        "deliveryId": "del_fan_recap_1",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Highlight Reel Push Notification",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your best moments in action",
+      "cta": "Watch Highlights",
+      "tracking": {
+        "campaignId": "push_fan_recap_2",
+        "deliveryId": "del_fan_recap_2",
+        "trackingEvents": [
+          "push_open",
+          "video_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Social Share Prompt Email",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Share your fandom with friends",
+      "cta": "Share My Story",
+      "tracking": {
+        "campaignId": "email_fan_recap_3",
+        "deliveryId": "del_fan_recap_3",
+        "trackingEvents": [
+          "email_open",
+          "social_share"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Next Season Teaser Offer",
+      "timing": {
+        "offsetHours": 96
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your next chapter starts soon",
+      "cta": "Explore Upcoming Season",
+      "tracking": {
+        "campaignId": "email_fan_recap_4",
+        "deliveryId": "del_fan_recap_4",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_engagement_snapshot",
+        "eventId": "evt_fan_recap_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowHours": 120
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "email_open",
+      "push_open",
+      "social_share"
+    ],
+    "eventMapping": {
+      "social_share": "evt_social_share_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "social_share",
+    "secondaryKPIs": [
+      "email_open",
+      "content_click",
+      "video_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 120
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

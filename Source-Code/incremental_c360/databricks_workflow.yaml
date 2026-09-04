@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    c360_incremental_45_day_campaign:
+      name: c360_incremental_45_day_campaign
+      schedule:
+        quartz_cron_expression: "0 0 8 * * ?"
+        timezone_id: Asia/Kolkata
+        pause_status: UNPAUSED
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: discover_profile_generate_upsert
+          spark_python_task:
+            python_file: ./incremental_c360/main.py
+            parameters:
+              - --config
+              - ./incremental_c360/config.yaml
+          job_cluster_key: c360_incremental_job_cluster
+      job_clusters:
+        - job_cluster_key: c360_incremental_job_cluster
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: Standard_DS4_v2
+            autoscale:
+              min_workers: 2
+              max_workers: 8
+            spark_conf:
+              spark.databricks.delta.schema.autoMerge.enabled: "true"
+              spark.sql.adaptive.enabled: "true"
+              spark.databricks.delta.optimizeWrite.enabled: "true"
+              spark.databricks.delta.autoCompact.enabled: "true"
+            autotermination_minutes: 20
+

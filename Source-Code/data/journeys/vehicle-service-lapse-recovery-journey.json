@@ -1,0 +1,91 @@
+{
+  "categoryId": "service-retention",
+  "categoryName": "Service Retention & Reactivation",
+  "categoryDescription": "Journeys focused on bringing inactive service customers back into scheduled maintenance.",
+  "subCategoryId": "maintenance-winback",
+  "subCategoryName": "Maintenance Win-Back",
+  "slug": "vehicle-service-lapse-recovery-journey",
+  "name": "Vehicle Service Lapse Recovery Journey",
+  "active": true,
+  "brief": "Find customers who have not serviced their vehicle in 9 months and run a reminder plus incentive journey to bring them back to workshop appointments.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-06-30",
+  "journeyOverrides": {
+    "name": "Vehicle Service Lapse Recovery",
+    "objective": "Recover service engagement from customers inactive for nine months by driving appointment bookings.",
+    "audience": "No_Service_9M_Customers",
+    "variantA": "Standard service reminder cadence",
+    "variantB": "Reminder plus loyalty incentive"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Find customers who have not serviced their vehicle in 9 months and run a reminder plus incentive journey to bring them back to workshop appointments.",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "vehicle_service_lapse_recovery_journey_qualified",
+    "eventId": "evt_vehicle_service_lapse_recovery_journey_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "No_Service_9M_Customers"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "No_Service_9M_Customers"
+  },
+  "exitConditions": [
+    {
+      "event": "app_session_started",
+      "eventId": "evt_app_session_started_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "vehicle_service_lapse_recovery_journey_qualified",
+        "eventId": "evt_vehicle_service_lapse_recovery_journey_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "vehicle-service-lapse-recovery-journey"
+}

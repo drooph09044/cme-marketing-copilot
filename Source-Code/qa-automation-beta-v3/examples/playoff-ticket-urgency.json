@@ -1,0 +1,19 @@
+{
+  "categoryId": "ticketing-sales",
+  "categoryName": "Ticketing & Sales",
+  "categoryDescription": "Journeys focused on ticket conversion, renewals, and premium inventory monetization.",
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "slug": "playoff-ticket-urgency",
+  "name": "Playoff Ticket Urgency",
+  "brief": "Recent event attendees have not purchased the featured event. Use email and push, test generic versus personalized copy, track purchases, and reserve a 10 percent holdout for incrementality.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-04-18",
+  "journeyOverrides": {
+    "name": "Playoff Ticket Urgency - Featured Event",
+    "objective": "Drive incremental ticket purchases for the featured event using urgency-based orchestration, personalization, and a controlled holdout for lift measurement.",
+    "audience": "Recent_Event_Attendees_No_Purchase",
+    "variantA": "Standard urgency cadence",
+    "variantB": "Personalized plus priority access"
+  }
+}

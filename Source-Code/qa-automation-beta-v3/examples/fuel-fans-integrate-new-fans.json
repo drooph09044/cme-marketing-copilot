@@ -1,0 +1,144 @@
+{
+  "useCaseId": "fuel-fans-integrate-new-fans",
+  "name": "INTEGRATE new fans",
+  "clientTag": "PGA",
+  "subCategoryId": "engagements",
+  "subCategoryName": "Engagements",
+  "category": {
+    "categoryId": "fuel-fans",
+    "categoryName": "Fuel Fans"
+  },
+  "journeyTable": {
+    "journeyName": "INTEGRATE new fans",
+    "journeyGoal": "Welcome new fans to your media ecosystem",
+    "entryTrigger": "new_user_registration",
+    "journeyCategory": "Fan Engagement",
+    "totalDuration": "5 days",
+    "exitClause": "Exit after fan completes onboarding"
+  },
+  "entryCriteria": {
+    "event": "new_user_registration",
+    "eventId": "evt_register_001",
+    "conditions": [
+      {
+        "field": "marketingOptIn",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "New_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Welcome Message",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Welcome to the fan community",
+      "cta": "Explore Content",
+      "tracking": {
+        "campaignId": "email_newfan_welcome",
+        "deliveryId": "del_email_ff1",
+        "trackingEvents": [
+          "email_open",
+          "content_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "App Engagement Prompt",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "IN_APP",
+      "messageTheme": "Discover highlights, scores, and exclusive content",
+      "cta": "Start Exploring",
+      "tracking": {
+        "campaignId": "inapp_newfan_engage",
+        "deliveryId": "del_inapp_ff2",
+        "trackingEvents": [
+          "inapp_view",
+          "profile_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "new_user_registration",
+        "eventId": "evt_register_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "duration": 24,
+        "unit": "HOURS"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "profile_complete",
+      "eventId": "evt_profile_001",
+      "condition": "profileCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "content_view",
+      "profile_complete"
+    ],
+    "eventMapping": {
+      "profile_complete": "evt_profile_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "profile_complete",
+    "secondaryKPIs": [
+      "email_open",
+      "inapp_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,375 @@
+domain: media
+input:
+  standardized_records: standardized_data/media/all_standardized.csv
+  record_id_field: record_id
+  source_field: source_file
+  source_system_value: media
+  field_names:
+    email: email
+    phone: phone
+    name: full_name
+    address: address
+    city: city
+    state: state
+    zip: zip
+    device_id: device_id
+    ip_address: ip_address
+output:
+  prepared_records: matching_output/media/enhanced_prepared_records.csv
+  candidate_pairs: matching_output/media/candidate_pairs.csv
+  clustered_records: clustering_output/media/clustered_records.csv
+  household_links: clustering_output/media/household_links.csv
+  cluster_summary: clustering_output/media/cluster_summary.json
+  golden_records: golden_records_output/media/golden_records.csv
+  superseded_ids: golden_records_output/media/superseded_ids.csv
+  golden_record_summary: golden_records_output/media/golden_record_summary.json
+  candidate_pair_columns:
+  - record_id_1
+  - record_id_2
+  - source_1
+  - source_2
+  - matched_fields
+  - matching_techniques
+  - email_confidence
+  - email_weight
+  - email_contribution
+  - phone_confidence
+  - phone_weight
+  - phone_contribution
+  - name_confidence
+  - name_weight
+  - name_contribution
+  - address_confidence
+  - address_weight
+  - address_contribution
+  - probabilistic_confidence
+  - probabilistic_weight
+  - probabilistic_contribution
+  - raw_confidence
+  - final_confidence
+  - match_tier
+  - decision_reason
+  golden_record_columns:
+  - cluster_id
+  - golden_id
+  - household_id
+  - source_system
+  - full_name
+  - email
+  - phone
+  - address
+  - city
+  - state
+  - zip
+  - record_count
+  - all_emails
+  - all_phones
+  - all_names
+  - all_addresses
+  superseded_id_columns:
+  - record_id
+  - source_file
+  - source_system
+  - cluster_id
+  - golden_id
+  - household_id
+  column_names:
+    candidate_record_id_1: record_id_1
+    candidate_record_id_2: record_id_2
+    edge_type: match_tier
+    match_tier: match_tier
+    relationship_classification: match_tier
+    final_confidence: final_confidence
+    matching_person_feature_count: matching_person_feature_count
+    matched_fields: matched_fields
+    matching_techniques: matching_techniques
+    cluster_id: cluster_id
+    cluster_size: cluster_size
+identity_matching:
+  primary_tag: email
+  available_primary_identifiers:
+  - email
+  - phone
+  available_key_identifiers: []
+  pii_scoring_features:
+  - email
+  - phone
+primary_tag_presets:
+  email:
+    feature_weights:
+      email: 40
+      phone: 30
+      name: 20
+      address: 10
+      probabilistic: 0
+    candidate_strategy_order:
+    - same_email
+    - same_phone
+    - name_and_zip
+    - address_and_zip
+    identifier_priority:
+    - email
+    - phone
+    - name
+    - address
+    - probabilistic
+  phone:
+    feature_weights:
+      phone: 40
+      email: 30
+      name: 20
+      address: 10
+      probabilistic: 0
+    candidate_strategy_order:
+    - same_phone
+    - same_email
+    - name_and_zip
+    - address_and_zip
+    identifier_priority:
+    - phone
+    - email
+    - name
+    - address
+    - probabilistic
+matching_field_preparation:
+  derived_field_names:
+    email_raw: email_raw
+    email_standardized: email_standardized
+    email_name_part: email_name_part
+    email_provider: email_provider
+    phone_raw: phone_raw
+    phone_standardized: phone_standardized
+    name_raw: name_raw
+    first_name: first_name
+    last_name: last_name
+    first_initial: first_initial
+    last_initial: last_initial
+    address_raw: address_raw
+    address_standardized: address_standardized
+    house_number: house_number
+    street_name: street_name
+    zip: zip
+  exact_identifier_fields: []
+  email_normalization:
+    lowercase: true
+    remove_spaces: true
+    collapse_repeated_at: true
+    remove_plus_tags: true
+    collapse_repeated_dots: true
+    strip_outer_dots: true
+    correct_domain_typos: true
+  email_domain_corrections:
+    gmail.co: gmail.com
+    gmai.com: gmail.com
+    gmial.com: gmail.com
+    hotmial.com: hotmail.com
+    hotmal.com: hotmail.com
+    outlook.co: outlook.com
+    outllook.com: outlook.com
+    yhaoo.com: yahoo.com
+    icloud.co: icloud.com
+    icould.com: icloud.com
+  phone_normalization:
+    digits_only: true
+    remove_us_country_code: true
+    minimum_digits: 10
+    minimum_unique_digits: 3
+    low_quality_values:
+    - '1234567890'
+  name_normalization:
+    remove_titles: true
+    remove_suffixes: true
+    apply_nicknames: false
+  name_title_words:
+  - MR
+  - MRS
+  - MS
+  - DR
+  name_suffix_words:
+  - JR
+  - SR
+  - II
+  - III
+  address_normalization:
+    uppercase: true
+    remove_punctuation: true
+    split_house_number: true
+candidate_generation:
+  max_pairs_per_record: 30
+  max_block_size: 500
+  compare_records_from_same_source_file: false
+  strategy_order:
+  - same_email
+  - same_phone
+  - name_and_zip
+  - address_and_zip
+  strategy_definitions:
+    same_email:
+      enabled: true
+      type: exact_fields
+      fields:
+      - email_standardized
+      label: Standardized Email Match
+      compare_records_from_same_source_file: true
+      pair_limit_scope: strategy
+    same_phone:
+      enabled: true
+      type: exact_fields
+      fields:
+      - phone_standardized
+      label: Standardized Phone Match
+      compare_records_from_same_source_file: true
+      pair_limit_scope: strategy
+    name_and_zip:
+      enabled: true
+      type: name_zip_prefix
+      first_name_field: first_name
+      last_name_field: last_name
+      zip_field: zip
+      character_count: 3
+      label: Name and ZIP Candidate
+      pair_limit_scope: strategy
+    address_and_zip:
+      enabled: true
+      type: exact_fields
+      fields:
+      - address_standardized
+      - zip
+      label: Address and ZIP Candidate
+      pair_limit_scope: strategy
+features:
+  email:
+    weight: 40
+    comparison_pipeline:
+    - method: raw_exact
+      confidence: 1
+      label: Raw Email Exact Match
+    - method: standardized_exact
+      confidence: 1
+      label: Standardized Email Exact Match
+    - method: provider_mismatch
+      confidence: 0
+      label: Email Provider Mismatch
+    no_match:
+      confidence: 0
+      label: Email No Match
+  phone:
+    weight: 30
+    comparison_pipeline:
+    - method: standardized_exact
+      confidence: 1
+      label: Standardized Phone Exact Match
+    no_match:
+      confidence: 0
+      label: Phone No Match
+  name:
+    weight: 20
+    require_initials_before_partial_matches: true
+    first_character_count: 3
+    similarity_threshold: 0.88
+    comparison_pipeline:
+    - method: first_name_and_last_name
+      confidence: 1
+      label: Exact First + Last Name
+    - method: initials
+      label: Initials Gate
+    - method: first_three_characters
+      label: First 3 Characters After Initials
+    - method: first_initial_and_full_last_name
+      label: First Initial + Full Last Name
+    - method: full_first_name_and_last_initial
+      label: Full First Name + Last Initial
+    - method: soundex
+      label: Soundex + Name Similarity
+    - method: jaro_winkler
+      label: Jaro-Winkler Name Similarity
+    no_match:
+      confidence: 0
+      label: Name No Match
+      initials_label: Name Initials No Match
+  address:
+    weight: 10
+    street_similarity_threshold: 0.88
+    comparison_pipeline:
+    - method: zip_mismatch
+      confidence: 0
+      label: ZIP No Match
+    - method: house_number_mismatch
+      confidence: 0
+      label: Different House Number
+    - method: zip_house_number_street_exact
+      confidence: 1
+      label: ZIP + House Number + Street
+    - method: street_similarity
+      label: Similar Address Within ZIP
+    no_match:
+      confidence: 0
+      label: Address No Match
+  probabilistic:
+    weight: 0
+    maximum_contribution: 5
+    methods:
+      same_device:
+        enabled: false
+        confidence: 1
+        label: Device ID Match
+      same_ip:
+        enabled: false
+        confidence: 1
+        label: IP Address Match
+    no_match:
+      confidence: 0
+      label: Probabilistic No Match
+confidence_scoring:
+  max_score: 100
+  person_features:
+  - email
+  - phone
+  - name
+match_classification:
+  decision_reasons:
+    classified: Final confidence classified using configured match tier thresholds
+    unclassified: Final confidence below configured weak threshold
+  edge_tiers:
+    exact:
+      description: Full identity match
+      min_score: 85
+    strong:
+      description: High confidence
+      min_score: 70
+    medium:
+      description: Moderate confidence
+      min_score: 60
+    weak:
+      description: Partial signal
+      min_score: 30
+clustering:
+  max_cluster_size: 500
+  cluster_id_prefix: MED-CL
+  golden_id_prefix: MED-GR
+  household_id_prefix: MED-HH
+  accepted_match_tiers:
+  - exact
+  - strong
+  - medium
+  - weak
+  weak_edge_allowed_matched_fields:
+  - email
+  - phone
+  identifier_priority:
+  - email
+  - phone
+  - name
+  - address
+  - probabilistic
+  cluster_guardrails:
+    max_distinct_emails: 5
+    max_distinct_phones: 5
+    max_distinct_names: 8
+household_linking:
+  enabled: true
+incremental_update:
+  enabled: false
+  mode: full_refresh
+
+

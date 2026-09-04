@@ -1,0 +1,220 @@
+{
+  "useCaseId": "game-day-engagement-journey",
+  "name": "Game Day Engagement Journey",
+  "category": {
+    "categoryId": "engagements",
+    "categoryName": "Engagements"
+  },
+  "journeyTable": {
+    "journeyName": "Game Day Engagement Journey",
+    "journeyGoal": "Enhance fan experience during game day and drive real-time engagement and revenue",
+    "entryTrigger": "game_day_event",
+    "journeyCategory": "In-Game & Event Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after post-game communication"
+  },
+  "entryCriteria": {
+    "event": "game_day_event",
+    "eventId": "evt_game_day_001",
+    "conditions": [
+      {
+        "field": "hasTicket",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Game_Attendees"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Morning of Game",
+      "timing": {
+        "relative": "morning_of_event",
+        "description": "Morning of game day"
+      },
+      "channel": "PUSH",
+      "messageTheme": "Game Day is Here! – gate open time, parking tips, weather, hype message",
+      "cta": "View Stadium Map",
+      "tracking": {
+        "campaignId": "push_game_day_morning",
+        "deliveryId": "del_push_301",
+        "trackingEvents": [
+          "push_sent",
+          "push_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "2 Hours Pre-Kickoff",
+      "timing": {
+        "relative": "2_hours_before_event",
+        "description": "2 hours before kickoff"
+      },
+      "channel": "PUSH",
+      "messageTheme": "Beat the rush – early arrival offer (e.g. free F&B upgrade before kickoff)",
+      "cta": "Claim Offer",
+      "tracking": {
+        "campaignId": "push_early_arrival_offer",
+        "deliveryId": "del_push_302",
+        "trackingEvents": [
+          "push_sent",
+          "push_click"
+        ]
+      },
+      "personalization": [
+        "offerDetails"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Halftime",
+      "timing": {
+        "relative": "halftime",
+        "description": "During halftime break"
+      },
+      "channel": [
+        "PUSH",
+        "IN_APP"
+      ],
+      "messageTheme": "Halftime Flash Sale – 20% off merch for 30 mins; half-time stats snapshot",
+      "cta": "Shop Now",
+      "tracking": {
+        "campaignId": "halftime_flash_sale",
+        "deliveryId": "del_push_inapp_303",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "inapp_view",
+          "inapp_click"
+        ]
+      },
+      "personalization": [
+        "favoriteTeam",
+        "discountCode"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Post-Game",
+      "timing": {
+        "relative": "post_event",
+        "description": "Immediately after game ends"
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Thanks for being there – recap, highlight clip, early access to next game tickets",
+      "cta": "Get Next Game Tickets",
+      "tracking": {
+        "campaignId": "post_game_followup",
+        "deliveryId": "del_push_email_304",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "favoriteTeam",
+        "nextGameDetails"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "event_based",
+    "timeReference": "eventTime",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "game_day_event",
+        "eventId": "evt_game_day_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n7",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n8",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n9",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowDays": 1
+    },
+    "suppressionRules": [],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "offer_claimed",
+      "purchase_completed"
+    ],
+    "eventMapping": {
+      "game_day_event": "evt_game_day_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_completed",
+    "secondaryKPIs": [
+      "push_click",
+      "inapp_click",
+      "email_click",
+      "offer_claimed"
+    ],
+    "attribution": {
+      "model": "real_time",
+      "lookbackDays": 1
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

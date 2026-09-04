@@ -1,0 +1,168 @@
+{
+  "id": "098",
+  "matrix_row_id": 98,
+  "matrix_row_name": "Australian GP Season Opener Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the F1 Australian GP season opener Mar 6-8.",
+    "Create an Australian GP tune-in journey for the 2026 F1 season opener in Melbourne. Cadence: T-1w pre-race buildup email with grid preview, T-1d push covering Free Practice highlights, Saturday Qualifying push with grid positions, Sunday race-day tune-in push. Broadcast on F1 TV Pro and ESPN. Per-fav-driver and per-fav-team variants.",
+    "Need a tune-in for the Australian GP — multi-day race weekend cadence with grid preview and per-fav-driver context."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-australian-gp-2026-tune-in",
+    "metadata": {
+      "name": "F1 Australian GP Season Opener Tune-In - Mar 6-8",
+      "internal_name": "F1_Australian_GP_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "F1", "team": null, "product": "F1 TV Pro"},
+      "purpose": "Drive tune-in to the 2026 F1 season opener at Albert Park, Melbourne. Bahrain and Saudi Arabia have been removed from the 2026 calendar, making Australia the season opener.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-03-01",
+      "end_date": "2026-03-09",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the Australian GP on F1 TV Pro and ESPN.", "kpi": "Australian GP viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "One-week ramp followed by a three-day race weekend push. Per-fav-driver and per-fav-team content variants for fans with declared favorites; neutral variant otherwise.",
+        "timing_rationale": "Australian GP race weekend Mar 6-8, 2026. Free Practice Friday, Qualifying Saturday, Race Sunday.",
+        "notes": "Albert Park, Melbourne; 2026 season opener."
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_f1_fan",
+        "name": "Active F1 fan",
+        "criteria": {"field": "f1.activity_within_days", "op": "lte", "value": 365},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_fan_with_fav",
+        "name": "F1 fan with favorite driver or team",
+        "criteria": {
+          "any_of": [
+            {"field": "f1.favorite_driver", "op": "is_not_null"},
+            {"field": "f1.favorite_team", "op": "is_not_null"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Driver or Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Cadence opens (T-1w)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "dec_has_fav",
+        "type": "decision",
+        "label": "Fav driver or team set?",
+        "decision_basis": "pull",
+        "condition": {
+          "any_of": [
+            {"field": "f1.favorite_driver", "op": "is_not_null"},
+            {"field": "f1.favorite_team", "op": "is_not_null"}
+          ]
+        }
+      },
+      {
+        "id": "email_personalized_preview",
+        "type": "action",
+        "label": "Email T-1w - Personalized grid preview",
+        "channel": "ch_email",
+        "touch_id": "TA1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-01"},
+        "copy": {
+          "subject": "Lights out in one week: {{FT}}'s 2026 season starts in Melbourne",
+          "cta_label": "See the grid preview"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_neutral_preview",
+        "type": "action",
+        "label": "Email T-1w - Neutral grid preview",
+        "channel": "ch_email",
+        "touch_id": "TA2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-01"},
+        "copy": {
+          "subject": "Lights out in one week: the 2026 season starts in Melbourne",
+          "cta_label": "See the grid preview"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_f1", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_friday_fp",
+        "type": "action",
+        "label": "Push Fri - Free Practice highlights",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-06"},
+        "copy": {"headline": "Free Practice underway in Melbourne - watch live on F1 TV"}
+      },
+      {
+        "id": "push_sat_quali",
+        "type": "action",
+        "label": "Push Sat - Qualifying grid positions",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-07"},
+        "copy": {"headline": "{{FT}} starts P? on the Australian GP grid"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_race_day",
+        "type": "action",
+        "label": "Push Race Day - Lights out",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {"type": "scheduled", "calendar_date": "2026-03-08"},
+        "copy": {"headline": "Lights out at the Australian GP - watch on F1 TV / ESPN"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav"},
+      {"from": "dec_has_fav", "to": "email_personalized_preview", "branch_label": "yes"},
+      {"from": "dec_has_fav", "to": "email_neutral_preview", "branch_label": "no"},
+      {"from": "email_personalized_preview", "to": "dec_push_optin"},
+      {"from": "email_neutral_preview", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_friday_fp", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_friday_fp", "to": "push_sat_quali"},
+      {"from": "push_sat_quali", "to": "push_race_day"},
+      {"from": "push_race_day", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Australian GP viewership"}],
+      "secondary_kpis": [{"name": "Personalized vs neutral email engagement"}, {"name": "Per-race-day push CTR"}],
+      "tests": []
+    }
+  }
+}

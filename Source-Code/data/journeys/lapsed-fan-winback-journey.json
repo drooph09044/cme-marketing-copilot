@@ -1,0 +1,279 @@
+{
+  "useCaseId": "lapsed-fan-winback-journey",
+  "name": "Lapsed Fan Win-Back Journey",
+  "category": {
+    "categoryId": "reengagement",
+    "categoryName": "Re-Engagement & Win-Back"
+  },
+  "journeyTable": {
+    "journeyName": "Lapsed Fan Win-Back Journey",
+    "journeyGoal": "Re-engage lapsed fans and drive ticket purchases through emotional and incentive-led messaging",
+    "entryTrigger": "fan_inactive",
+    "journeyCategory": "Re-Engagement & Win-Back",
+    "totalDuration": "45 days",
+    "exitClause": "Exit when purchase_completed OR unsubscribe"
+  },
+  "entryCriteria": {
+    "event": "fan_inactive",
+    "eventId": "evt_fan_inactive_001",
+    "conditions": [
+      {
+        "field": "daysSinceLastEngagement",
+        "operator": "GREATER_THAN",
+        "value": 60
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Lapsed_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 1",
+      "timing": {
+        "description": "1 day after entering journey",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We Miss You – emotional re-engagement; highlight best moments from last season",
+      "cta": "See What You Missed",
+      "tracking": {
+        "campaignId": "email_winback_emotional",
+        "deliveryId": "del_email_401",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "favoriteTeam",
+        "topMoments"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 7",
+      "timing": {
+        "description": "7 days after entering journey",
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Come Back for Less – discounted single-game ticket for upcoming matchup",
+      "cta": "Claim Your Offer",
+      "tracking": {
+        "campaignId": "email_winback_offer",
+        "deliveryId": "del_email_402",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "discountCode",
+        "upcomingMatch"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 21",
+      "timing": {
+        "description": "21 days after entering journey",
+        "offsetHours": 504
+      },
+      "channel": "SMS",
+      "messageTheme": "Last chance – flash offer expires in 48 hrs; urgency-led short copy",
+      "cta": "Get Tickets",
+      "tracking": {
+        "campaignId": "sms_winback_urgency",
+        "deliveryId": "del_sms_403",
+        "trackingEvents": [
+          "sms_sent",
+          "sms_click"
+        ]
+      },
+      "personalization": [
+        "discountCode"
+      ]
+    },
+    {
+      "tpId": "TP4",
+      "label": "Day 45",
+      "timing": {
+        "description": "45 days after entering journey",
+        "offsetHours": 1080
+      },
+      "channel": "EMAIL",
+      "messageTheme": "One last thing – best available offer + option to update prefs or unsubscribe gracefully",
+      "cta": "Stay Connected",
+      "tracking": {
+        "campaignId": "email_winback_final",
+        "deliveryId": "del_email_404",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "preferenceCenterLink",
+        "bestOffer"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "lastEngagementDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_inactive",
+        "eventId": "evt_fan_inactive_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_completed",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 144
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_completed",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 336
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_completed",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n11"
+      },
+      {
+        "id": "n11",
+        "type": "WAIT",
+        "durationHours": 576
+      },
+      {
+        "id": "n12",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n13",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_completed",
+      "eventId": "evt_purchase_completed_001",
+      "action": "IMMEDIATE_EXIT"
+    },
+    {
+      "event": "unsubscribe",
+      "eventId": "evt_unsubscribe_002",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowDays": 45
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "purchase_completed == true"
+      },
+      {
+        "ruleId": "unsubscribed_users",
+        "condition": "unsubscribe == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "purchase_completed"
+    ],
+    "eventMapping": {
+      "fan_inactive": "evt_fan_inactive_001",
+      "purchase_completed": "evt_purchase_completed_001",
+      "unsubscribe": "evt_unsubscribe_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "purchase_completed",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 45
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

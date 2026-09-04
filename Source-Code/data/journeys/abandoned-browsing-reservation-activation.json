@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-browsing-reservation-activation",
+  "name": "Abandoned Browsing: Reservation - Activation Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Browsing: Reservation - Activation",
+    "journeyGoal": "Re-engage users who added a reservation but did not complete it",
+    "entryTrigger": "user_added_reservation",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "3 days",
+    "exitClause": "Exit after reservation or 3 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_reservation",
+    "eventId": "evt_addreservation_001",
+    "conditions": [
+      {
+        "field": "reservationStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Reservation Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Complete your reservation now to secure your spot!",
+      "cta": "Complete Reservation",
+      "tracking": {
+        "campaignId": "email_activation_reservation",
+        "deliveryId": "del_email_06",
+        "trackingEvents": [
+          "email_open",
+          "reservation_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Reminder Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your reservation is waiting – don’t miss out!",
+      "cta": "View Reservation",
+      "tracking": {
+        "campaignId": "push_activation_reservation",
+        "deliveryId": "del_push_06",
+        "trackingEvents": [
+          "push_open",
+          "reservation_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_reservation",
+        "eventId": "evt_addreservation_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "reservation_complete",
+          "field": "reservationCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "reservation_complete",
+      "eventId": "evt_reservation_002",
+      "condition": "reservationCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "reservation_complete"
+    ],
+    "eventMapping": {
+      "reservation_complete": "evt_reservation_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "reservation_complete",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,258 @@
+{
+  "useCaseId": "fuel-fans-at-risk-engagement-rescue",
+  "name": "At-Risk Fan Engagement Rescue Journey",
+  "category": {
+    "categoryId": "retention",
+    "categoryName": "Fan Retention"
+  },
+  "journeyTable": {
+    "journeyName": "Engagement Rescue",
+    "journeyGoal": "Re-engage fans showing declining enthusiasm before they disengage or churn",
+    "entryTrigger": "fan_engagement_score_decline",
+    "journeyCategory": "Retention",
+    "totalDuration": "10 days",
+    "exitClause": "Exit if fan shows renewed engagement (viewing, attendance, or interaction)"
+  },
+  "entryCriteria": {
+    "event": "fan_engagement_monitoring",
+    "eventId": "evt_fan_engagement_002",
+    "conditions": [
+      {
+        "field": "engagementScoreChange",
+        "operator": "LESS_THAN_EQUALS",
+        "value": -30
+      },
+      {
+        "field": "lastInteractionDays",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 7
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "At_Risk_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "We Miss You Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your team has missed you",
+      "cta": "Catch Up Now",
+      "tracking": {
+        "campaignId": "email_atrisk_1",
+        "deliveryId": "del_atrisk_1",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Personalized Highlight Push",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "PUSH",
+      "messageTheme": "Relive your favorite moments",
+      "cta": "Watch Highlights",
+      "tracking": {
+        "campaignId": "push_atrisk_2",
+        "deliveryId": "del_atrisk_2",
+        "trackingEvents": [
+          "push_open",
+          "video_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Comeback Incentive Email",
+      "timing": {
+        "offsetHours": 96
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We’ve got something special for your return",
+      "cta": "Unlock Offer",
+      "tracking": {
+        "campaignId": "email_atrisk_3",
+        "deliveryId": "del_atrisk_3",
+        "trackingEvents": [
+          "email_open",
+          "offer_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Last Chance SMS",
+      "timing": {
+        "offsetHours": 192
+      },
+      "channel": "SMS",
+      "messageTheme": "Final chance to reconnect with your team",
+      "cta": "Come Back Now",
+      "tracking": {
+        "campaignId": "sms_atrisk_4",
+        "deliveryId": "del_atrisk_4",
+        "trackingEvents": [
+          "sms_click",
+          "content_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_engagement_monitoring",
+        "eventId": "evt_fan_engagement_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "fan_reengagement_event",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "fan_reengagement_event",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "fan_reengagement_event",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "fan_reengagement_event",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n12"
+      },
+      {
+        "id": "n12",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n13",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n14",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "fan_reengagement_event",
+      "eventId": "evt_fan_reengage_001",
+      "condition": "engaged == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowHours": 192
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "email_open",
+      "push_open",
+      "video_view",
+      "offer_click"
+    ],
+    "eventMapping": {
+      "fan_reengagement_event": "evt_fan_reengage_001",
+      "offer_click": "evt_offer_click_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "fan_reengagement_event",
+    "secondaryKPIs": [
+      "video_view",
+      "email_open",
+      "offer_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 192
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

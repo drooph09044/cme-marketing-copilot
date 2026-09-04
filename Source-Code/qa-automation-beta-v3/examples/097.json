@@ -1,0 +1,220 @@
+{
+  "id": "097",
+  "matrix_row_id": 97,
+  "matrix_row_name": "F1 TV Pro subscription abandon cart",
+  "template": "tpl_abandon_cart",
+  "league": "F1",
+  "sport": "motorsport",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an F1 TV Pro abandon-cart journey with an identity matrix fanout.",
+    "Create an F1 TV Pro abandon-cart journey. Identity-matrix audience: app-known, app-unknown, web-known, web-unknown. Modal at funnel entry, then push during Friday Free Practice or Saturday Qualifying of the next race weekend for opted-in fans, plus an email follow-up within 24h with race-weekend value props.",
+    "Need an F1 TV Pro abandon cart — fan out across app/web and known/unknown, modal first then race-weekend push + 24h email."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "f1-tv-pro-abandon-cart-2026",
+    "metadata": {
+      "name": "F1 TV Pro Subscription Abandon Cart",
+      "internal_name": "F1_TV_Pro_AC_2026",
+      "brand": {"vertical": "streaming", "league": "F1", "team": null, "product": "F1 TV Pro"},
+      "purpose": "Recover F1 TV Pro subscription funnel abandoners across the four identity-matrix states with a modal-first, then race-weekend push and email cadence.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-02-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Recover F1 TV Pro subscription funnel abandoners.", "kpi": "Recovered-subscription rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix fanout: app-known fans get an app modal then a race-weekend push aligned to Friday Free Practice or Saturday Qualifying; web-known fans get a web modal then a 24h email; unknown profiles get only the modal at funnel entry.",
+        "timing_rationale": "Race weekends are the highest-intent moments for fans to act on F1 TV Pro.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["app_modal", "web_modal", "push", "email"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_ac_app_known",
+        "name": "Cart abandoner - app, known",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.f1_tv_pro_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "app"},
+            {"field": "identity.known", "op": "equals", "value": true}
+          ]
+        },
+        "identity_state": "app_known"
+      },
+      {
+        "id": "aud_ac_app_unknown",
+        "name": "Cart abandoner - app, unknown",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.f1_tv_pro_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "app"},
+            {"field": "identity.known", "op": "equals", "value": false}
+          ]
+        },
+        "identity_state": "app_unknown"
+      },
+      {
+        "id": "aud_ac_web_known",
+        "name": "Cart abandoner - web, known",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.f1_tv_pro_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "web"},
+            {"field": "identity.known", "op": "equals", "value": true}
+          ]
+        },
+        "identity_state": "web_known"
+      },
+      {
+        "id": "aud_ac_web_unknown",
+        "name": "Cart abandoner - web, unknown",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.f1_tv_pro_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "web"},
+            {"field": "identity.known", "op": "equals", "value": false}
+          ]
+        },
+        "identity_state": "web_unknown"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}},
+      {"id": "supp_active_sub", "name": "Already active F1 TV Pro subscriber", "scope": "global", "criteria": {"field": "f1_tv_pro.status", "op": "equals", "value": "active"}}
+    ],
+    "channels": [
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "f1_tv_app"},
+      {"id": "ch_web_modal", "type": "web_modal", "platform": "f1_tv_web"},
+      {"id": "ch_push", "type": "push", "platform": "f1_tv_app"},
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Driver or Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Cart abandonment trigger", "entry_criteria": {"trigger": "event", "event_name": "f1_tv_pro_cart_abandoned"}},
+      {
+        "id": "split_identity_matrix",
+        "type": "audience_split",
+        "label": "4-way identity-matrix split",
+        "audiences": ["aud_ac_app_known", "aud_ac_app_unknown", "aud_ac_web_known", "aud_ac_web_unknown"],
+        "mode": "waterfall"
+      },
+      {
+        "id": "modal_app_known",
+        "type": "action",
+        "label": "App modal - Known fan, driver/team-themed",
+        "channel": "ch_app_modal",
+        "touch_id": "M1",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Don't miss {{FT}} at the next Grand Prix - finish signing up", "cta_label": "Resume sign-up"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "modal_app_unknown",
+        "type": "action",
+        "label": "App modal - Unknown",
+        "channel": "ch_app_modal",
+        "touch_id": "M2",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Every Free Practice, Qualifying, and race on F1 TV Pro", "cta_label": "Sign up"}
+      },
+      {
+        "id": "modal_web_known",
+        "type": "action",
+        "label": "Web modal - Known fan, driver/team-themed",
+        "channel": "ch_web_modal",
+        "touch_id": "M3",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Pick up where you left off - {{FT}} race weekend is next", "cta_label": "Resume sign-up"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "modal_web_unknown",
+        "type": "action",
+        "label": "Web modal - Unknown",
+        "channel": "ch_web_modal",
+        "touch_id": "M4",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Every Free Practice, Qualifying, and race on F1 TV Pro", "cta_label": "Sign up"}
+      },
+      {
+        "id": "wait_to_race_weekend",
+        "type": "wait",
+        "label": "Wait until next race weekend or 14d max",
+        "timing": {
+          "type": "wait_until",
+          "until": {"field": "next_race_weekend_within_hours", "op": "lte", "value": 48},
+          "check_every": {"value": 12, "unit": "hour"},
+          "max_wait": {"value": 14, "unit": "day"}
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_f1", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_race_weekend",
+        "type": "action",
+        "label": "Push - Free Practice or Qualifying alert",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "relative_to_event", "event": "next_free_practice", "direction": "before", "offset": {"value": 1, "unit": "hour"}},
+        "copy": {"headline": "Free Practice starts in 1 hour - watch live on F1 TV Pro"}
+      },
+      {
+        "id": "email_24h_followup",
+        "type": "action",
+        "label": "Email T+24h - F1 TV Pro value props",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "relative_to_event", "event": "f1_tv_pro_cart_abandoned", "direction": "after", "offset": {"value": 24, "unit": "hour"}},
+        "copy": {
+          "subject": "Every session, every Grand Prix - one subscription",
+          "cta_label": "Subscribe to F1 TV Pro"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_identity_matrix"},
+      {"from": "split_identity_matrix", "to": "modal_app_known", "branch_label": "app_known"},
+      {"from": "split_identity_matrix", "to": "modal_app_unknown", "branch_label": "app_unknown"},
+      {"from": "split_identity_matrix", "to": "modal_web_known", "branch_label": "web_known"},
+      {"from": "split_identity_matrix", "to": "modal_web_unknown", "branch_label": "web_unknown"},
+      {"from": "modal_app_known", "to": "wait_to_race_weekend"},
+      {"from": "modal_web_known", "to": "wait_to_race_weekend"},
+      {"from": "modal_app_unknown", "to": "end_journey"},
+      {"from": "modal_web_unknown", "to": "end_journey"},
+      {"from": "wait_to_race_weekend", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_race_weekend", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "email_24h_followup", "branch_label": "no"},
+      {"from": "push_race_weekend", "to": "email_24h_followup"},
+      {"from": "email_24h_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Recovered-subscription rate"}],
+      "secondary_kpis": [{"name": "Modal CTR by identity state"}, {"name": "Race-weekend push CTR"}],
+      "tests": []
+    }
+  }
+}

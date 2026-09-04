@@ -1,0 +1,78 @@
+{
+  "databricks_compat": {
+    "source_prefixes": {
+      "media": [
+        "med"
+      ],
+      "sports": [
+        "spt"
+      ],
+      "automotive": [
+        "aut",
+        "auto"
+      ],
+      "telecom": [
+        "tel"
+      ]
+    },
+    "output_layers": [
+      "std",
+      "slv",
+      "gld",
+      "brz"
+    ],
+    "json_suffixes": [
+      ".json"
+    ],
+    "csv_suffixes": [
+      "",
+      ".csv"
+    ],
+    "data_directories": [
+      "data",
+      "generated_data",
+      "preprocessed_data",
+      "standardized_data",
+      "enhanced_identity_config",
+      "matching_output",
+      "clustering_output",
+      "evaluation_output",
+      "golden_records_output",
+      "standardization_reports",
+      "consent_data",
+      "segmentation",
+      "qaautomationexamples",
+      "login"
+    ],
+    "known_data_files": [
+      "general_data",
+      "golden_records",
+      "candidate_pairs",
+      "clustered_records",
+      "all_standardized",
+      "all_preprocessed",
+      "enhanced_prepared_records",
+      "customer_profile_export",
+      "superseded_ids",
+      "household_links",
+      "activity_detail_fields",
+      "household_consent_flags",
+      "blocking_config.json",
+      "tag_mappings.json",
+      "source_preferences.json",
+      "data_source_classification.json",
+      "golden_record_provenance.json",
+      "evaluation_report.json",
+      "cluster_summary.json",
+      "golden_record_summary.json",
+      "cleaning_standardization_report.json",
+      "identity_config.override.json",
+      "household_summary.json",
+      "ground_truth.json",
+      "copilot_segments.json",
+      "users",
+      "auth_sessions",
+      "auth_logs"
+    ]
+  }
+}

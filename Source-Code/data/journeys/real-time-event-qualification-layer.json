@@ -1,0 +1,114 @@
+{
+  "useCaseId": "real-time-event-qualification-layer",
+  "name": "Real-Time Event Qualification & Signal Generation Layer",
+  "category": {
+    "categoryId": "data-intelligence",
+    "categoryName": "Intelligence Layer"
+  },
+  "journeyTable": {
+    "journeyName": "Event Qualification Engine",
+    "journeyGoal": "Convert raw behavioral events into enriched, decision-ready signals for activation across CDP, AJO, and Target",
+    "entryTrigger": "all_event_stream_ingestion",
+    "journeyCategory": "System Intelligence",
+    "totalDuration": "continuous",
+    "exitClause": "Always-on system process"
+  },
+  "entryCriteria": {
+    "event": "real_time_event_qualification_signal_generation_layer_qualified",
+    "eventId": "evt_real_time_event_qualification_signal_generation_layer_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Journey_Audience"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Journey_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Engagement email",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "real_time_event_qualification_signal_generation_layer_qualified",
+        "eventId": "evt_real_time_event_qualification_signal_generation_layer_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "journey_goal_achieved",
+      "eventId": "evt_journey_goal_achieved_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": false,
+      "maxMessagesPerUser": 0,
+      "timeWindowHours": 0
+    },
+    "prioritization": {
+      "priority": "SYSTEM_CRITICAL"
+    }
+  },
+  "tracking": {
+    "globalEvents": [],
+    "eventMapping": {}
+  },
+  "analytics": {
+    "primaryKPI": "signal_accuracy",
+    "secondaryKPIs": [
+      "event_latency",
+      "noise_reduction_rate",
+      "conversion_lift_from_signals"
+    ],
+    "attribution": {
+      "model": "none",
+      "lookbackHours": 0
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

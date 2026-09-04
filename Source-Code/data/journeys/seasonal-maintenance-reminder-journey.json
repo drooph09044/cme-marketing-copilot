@@ -1,0 +1,91 @@
+{
+  "categoryId": "seasonal-maintenance",
+  "categoryName": "Seasonal Maintenance",
+  "categoryDescription": "Journeys aimed at planned seasonal inspections and preventive care.",
+  "subCategoryId": "maintenance-reminders",
+  "subCategoryName": "Maintenance Reminders",
+  "slug": "seasonal-maintenance-reminder-journey",
+  "name": "Seasonal Maintenance Reminder Journey",
+  "active": true,
+  "brief": "Trigger seasonal maintenance reminders for customers due for routine service, and optimize conversion with channel and copy testing.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-08-05",
+  "journeyOverrides": {
+    "name": "Seasonal Maintenance Reminder",
+    "objective": "Increase routine maintenance bookings during seasonal service windows.",
+    "audience": "Seasonal_Maintenance_Due",
+    "variantA": "Standard seasonal reminder cadence",
+    "variantB": "Reminder plus seasonal benefits message"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Trigger seasonal maintenance reminders for customers due for routine service, and optimize conversion with channel and copy testing.",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "seasonal_maintenance_reminder_journey_qualified",
+    "eventId": "evt_seasonal_maintenance_reminder_journey_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Seasonal_Maintenance_Due"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Seasonal_Maintenance_Due"
+  },
+  "exitConditions": [
+    {
+      "event": "journey_goal_achieved",
+      "eventId": "evt_journey_goal_achieved_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "seasonal_maintenance_reminder_journey_qualified",
+        "eventId": "evt_seasonal_maintenance_reminder_journey_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "seasonal-maintenance-reminder-journey"
+}

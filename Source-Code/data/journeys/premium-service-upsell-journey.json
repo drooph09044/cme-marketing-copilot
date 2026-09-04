@@ -1,0 +1,91 @@
+{
+  "categoryId": "service-upsell",
+  "categoryName": "Premium Service Upsell",
+  "categoryDescription": "Journeys focused on moving qualified customers to premium maintenance packages.",
+  "subCategoryId": "premium-care",
+  "subCategoryName": "Premium Care",
+  "slug": "premium-service-upsell-journey",
+  "name": "Premium Service Upsell Journey",
+  "active": true,
+  "brief": "Find customers eligible for premium service upsell and personalize package recommendations based on service history and vehicle profile.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-29",
+  "journeyOverrides": {
+    "name": "Premium Service Upsell",
+    "objective": "Increase premium service package attach rate among eligible customers.",
+    "audience": "Premium_Service_Eligible",
+    "variantA": "Value-led package recommendation",
+    "variantB": "Value plus concierge booking experience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Find customers eligible for premium service upsell and personalize package recommendations based on service history and vehicle profile.",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "premium_service_upsell_journey_qualified",
+    "eventId": "evt_premium_service_upsell_journey_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Premium_Service_Eligible"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Premium_Service_Eligible"
+  },
+  "exitConditions": [
+    {
+      "event": "upgrade_completed",
+      "eventId": "evt_upgrade_completed_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "premium_service_upsell_journey_qualified",
+        "eventId": "evt_premium_service_upsell_journey_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "premium-service-upsell-journey"
+}

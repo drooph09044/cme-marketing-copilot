@@ -1,0 +1,132 @@
+{
+  "useCaseId": "streaming-engagement-push-followup",
+  "name": "Streaming Engagement – Push Follow-up Journey",
+  "category": {
+    "categoryId": "real-time-engagement",
+    "categoryName": "Real-Time Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Streaming Engagement – Push Follow-up",
+    "journeyGoal": "Follow up with users who haven’t started the stream after login",
+    "entryTrigger": "user_logged_in",
+    "journeyCategory": "Engagement",
+    "totalDuration": "1 day",
+    "exitClause": "Exit after stream started"
+  },
+  "entryCriteria": {
+    "event": "user_logged_in",
+    "eventId": "evt_login_004",
+    "conditions": [
+      {
+        "field": "subscriptionStatus",
+        "operator": "EQUALS",
+        "value": "ACTIVE"
+      },
+      {
+        "field": "streamStarted",
+        "operator": "EQUALS",
+        "value": "FALSE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Logged-in Users Pending Stream Start"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Push Follow-up",
+      "timing": {
+        "offsetHours": 2
+      },
+      "channel": "PUSH",
+      "messageTheme": "Don’t miss out – your live stream is ready to watch!",
+      "cta": "Watch Live",
+      "tracking": {
+        "campaignId": "push_stream_followup",
+        "deliveryId": "del_push_36",
+        "trackingEvents": [
+          "push_open",
+          "stream_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_logged_in",
+        "eventId": "evt_login_004"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "stream_start",
+          "field": "streamStarted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 2
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "stream_start",
+      "eventId": "evt_stream_004",
+      "condition": "streamStarted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 24
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "stream_start"
+    ],
+    "eventMapping": {
+      "stream_start": "evt_stream_004"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "stream_start",
+    "secondaryKPIs": [
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 24
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

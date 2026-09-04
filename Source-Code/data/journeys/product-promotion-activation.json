@@ -1,0 +1,168 @@
+{
+  "useCaseId": "product-promotion-activation",
+  "name": "Product Promotion – Activation Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Product Promotion – Activation",
+    "journeyGoal": "Activate users who showed interest in products but did not complete engagement",
+    "entryTrigger": "user_added_product",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after product viewed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_added_product",
+    "eventId": "evt_add_product_001",
+    "conditions": [
+      {
+        "field": "productCategory",
+        "operator": "EQUALS",
+        "value": "Product"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Added Product Users – Activation"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Product Activation Email",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Complete your product engagement now and unlock exclusive benefits!",
+      "cta": "View Product",
+      "tracking": {
+        "campaignId": "email_product_activation",
+        "deliveryId": "del_email_30",
+        "trackingEvents": [
+          "email_open",
+          "product_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Product Activation Push",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your selected product is waiting – activate now and explore!",
+      "cta": "View Product",
+      "tracking": {
+        "campaignId": "push_product_activation",
+        "deliveryId": "del_push_30",
+        "trackingEvents": [
+          "push_open",
+          "product_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_added_product",
+        "eventId": "evt_add_product_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_view",
+          "field": "productViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_view",
+          "field": "productViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_view",
+      "eventId": "evt_product_002",
+      "condition": "productViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_view"
+    ],
+    "eventMapping": {
+      "product_view": "evt_product_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_view",
+    "secondaryKPIs": [
+      "email_open",
+      "push_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

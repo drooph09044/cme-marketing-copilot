@@ -1,0 +1,130 @@
+{
+  "useCaseId": "merch-medium-value",
+  "name": "Medium Value Merchandise Purchase Journey",
+  "category": {
+    "categoryId": "merchandising",
+    "categoryName": "Shop - Merchandise"
+  },
+  "journeyTable": {
+    "journeyName": "Medium Value Merchandise Buyers",
+    "journeyGoal": "Increase order frequency for mid-value merch customers",
+    "entryTrigger": "medium_merch_segment",
+    "journeyCategory": "Revenue",
+    "totalDuration": "10 days",
+    "exitClause": "Exit after purchase increase"
+  },
+  "entryCriteria": {
+    "event": "merch_purchase_event",
+    "eventId": "evt_merch_002",
+    "conditions": [
+      {
+        "field": "averageOrderValue",
+        "operator": "BETWEEN",
+        "value": [
+          50,
+          299
+        ]
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Medium_Value_Merch_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "New Collection Drop",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Fresh merch just landed",
+      "cta": "Explore",
+      "tracking": {
+        "campaignId": "email_merch_mid",
+        "deliveryId": "del_email_mm1",
+        "trackingEvents": [
+          "email_open",
+          "product_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "merch_purchase_event",
+        "eventId": "evt_merch_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "repeatPurchase",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_purchase",
+      "eventId": "evt_product_002",
+      "condition": "repeatPurchase == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_purchase"
+    ],
+    "eventMapping": {
+      "product_purchase": "evt_product_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_purchase",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

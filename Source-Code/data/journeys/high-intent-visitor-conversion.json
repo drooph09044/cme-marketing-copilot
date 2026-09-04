@@ -1,0 +1,178 @@
+{
+  "useCaseId": "high-intent-visitor-conversion",
+  "name": "High Intent Visitor Conversion Journey",
+  "category": {
+    "categoryId": "conversion",
+    "categoryName": "Conversion"
+  },
+  "journeyTable": {
+    "journeyName": "High Intent Visitor Conversion",
+    "journeyGoal": "Convert highly engaged visitors into customers",
+    "entryTrigger": "high_engagement_detected",
+    "journeyCategory": "Acquisition",
+    "totalDuration": "30 days",
+    "exitClause": "Exit after successful conversion"
+  },
+  "entryCriteria": {
+    "event": "high_engagement_detected",
+    "eventId": "evt_engage_001",
+    "conditions": [
+      {
+        "field": "sessionDepth",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 5
+      },
+      {
+        "field": "timeOnSiteMinutes",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 8
+      },
+      {
+        "field": "convertedLast30Days",
+        "operator": "EQUALS",
+        "value": false
+      }
+    ],
+    "identity": {
+      "primaryId": "visitorId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Intent_Visitors"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Conversion Incentive",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Ready to get started?",
+      "cta": "Start Now",
+      "tracking": {
+        "campaignId": "email_conversion_push",
+        "deliveryId": "del_email_h1",
+        "trackingEvents": [
+          "email_open",
+          "signup_complete"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Retargeting Reminder",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Still exploring? See why customers choose us",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "display_conversion_reminder",
+        "deliveryId": "del_display_h2",
+        "trackingEvents": [
+          "ad_click",
+          "signup_complete"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "high_engagement_detected",
+        "eventId": "evt_engage_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "signup_complete",
+          "field": "signupCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "signup_complete",
+          "field": "signupCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "signup_complete",
+      "eventId": "evt_signup_001",
+      "condition": "signupCompleted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 720
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "signup_complete"
+    ],
+    "eventMapping": {
+      "signup_complete": "evt_signup_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "signup_complete",
+    "secondaryKPIs": [
+      "email_open",
+      "ad_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

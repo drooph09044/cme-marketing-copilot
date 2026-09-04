@@ -1,0 +1,20 @@
+{
+  "categoryId": "household-growth",
+  "categoryName": "Household Retention & Growth",
+  "categoryDescription": "Journeys to increase share of wallet across households with multiple vehicles.",
+  "subCategoryId": "multi-vehicle-care",
+  "subCategoryName": "Multi-Vehicle Care",
+  "slug": "multi-vehicle-household-care-journey",
+  "name": "Multi-Vehicle Household Care Journey",
+  "active": true,
+  "brief": "Identify households with multiple vehicles and coordinate maintenance nudges to consolidate servicing with one provider.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-07-22",
+  "journeyOverrides": {
+    "name": "Multi-Vehicle Household Care",
+    "objective": "Increase repeat service visits by bundling maintenance reminders across household vehicles.",
+    "audience": "Household_Multi_Vehicle",
+    "variantA": "Coordinated maintenance scheduling",
+    "variantB": "Scheduling plus household loyalty benefits"
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "useCaseId": "build-brand-start-the-season",
+  "name": "START the season",
+  "clientTag": "PGA",
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "category": {
+    "categoryId": "build-brand",
+    "categoryName": "Build Brand"
+  },
+  "journeyTable": {
+    "journeyName": "START the season",
+    "journeyGoal": "Build anticipation for opening day",
+    "entryTrigger": "season_announcement",
+    "journeyCategory": "Brand Awareness",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after opening day starts"
+  },
+  "entryCriteria": {
+    "event": "season_announcement",
+    "eventId": "evt_season_001",
+    "conditions": [
+      {
+        "field": "fanStatus",
+        "operator": "EQUALS",
+        "value": "ACTIVE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Season_Opening_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Opening Day Teaser",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "The new season is almost here",
+      "cta": "View Schedule",
+      "tracking": {
+        "campaignId": "push_opening_teaser",
+        "deliveryId": "del_push_bb1",
+        "trackingEvents": [
+          "push_open",
+          "schedule_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Countdown Reminder",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Get ready for opening day excitement",
+      "cta": "Buy Tickets",
+      "tracking": {
+        "campaignId": "email_opening_countdown",
+        "deliveryId": "del_email_bb2",
+        "trackingEvents": [
+          "email_open",
+          "ticket_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "season_announcement",
+        "eventId": "evt_season_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "duration": 48,
+        "unit": "HOURS"
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "opening_day_started",
+      "eventId": "evt_opening_001",
+      "condition": "openingDay == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 72
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "schedule_view",
+      "ticket_click"
+    ],
+    "eventMapping": {
+      "opening_day_started": "evt_opening_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_click",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 72
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

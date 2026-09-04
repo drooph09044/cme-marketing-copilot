@@ -1,0 +1,168 @@
+{
+  "useCaseId": "event-reminder-push-email",
+  "name": "Event Reminder – Push & Email Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Event Reminder – Push & Email",
+    "journeyGoal": "Remind users about upcoming events to drive engagement",
+    "entryTrigger": "user_registered_event",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after event viewed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_registered_event",
+    "eventId": "evt_registered_event_001",
+    "conditions": [
+      {
+        "field": "eventType",
+        "operator": "EQUALS",
+        "value": "Event"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Registered Event Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Event Reminder Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "Don’t miss your upcoming event – view details now!",
+      "cta": "View Event",
+      "tracking": {
+        "campaignId": "push_event_reminder",
+        "deliveryId": "del_push_27",
+        "trackingEvents": [
+          "push_open",
+          "event_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Event Reminder Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your registered event is coming up – check the details!",
+      "cta": "View Event",
+      "tracking": {
+        "campaignId": "email_event_reminder",
+        "deliveryId": "del_email_27",
+        "trackingEvents": [
+          "email_open",
+          "event_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_registered_event",
+        "eventId": "evt_registered_event_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "event_view",
+          "field": "eventViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "event_view",
+          "field": "eventViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "event_view",
+      "eventId": "evt_event_003",
+      "condition": "eventViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "event_view"
+    ],
+    "eventMapping": {
+      "event_view": "evt_event_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "event_view",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

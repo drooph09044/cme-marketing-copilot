@@ -1,0 +1,224 @@
+{
+  "useCaseId": "churn-risk-intervention",
+  "name": "Churn Risk Intervention Journey",
+  "category": {
+    "categoryId": "retention",
+    "categoryName": "Retention / Renewal"
+  },
+  "journeyTable": {
+    "journeyName": "Churn Risk Intervention",
+    "journeyGoal": "Proactively retain high-risk customers before cancellation",
+    "entryTrigger": "churn_risk_score_threshold_exceeded",
+    "journeyCategory": "Retention",
+    "totalDuration": "21 days",
+    "exitClause": "Exit if customer contacts support, renews, or upgrades"
+  },
+  "entryCriteria": {
+    "event": "churn_risk_score_update",
+    "eventId": "evt_churnrisk_001",
+    "conditions": [
+      {
+        "field": "churnRiskScore",
+        "operator": "GREATER_THAN",
+        "value": 80
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Churn_Risk_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Service Check-in Email",
+      "timing": {
+        "offsetDays": 1
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We want to make things right – proactive service check-in",
+      "cta": "Talk to Us",
+      "tracking": {
+        "campaignId": "churnrisk_checkin_1",
+        "deliveryId": "del_churn_1",
+        "trackingEvents": [
+          "email_open",
+          "support_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Rep Outreach",
+      "timing": {
+        "offsetDays": 7
+      },
+      "channel": "OUTBOUND_CALL_SMS",
+      "messageTheme": "Understanding your concerns and offering tailored solutions",
+      "cta": "Speak to a Specialist",
+      "tracking": {
+        "campaignId": "churnrisk_rep_7",
+        "deliveryId": "del_churn_2",
+        "trackingEvents": [
+          "call_connected",
+          "issue_resolved"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Retention Offer Email",
+      "timing": {
+        "offsetDays": 21
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We'd hate to see you go – best available retention offer",
+      "cta": "Stay & Save",
+      "tracking": {
+        "campaignId": "churnrisk_offer_21",
+        "deliveryId": "del_churn_3",
+        "trackingEvents": [
+          "email_open",
+          "offer_redeemed"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "churn_risk_score_update",
+        "eventId": "evt_churnrisk_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "support_contact",
+          "field": "contacted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "support_contact",
+          "field": "contacted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 144
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "support_contact",
+          "field": "contacted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 336
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "support_contact",
+      "eventId": "evt_support_001",
+      "condition": "contacted == true",
+      "action": "EXIT"
+    },
+    {
+      "event": "contract_renewed",
+      "eventId": "evt_renew_001",
+      "condition": "renewed == true",
+      "action": "EXIT"
+    },
+    {
+      "event": "plan_upgraded",
+      "eventId": "evt_upgrade_001",
+      "condition": "upgraded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 504
+    },
+    "prioritization": {
+      "priority": "CRITICAL"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "issue_resolved",
+      "offer_redeemed",
+      "support_contact"
+    ],
+    "eventMapping": {
+      "issue_resolved": "evt_issue_001",
+      "offer_redeemed": "evt_offer_001",
+      "support_contact": "evt_support_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "retention_rate",
+    "secondaryKPIs": [
+      "offer_redemption",
+      "support_resolution_rate"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 504
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

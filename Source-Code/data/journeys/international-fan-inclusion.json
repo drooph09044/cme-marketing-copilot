@@ -1,0 +1,207 @@
+{
+  "useCaseId": "international-fan-inclusion",
+  "name": "International Fan Inclusion Journey",
+  "category": {
+    "categoryId": "acquisition",
+    "categoryName": "Audience Expansion"
+  },
+  "journeyTable": {
+    "journeyName": "International Fan Engagement",
+    "journeyGoal": "Engage global audiences with localized content and time-zone optimized experiences",
+    "entryTrigger": "geo_location_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "30 days",
+    "exitClause": "Exit if fan engages with localized content twice"
+  },
+  "entryCriteria": {
+    "event": "geo_detect",
+    "eventId": "evt_geo_001",
+    "conditions": [
+      {
+        "field": "country",
+        "operator": "NOT_EQUALS",
+        "value": "home_country"
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "International_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Localized Welcome Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Follow your team from anywhere in the world",
+      "cta": "Explore Content",
+      "tracking": {
+        "campaignId": "email_global_1",
+        "deliveryId": "del_global_1",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Timezone Match Reminder",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "Live match starting in your time zone",
+      "cta": "Watch Live",
+      "tracking": {
+        "campaignId": "push_global_2",
+        "deliveryId": "del_global_2",
+        "trackingEvents": [
+          "push_open",
+          "stream_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Regional Highlights Email",
+      "timing": {
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Best moments curated for you",
+      "cta": "Watch Highlights",
+      "tracking": {
+        "campaignId": "email_global_3",
+        "deliveryId": "del_global_3",
+        "trackingEvents": [
+          "email_open",
+          "video_play"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "geo_detect",
+        "eventId": "evt_geo_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "localized_engagement",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "localized_engagement",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "localized_engagement",
+          "field": "engaged",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "localized_engagement",
+      "eventId": "evt_local_eng_001",
+      "condition": "engaged == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 720
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "localized_engagement"
+    ],
+    "eventMapping": {
+      "localized_engagement": "evt_local_eng_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "stream_start",
+    "secondaryKPIs": [
+      "video_play"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

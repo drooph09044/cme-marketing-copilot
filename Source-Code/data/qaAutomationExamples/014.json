@@ -1,0 +1,279 @@
+{
+  "id": "014",
+  "matrix_row_id": 14,
+  "matrix_row_name": "New NFL App Install Welcome",
+  "template": "tpl_welcome_series",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a 5-day NFL App install welcome with push and email.",
+    "Trigger on NFL App install. Day 0 push welcomes the new user. Day 2 email walks through key app features (scores, video, fantasy). Day 5 push drives fav-team setup if not yet completed. Primary goal is favorite-team set in profile, which enables downstream personalized journeys.",
+    "Need an NFL App onboarding flow \u2014 push welcome, then email features tour, then a final push to set fav team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-app-install-welcome",
+    "metadata": {
+      "name": "New NFL App Install Welcome",
+      "internal_name": "NFL_App_Install_Welcome_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL App"
+      },
+      "purpose": "Welcome new NFL App installs and drive favorite-team setup as an activation goal.",
+      "archetype": "onboarding",
+      "launch_date": "2026-06-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive fav-team set in profile within 7 days of install.",
+          "kpi": "Favorite-team set rate within 7d of install",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Day 0 push welcomes new installer. Day 2 email walks through key features (scores, video, fantasy). Day 5 push drives fav-team setup if not yet complete.",
+        "timing_rationale": "5-day onboarding window aligns with NFL App engagement decay curve.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_new_installer",
+        "name": "New NFL App installer",
+        "criteria": {
+          "field": "nfl_app.days_since_install",
+          "op": "equals",
+          "value": 0
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "NFL App installed",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "nfl_app_installed"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_d0",
+        "type": "action",
+        "label": "Push Day 0 - Welcome",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Welcome to the NFL App"
+        }
+      },
+      {
+        "id": "wait_2d",
+        "type": "wait",
+        "label": "Wait 2 days",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_d2",
+        "type": "action",
+        "label": "Email Day 2 - App features tour",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Get the most out of the NFL App",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Scores & schedules"
+            },
+            {
+              "rank": "secondary",
+              "name": "Video highlights"
+            },
+            {
+              "rank": "tertiary",
+              "name": "Fantasy integration"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_3d",
+        "type": "wait",
+        "label": "Wait to Day 5",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 3,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team set?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "favorite_team",
+          "op": "is_not_null"
+        }
+      },
+      {
+        "id": "push_d5_fav_team",
+        "type": "action",
+        "label": "Push Day 5 - Pick favorite team",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Pick your favorite team for personalized scores and highlights"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_d0",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_2d",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_d0",
+        "to": "wait_2d"
+      },
+      {
+        "from": "wait_2d",
+        "to": "email_d2"
+      },
+      {
+        "from": "email_d2",
+        "to": "wait_3d"
+      },
+      {
+        "from": "wait_3d",
+        "to": "dec_has_fav_team"
+      },
+      {
+        "from": "dec_has_fav_team",
+        "to": "end_journey",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_has_fav_team",
+        "to": "push_d5_fav_team",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_d5_fav_team",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Favorite-team set rate within 7d"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "App return rate Day 7"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

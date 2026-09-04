@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-cart-merchandise-reminder",
+  "name": "Abandoned Cart: Merchandise – Reminder Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Cart: Merchandise – Reminder",
+    "journeyGoal": "Remind users who added merchandise to cart but did not complete purchase",
+    "entryTrigger": "user_abandoned_cart_merchandise",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after merchandise purchased or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_abandoned_cart_merchandise",
+    "eventId": "evt_cart_merch_001",
+    "conditions": [
+      {
+        "field": "cartStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Abandoned Cart Merchandise Users – Reminder"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Merchandise Cart Reminder Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "You left items in your cart – complete your purchase now!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "push_cart_merch_reminder",
+        "deliveryId": "del_push_39",
+        "trackingEvents": [
+          "push_open",
+          "merch_purchase"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Merchandise Cart Reminder Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your selected merchandise is waiting – complete your purchase today!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "email_cart_merch_reminder",
+        "deliveryId": "del_email_39",
+        "trackingEvents": [
+          "email_open",
+          "merch_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_abandoned_cart_merchandise",
+        "eventId": "evt_cart_merch_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "merch_purchase",
+          "field": "merchPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "merch_purchase",
+          "field": "merchPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "merch_purchase",
+      "eventId": "evt_merch_003",
+      "condition": "merchPurchased == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "merch_purchase"
+    ],
+    "eventMapping": {
+      "merch_purchase": "evt_merch_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "merch_purchase",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

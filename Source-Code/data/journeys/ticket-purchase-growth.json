@@ -1,0 +1,185 @@
+{
+  "useCaseId": "ticket-purchase-growth",
+  "name": "Ticket Purchase Growth Journey",
+  "category": {
+    "categoryId": "commerce",
+    "categoryName": "Commerce"
+  },
+  "journeyTable": {
+    "journeyName": "Ticket Purchase Growth",
+    "journeyGoal": "Increase repeat ticket purchases and season ticket upgrades",
+    "entryTrigger": "ticket_purchase_detected",
+    "journeyCategory": "Sales",
+    "totalDuration": "14 days",
+    "exitClause": "Exit after repeat purchase or season ticket upgrade"
+  },
+  "entryCriteria": {
+    "event": "ticket_purchase_detected",
+    "eventId": "evt_ticket_001",
+    "conditions": [
+      {
+        "field": "ticketPurchaseType",
+        "operator": "IN",
+        "value": [
+          "SINGLE_MATCH",
+          "SEASON_TICKET_HOLDER"
+        ]
+      },
+      {
+        "field": "marketingOptIn",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Ticket_Purchasers_and_STH"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Upcoming Match Recommendation",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Don’t miss the next big match",
+      "cta": "Buy Tickets",
+      "tracking": {
+        "campaignId": "email_match_recommendation",
+        "deliveryId": "del_email_t1",
+        "trackingEvents": [
+          "email_open",
+          "ticket_purchase"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Season Ticket Upgrade Offer",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "SMS",
+      "messageTheme": "Upgrade to a season pass for exclusive benefits",
+      "cta": "Upgrade Now",
+      "tracking": {
+        "campaignId": "sms_season_upgrade",
+        "deliveryId": "del_sms_t2",
+        "trackingEvents": [
+          "sms_click",
+          "season_upgrade"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "ticket_purchase_detected",
+        "eventId": "evt_ticket_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "repeatPurchase",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "season_upgrade",
+          "field": "seasonTicketUpgrade",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_purchase",
+      "eventId": "evt_ticket_purchase_002",
+      "condition": "repeatPurchase == true",
+      "action": "EXIT"
+    },
+    {
+      "event": "season_upgrade",
+      "eventId": "evt_upgrade_002",
+      "condition": "seasonTicketUpgrade == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "ticket_purchase",
+      "season_upgrade"
+    ],
+    "eventMapping": {
+      "ticket_purchase": "evt_ticket_purchase_002",
+      "season_upgrade": "evt_upgrade_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_purchase",
+    "secondaryKPIs": [
+      "season_upgrade",
+      "email_open",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

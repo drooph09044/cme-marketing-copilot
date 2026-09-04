@@ -1,0 +1,133 @@
+{
+  "id": "039",
+  "matrix_row_id": 39,
+  "matrix_row_name": "All-Star Weekend Merch Cross-Sell",
+  "template": "tpl_merch_cross_sell",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an All-Star Weekend merch cross-sell email for NBA fans.",
+    "Create a single-email merch promotion to fans who hold All-Star Weekend tickets or have watched All-Star content on League Pass. Product focus: All-Star Game jerseys, Saturday Night skills-comp gear, and host-city LA collaborations. Send three days before tip-off on Feb 10, 2026.",
+    "Need an NBA Store cross-sell for All-Star Weekend at Intuit Dome. Target ticket holders and League Pass viewers who've watched All-Star content. Email only."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-allstar-merch-cross-sell-2026",
+    "metadata": {
+      "name": "All-Star Weekend Merch Cross-Sell",
+      "internal_name": "NBA_AllStar_Merch_2026",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA Store"},
+      "purpose": "Drive NBA Store merch sales tied to All-Star Weekend (Feb 13-15, 2026 at Intuit Dome, LA) by promoting All-Star jerseys, skills-comp gear, and host-city collabs to ticket holders and League Pass All-Star viewers.",
+      "archetype": "cross_sell",
+      "launch_date": "2026-02-10",
+      "end_date": "2026-02-16",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive NBA Store conversions on All-Star merch.", "kpi": "All-Star merch revenue attributable to journey", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-weekend email three days before tip-off, targeting fans who either hold All-Star Weekend tickets or have engaged with All-Star content on League Pass in the prior 60 days. Single-channel: email.",
+        "timing_rationale": "Feb 10 deploy timed to All-Star Game on Feb 15 — gives buyers time for delivery before weekend.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_allstar_ticket_holder",
+        "name": "All-Star Weekend ticket holder",
+        "criteria": {"field": "all_star_2026.ticket_purchased", "op": "equals", "value": true}
+      },
+      {
+        "id": "aud_allstar_lp_viewer",
+        "name": "League Pass All-Star content viewer",
+        "description": "Fan who has watched All-Star content on League Pass in the last 60 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "league_pass.allstar_content_views_last_60d", "op": "gt", "value": 0},
+            {"field": "league_pass.status", "op": "equals", "value": "active"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Entry: All-Star merch window opens", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "split_aud",
+        "type": "audience_split",
+        "label": "Audience split: ticket holders vs LP All-Star viewers",
+        "mode": "waterfall",
+        "audiences": ["aud_allstar_ticket_holder", "aud_allstar_lp_viewer"]
+      },
+      {
+        "id": "email_ticket_holders",
+        "type": "action",
+        "label": "Email - All-Star ticket holders (gameday gear)",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-10"},
+        "copy": {
+          "subject": "Gear up for All-Star Weekend in LA",
+          "preview": "Jerseys, skills-comp gear, host-city collabs",
+          "cta_label": "Shop All-Star",
+          "modules": [
+            {"rank": "primary", "name": "2026 All-Star Game jerseys"},
+            {"rank": "secondary", "name": "Saturday Night skills-comp gear"},
+            {"rank": "tertiary", "name": "Intuit Dome / LA host-city collab"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "email_lp_viewers",
+        "type": "action",
+        "label": "Email - League Pass All-Star viewers (jersey focus)",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "scheduled", "calendar_date": "2026-02-10"},
+        "copy": {
+          "subject": "Wear the All-Star weekend",
+          "preview": "Jerseys and gear from this year's All-Star",
+          "cta_label": "Shop All-Star",
+          "modules": [
+            {"rank": "primary", "name": "2026 All-Star Game jerseys (featuring {{FT}} representatives)"},
+            {"rank": "secondary", "name": "LA host-city collab"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_aud"},
+      {"from": "split_aud", "to": "email_ticket_holders", "branch_label": "ticket_holders"},
+      {"from": "split_aud", "to": "email_lp_viewers", "branch_label": "lp_viewers"},
+      {"from": "email_ticket_holders", "to": "end_journey"},
+      {"from": "email_lp_viewers", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "All-Star merch revenue attributable to journey"}],
+      "secondary_kpis": [{"name": "Email open / click rate"}, {"name": "Per-segment conversion rate"}],
+      "tests": []
+    }
+  }
+}

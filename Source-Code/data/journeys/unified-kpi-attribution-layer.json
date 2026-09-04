@@ -1,0 +1,118 @@
+{
+  "useCaseId": "unified-kpi-attribution-layer",
+  "name": "Unified Cross-Journey KPI Attribution Engine",
+  "category": {
+    "categoryId": "measurement-intelligence",
+    "categoryName": "Analytics & Attribution"
+  },
+  "journeyTable": {
+    "journeyName": "Attribution Intelligence System",
+    "journeyGoal": "Provide a single source of truth for conversion attribution across all journeys, channels, and platforms",
+    "entryTrigger": "conversion_event_stream",
+    "journeyCategory": "System Measurement",
+    "totalDuration": "continuous",
+    "exitClause": "Always-on measurement layer"
+  },
+  "entryCriteria": {
+    "event": "unified_cross_journey_kpi_attribution_engine_qualified",
+    "eventId": "evt_unified_cross_journey_kpi_attribution_engine_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Journey_Audience"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Journey_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Engagement email",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "unified_cross_journey_kpi_attribution_engine_qualified",
+        "eventId": "evt_unified_cross_journey_kpi_attribution_engine_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "journey_goal_achieved",
+      "eventId": "evt_journey_goal_achieved_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": false,
+      "maxMessagesPerUser": 0,
+      "timeWindowHours": 0
+    },
+    "prioritization": {
+      "priority": "SYSTEM_CRITICAL"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "conversion_event"
+    ],
+    "eventMapping": {
+      "conversion_event": "evt_conversion_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "journey_roi",
+    "secondaryKPIs": [
+      "incremental_revenue",
+      "attribution_confidence_score",
+      "cross_channel_conversion_rate"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

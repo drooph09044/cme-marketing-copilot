@@ -1,0 +1,184 @@
+{
+  "id": "049",
+  "matrix_row_id": 49,
+  "matrix_row_name": "Single-Game Ticket Post-Purchase",
+  "template": "tpl_post_purchase",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a post-purchase journey for single-game MLB tickets through the MLB Ballpark App.",
+    "Create a single-game ticket post-purchase journey. Order confirmation email immediately after purchase, parking and ballpark-logistics email 2 days before the game, game-day morning push with weather and gates-open time, T-30min push for stadium entry, and a post-game survey email Day +1.",
+    "Need an MLB single-game post-purchase flow — confirmation, prep email, game-day push, T-30 stadium entry push, post-game survey."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-single-game-post-purchase",
+    "metadata": {
+      "name": "MLB Single-Game Ticket Post-Purchase",
+      "internal_name": "MLB_SingleGame_PostPurchase_2026",
+      "brand": {"vertical": "ticketing", "league": "MLB", "team": null, "product": "MLB Ballpark App"},
+      "purpose": "Deliver a great single-game ticket-buyer experience from purchase through game day and post-game, surfacing logistics, weather, and a feedback loop.",
+      "archetype": "transactional",
+      "launch_date": "2026-03-26",
+      "end_date": "2026-10-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Maximize gameday attendance and satisfaction for single-game ticket buyers.", "kpi": "Gate-scan rate and post-game NPS", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Transactional cadence anchored to purchase event and game date. Confirmation email at purchase, prep email at T-2d, gameday morning push, T-30min entry push, post-game survey Day +1.",
+        "timing_rationale": "Ticket-buyer touchpoints align with the canonical fan journey to and from the ballpark.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_ticket_buyer",
+        "name": "Single-game ticket buyer",
+        "criteria": {"field": "tickets.single_game_purchase_active", "op": "equals", "value": true},
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_ballpark_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "day"}, "max_entries": null},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: Single-game ticket purchased",
+        "entry_criteria": {"trigger": "event", "event_name": "single_game_ticket_purchased"}
+      },
+      {
+        "id": "email_confirm",
+        "type": "action",
+        "label": "Email - Order confirmation",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Your {{FT}} ticket is confirmed",
+          "preview": "{{MTC}} at the ballpark",
+          "cta_label": "View tickets in app"
+        },
+        "personalization_used": ["FN", "FT", "MTC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_t2d",
+        "type": "wait",
+        "label": "Wait until T-2d to game",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "game_day",
+          "direction": "before",
+          "offset": {"value": 2, "unit": "day"}
+        }
+      },
+      {
+        "id": "email_prep",
+        "type": "action",
+        "label": "Email - Ballpark logistics and parking",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Heading to the ballpark? Here's what to know",
+          "modules": [
+            {"rank": "primary", "name": "Parking + gate map"},
+            {"rank": "secondary", "name": "Concessions and amenities"}
+          ]
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLB Ballpark App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_ballpark", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_gameday_morning",
+        "type": "action",
+        "label": "Push - Gameday morning weather and gates",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "game_day",
+          "direction": "before",
+          "offset": {"value": 6, "unit": "hour"}
+        },
+        "copy": {"headline": "Today at the ballpark - weather and gates info"}
+      },
+      {
+        "id": "push_entry",
+        "type": "action",
+        "label": "Push T-30min - Stadium entry",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "first_pitch",
+          "direction": "before",
+          "offset": {"value": 30, "unit": "minute"}
+        },
+        "copy": {"headline": "First pitch in 30 - tap to open your tickets"}
+      },
+      {
+        "id": "wait_day_after",
+        "type": "wait",
+        "label": "Wait 1 day post-game",
+        "timing": {"type": "wait", "duration": {"value": 1, "unit": "day"}}
+      },
+      {
+        "id": "email_survey",
+        "type": "action",
+        "label": "Email - Post-game survey",
+        "channel": "ch_email",
+        "touch_id": "TC",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "How was your day at the ballpark?",
+          "cta_label": "Take 60-second survey"
+        }
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_confirm"},
+      {"from": "email_confirm", "to": "wait_to_t2d"},
+      {"from": "wait_to_t2d", "to": "email_prep"},
+      {"from": "email_prep", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_gameday_morning", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_day_after", "branch_label": "no"},
+      {"from": "push_gameday_morning", "to": "push_entry"},
+      {"from": "push_entry", "to": "wait_day_after"},
+      {"from": "wait_day_after", "to": "email_survey"},
+      {"from": "email_survey", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Gate-scan rate"}, {"name": "Post-game survey NPS"}],
+      "secondary_kpis": [{"name": "Prep email open rate"}, {"name": "Gameday push click-through"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "id": "046",
+  "matrix_row_id": 46,
+  "matrix_row_name": "Lapsed MLB.TV subscriber win-back",
+  "template": "tpl_win_back",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLB.TV win-back journey for subscribers who lapsed 30+ days ago.",
+    "Create a 30/60/90-day win-back for lapsed MLB.TV subscribers. Tie storylines to fan's favorite team's pennant race position and the Aug 3 trade deadline. Use email and push.",
+    "We need to win back lapsed MLB.TV subs. Day 30: we miss you, with what they missed from their fav-team. Day 60: in-season hook (pennant race or trade deadline). Day 90: incentive offer. Suppress fans who already came back."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-tv-winback-2026",
+    "metadata": {
+      "name": "Lapsed MLB.TV Win-Back",
+      "internal_name": "MLB_TV_WinBack_2026",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB.TV"},
+      "purpose": "Win back fans whose MLB.TV subscription has lapsed by re-engaging them with their favorite team's in-season storylines and a renewal incentive.",
+      "archetype": "win_back",
+      "launch_date": "2026-04-01",
+      "end_date": "2026-09-30",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate lapsed MLB.TV subscribers in-season.", "kpi": "Re-subscription rate among lapsed users", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Standard 30/60/90 win-back cadence. Day 30 leads with what fans missed from their favorite team. Day 60 hooks the pennant race or trade deadline (Jul-Aug, with Aug 3 deadline as a strong content beat). Day 90 offers a renewal incentive as a final push before sunset.",
+        "timing_rationale": "Anchored to subscription expiry date (Day 0). 30/60/90-day touches spaced to reflect industry standard win-back cadence.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_mlb_tv",
+        "name": "Lapsed MLB.TV subscriber",
+        "description": "Fan whose MLB.TV subscription has expired or churned within the last 120 days.",
+        "criteria": {
+          "all_of": [
+            {"field": "mlb_tv.status", "op": "equals", "value": "churned"},
+            {"field": "mlb_tv.days_since_lapse", "op": "between", "value": [30, 120]}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_resubscribed",
+        "name": "Already re-subscribed",
+        "scope": "global",
+        "criteria": {"field": "mlb_tv.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "supp_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {"field": "consent.email", "op": "equals", "value": false}
+      }
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 30 days post-lapse",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {"field": "mlb_tv.days_since_lapse", "op": "equals", "value": 30}
+        }
+      },
+      {
+        "id": "email_d30_we_miss_you",
+        "type": "action",
+        "label": "Email Day 30 - We miss you",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Here's what you missed from {{FT}}",
+          "preview": "Highlights, standings, and what's ahead",
+          "cta_label": "Restart your subscription",
+          "modules": [
+            {"rank": "primary", "name": "Fav-team highlight reel from last 30 days"},
+            {"rank": "secondary", "name": "Current standings + remaining schedule"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_30_days",
+        "type": "wait",
+        "label": "Wait 30 days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d30",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "mlb_tv.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d60_pennant_or_deadline",
+        "type": "action",
+        "label": "Email Day 60 - Pennant race or trade deadline hook",
+        "channel": "ch_email",
+        "touch_id": "T60",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FT}} is in the thick of it",
+          "preview": "Pennant race storylines and Aug 3 trade deadline preview",
+          "cta_label": "Watch live on MLB.TV",
+          "modules": [
+            {"rank": "primary", "name": "Pennant race storyline tied to fav team"},
+            {"rank": "secondary", "name": "Trade deadline preview (when within 4 weeks of Aug 3)"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_d60_optin",
+        "type": "action",
+        "label": "Push Day 60 - Tune-in reminder for fav-team",
+        "channel": "ch_push",
+        "touch_id": "P60",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "{{FT}} is playing tonight - come back to MLB.TV"}
+      },
+      {
+        "id": "wait_30_more",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d60",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "mlb_tv.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d90_incentive",
+        "type": "action",
+        "label": "Email Day 90 - Renewal incentive",
+        "channel": "ch_email",
+        "touch_id": "T90",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "One last invite back to MLB.TV - 30% off through the playoffs",
+          "cta_label": "Renew at 30% off",
+          "modules": [
+            {"rank": "primary", "name": "30% renewal offer"},
+            {"rank": "secondary", "name": "Playoff push preview"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Journey End - Reactivated",
+        "reason": "converted"
+      },
+      {
+        "id": "end_completed",
+        "type": "end",
+        "label": "Journey End - Completed without reactivation",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {"from": "start", "to": "email_d30_we_miss_you"},
+      {"from": "email_d30_we_miss_you", "to": "wait_30_days"},
+      {"from": "wait_30_days", "to": "dec_back_after_d30"},
+      {"from": "dec_back_after_d30", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d30", "to": "email_d60_pennant_or_deadline", "branch_label": "no"},
+      {"from": "email_d60_pennant_or_deadline", "to": "push_d60_optin"},
+      {"from": "push_d60_optin", "to": "wait_30_more"},
+      {"from": "wait_30_more", "to": "dec_back_after_d60"},
+      {"from": "dec_back_after_d60", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d60", "to": "email_d90_incentive", "branch_label": "no"},
+      {"from": "email_d90_incentive", "to": "end_completed"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Re-subscription rate among lapsed users"}],
+      "secondary_kpis": [{"name": "Email open / click rates per touch"}, {"name": "Push view rate at Day 60"}],
+      "tests": []
+    }
+  }
+}

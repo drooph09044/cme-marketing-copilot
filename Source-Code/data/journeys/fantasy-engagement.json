@@ -1,0 +1,87 @@
+{
+  "useCaseId": "fantasy-engagement",
+  "clientTag": "PGA",
+  "name": "Fantasy Golf Engagement Journey",
+  "active": false,
+  "subCategoryId": "engagements",
+  "subCategoryName": "Engagements",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Fantasy Engagement",
+    "journeyGoal": "Increase fantasy participation",
+    "entryTrigger": "tournament_upcoming",
+    "totalDuration": "3 days"
+  },
+  "entryCriteria": {
+    "event": "tournament_upcoming",
+    "eventId": "evt_tour_001",
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Prospective_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "channel": "PUSH",
+      "messageTheme": "Build your fantasy team now",
+      "cta": "Play Now",
+      "tracking": {
+        "campaignId": "push_fantasy",
+        "deliveryId": "del_push_f1",
+        "trackingEvents": [
+          "fantasy_join"
+        ]
+      }
+    }
+  ],
+  "exitConditions": [
+    {
+      "event": "fantasy_join",
+      "eventId": "evt_fantasy_001",
+      "condition": "joined == true",
+      "action": "EXIT"
+    }
+  ],
+  "analytics": {
+    "primaryKPI": "fantasy_join"
+  },
+  "version": "1.0",
+  "status": "READY",
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "tournament_upcoming",
+        "eventId": "evt_tour_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "fantasy_join",
+          "field": "fantasyJoin",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "useCaseId": "ticket-low-value",
+  "name": "Low Value Ticket Purchase Journey",
+  "category": {
+    "categoryId": "ticketing",
+    "categoryName": "Ticketing"
+  },
+  "journeyTable": {
+    "journeyName": "Low Value Ticket Buyers",
+    "journeyGoal": "Increase repeat purchase from one-time ticket buyers",
+    "entryTrigger": "low_ticket_segment",
+    "journeyCategory": "Revenue",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after second purchase"
+  },
+  "entryCriteria": {
+    "event": "ticket_purchase_event",
+    "eventId": "evt_ticket_003",
+    "conditions": [
+      {
+        "field": "ticketsPurchasedSeason",
+        "operator": "EQUALS",
+        "value": 1
+      }
+    ],
+    "identity": {
+      "primaryId": "fanId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Low_Value_Ticket_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Come Back Offer",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "SMS",
+      "messageTheme": "Get 10% off your next match",
+      "cta": "Book Now",
+      "tracking": {
+        "campaignId": "sms_low_ticket",
+        "deliveryId": "del_sms_t1",
+        "trackingEvents": [
+          "sms_click",
+          "ticket_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "ticket_purchase_event",
+        "eventId": "evt_ticket_003"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_purchase",
+          "field": "secondPurchase",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_purchase",
+      "eventId": "evt_ticket_buy_003",
+      "condition": "secondPurchase == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 1,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "ticket_purchase"
+    ],
+    "eventMapping": {
+      "ticket_purchase": "evt_ticket_buy_003"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_purchase",
+    "secondaryKPIs": [
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "single_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

@@ -1,0 +1,347 @@
+{
+  "id": "024",
+  "matrix_row_id": 24,
+  "matrix_row_name": "Playoff Bracket & Wild Card Push",
+  "template": "tpl_playoff_push",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Wild Card playoff bracket reveal + per-fav-team push journey with a 10% A/B holdout.",
+    "Bracket reveal email at the end of the regular season's final Sunday for fans of bracket teams plus general NFL fans. Then per-fav-team push on Saturday, Sunday, and Monday of each Wild Card game. 10% holdout tests whether the bracket reveal email lifts next-round tune-in vs no reveal.",
+    "Need a Wild Card push cadence \u2014 bracket reveal email, then game-night pushes for fav-team fans of bracket teams. Hold out 10% for measurement."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-playoff-wildcard-2027",
+    "metadata": {
+      "name": "Playoff Bracket & Wild Card Push",
+      "internal_name": "NFL_WildCard_Push_2027",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Drive Wild Card Round tune-in (Jan 16-18, 2027) with bracket reveal email plus per-fav-team push on game days. 10% holdout tests bracket-reveal lift.",
+      "archetype": "event_promotion",
+      "launch_date": "2027-01-04",
+      "end_date": "2027-01-19",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive Wild Card tune-in.",
+          "kpi": "Per-game viewership lift vs control",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Composite audience: bracket-team fans + non-bracket fans for league-wide bracket reveal. Bracket reveal email at end of Week 18. Per-fav-team push on Saturday/Sunday/Monday Wild Card games.",
+        "timing_rationale": "Wild Card weekend Jan 16-18, 2027.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push",
+        "ab_test_holdout"
+      ],
+      "moments_that_matter": [
+        "GET PUMPED",
+        "GET READY"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_bracket_fan",
+        "name": "Fan of a Wild Card team",
+        "description": "Fan whose favorite team is one of the 14 playoff teams.",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            },
+            {
+              "field": "playoffs.fav_team_in_bracket",
+              "op": "equals",
+              "value": true
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_general_nfl_fan",
+        "name": "Active NFL fan (any team)",
+        "criteria": {
+          "any_of": [
+            {
+              "field": "activity.last_active_within_days",
+              "op": "lte",
+              "value": 90
+            },
+            {
+              "field": "favorite_team",
+              "op": "is_not_null"
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "End of regular season",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "dec_test_control",
+        "type": "decision",
+        "label": "10% control holdout",
+        "decision_basis": "test_split",
+        "condition": {
+          "field": "_random_pct",
+          "op": "lt",
+          "value": 10
+        }
+      },
+      {
+        "id": "end_control",
+        "type": "end",
+        "label": "Journey End (control)",
+        "reason": "completed"
+      },
+      {
+        "id": "email_bracket_reveal",
+        "type": "action",
+        "label": "Email - Wild Card bracket reveal",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2027-01-11"
+        },
+        "copy": {
+          "subject": "Wild Card matchups are set",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Bracket reveal graphic"
+            },
+            {
+              "rank": "secondary",
+              "name": "Per-fav-team storylines"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_bracket_fan",
+        "type": "decision",
+        "label": "Fav-team in bracket?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "playoffs.fav_team_in_bracket",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_sat",
+        "type": "action",
+        "label": "Push Saturday - Wild Card",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2027-01-16",
+          "time_local": "12:30 ET"
+        },
+        "copy": {
+          "headline": "{{MTC}} - Wild Card kicks off today"
+        },
+        "personalization_used": [
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "push_sun",
+        "type": "action",
+        "label": "Push Sunday - Wild Card",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2027-01-17",
+          "time_local": "12:30 ET"
+        },
+        "copy": {
+          "headline": "Wild Card Sunday - 3 games today"
+        }
+      },
+      {
+        "id": "push_mon",
+        "type": "action",
+        "label": "Push Monday - Wild Card finale",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2027-01-18",
+          "time_local": "17:00 ET"
+        },
+        "copy": {
+          "headline": "Wild Card Monday - tonight's matchup"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_test_control"
+      },
+      {
+        "from": "dec_test_control",
+        "to": "end_control",
+        "branch_label": "control"
+      },
+      {
+        "from": "dec_test_control",
+        "to": "email_bracket_reveal",
+        "branch_label": "test"
+      },
+      {
+        "from": "email_bracket_reveal",
+        "to": "dec_bracket_fan"
+      },
+      {
+        "from": "dec_bracket_fan",
+        "to": "dec_push_optin",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_bracket_fan",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_sat",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_sat",
+        "to": "push_sun"
+      },
+      {
+        "from": "push_sun",
+        "to": "push_mon"
+      },
+      {
+        "from": "push_mon",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Wild Card tune-in lift vs control"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Bracket reveal CTR"
+        },
+        {
+          "name": "Per-game push view rate"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Bracket reveal lift",
+          "hypothesis": "Bracket-reveal email lifts next-round tune-in rate above no-reveal baseline.",
+          "design": "10% holdout receives no journey touches.",
+          "control_holdout_pct": 10.0
+        }
+      ]
+    }
+  }
+}

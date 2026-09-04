@@ -1,0 +1,217 @@
+{
+  "categoryId": "loyalty-commerce",
+  "categoryName": "Loyalty & Commerce",
+  "categoryDescription": "Journeys that blend loyalty nudges, win-back motions, and merchandise conversion.",
+  "subCategoryId": "loyalty-commerce",
+  "subCategoryName": "Loyalty & Commerce",
+  "slug": "merch-drop-countdown",
+  "name": "Merch Drop Countdown",
+  "brief": "Recent merchandise buyers have not pre-registered for the next product drop. Use email and push with early-access messaging, product personalization, and a holdout to measure pre-order lift.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-21",
+  "journeyOverrides": {
+    "name": "Merch Drop Countdown",
+    "objective": "Increase pre-registration and pre-orders for the upcoming product drop.",
+    "audience": "Recent_Merch_Buyers_90d",
+    "variantA": "Standard countdown cadence",
+    "variantB": "Personalized product plus early access"
+  },
+  "nodeOverrides": {
+    "n3": {
+      "title": [
+        "Email 1"
+      ],
+      "subtitle": [
+        "Drop is coming",
+        "preview CTA"
+      ]
+    },
+    "n3b": {
+      "title": [
+        "Email 1B"
+      ],
+      "subtitle": [
+        "Your style ready",
+        "early access"
+      ]
+    },
+    "n6": {
+      "title": [
+        "Push 1"
+      ],
+      "subtitle": [
+        "Product drop",
+        "reserve now"
+      ]
+    },
+    "n9": {
+      "title": [
+        "Email 2"
+      ],
+      "subtitle": [
+        "Last preview",
+        "pre-order today"
+      ]
+    },
+    "n11": {
+      "title": [
+        "Pre-order",
+        "Started?"
+      ]
+    }
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Email 1",
+      "timing": {
+        "description": "+24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Drop is coming — preview CTA",
+      "cta": "Email 1",
+      "tracking": {
+        "campaignId": "email_email1",
+        "deliveryId": "del_email_2",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Push 1",
+      "timing": {
+        "description": "+72h from entry",
+        "offsetHours": 72
+      },
+      "channel": "PUSH",
+      "messageTheme": "Product drop — reserve now",
+      "cta": "Push 1",
+      "tracking": {
+        "campaignId": "push_push1",
+        "deliveryId": "del_push_3",
+        "trackingEvents": [
+          "push_sent",
+          "push_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Email 2",
+      "timing": {
+        "description": "+168h from entry",
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Last preview — pre-order today",
+      "cta": "Email 2",
+      "tracking": {
+        "campaignId": "email_email2",
+        "deliveryId": "del_email_4",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "merch_drop_countdown_qualified",
+    "eventId": "evt_merch_drop_countdown_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Recent_Merch_Buyers_90d"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Recent_Merch_Buyers_90d"
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_completed",
+      "eventId": "evt_purchase_completed_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "merch_drop_countdown_qualified",
+        "eventId": "evt_merch_drop_countdown_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_completed",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "purchase_completed",
+          "field": "purchaseCompleted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "merch-drop-countdown"
+}

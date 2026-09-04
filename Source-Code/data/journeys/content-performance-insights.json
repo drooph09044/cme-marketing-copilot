@@ -1,0 +1,120 @@
+{
+  "useCaseId": "content-performance-insights",
+  "name": "Content Performance & Commissioning Insights Journey",
+  "category": {
+    "categoryId": "content-intelligence",
+    "categoryName": "Content Strategy"
+  },
+  "journeyTable": {
+    "journeyName": "Content Performance Insights",
+    "journeyGoal": "Optimize content commissioning decisions",
+    "entryTrigger": "content_engagement_signal",
+    "journeyCategory": "Analytics",
+    "totalDuration": "Ongoing",
+    "exitClause": "Continuous evaluation"
+  },
+  "entryCriteria": {
+    "event": "content_watch",
+    "eventId": "evt_content_002",
+    "conditions": [
+      {
+        "field": "completionRate",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 80
+      }
+    ],
+    "identity": {
+      "primaryId": "contentId",
+      "namespace": "CONTENT"
+    },
+    "audienceName": "High_Performing_Content"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Dashboard Alert",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "INTERNAL",
+      "messageTheme": "High performing content detected – review for commissioning",
+      "cta": "View Insights",
+      "tracking": {
+        "campaignId": "internal_content_alert",
+        "deliveryId": "del_content_1",
+        "trackingEvents": [
+          "alert_view",
+          "commissioning_action"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "data-driven",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "content_watch",
+        "eventId": "evt_content_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "commissioning_action",
+          "field": "reviewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": false,
+      "maxMessagesPerUser": 0,
+      "timeWindowHours": 0
+    },
+    "prioritization": {
+      "priority": "LOW"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "content_watch"
+    ],
+    "eventMapping": {
+      "content_watch": "evt_content_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "content_roi",
+    "secondaryKPIs": [
+      "share_rate"
+    ],
+    "attribution": {
+      "model": "none",
+      "lookbackHours": 0
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

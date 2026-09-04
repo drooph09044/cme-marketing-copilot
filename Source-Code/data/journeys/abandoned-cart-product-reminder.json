@@ -1,0 +1,168 @@
+{
+  "useCaseId": "abandoned-cart-product-reminder",
+  "name": "Abandoned Cart: Product – Reminder Journey",
+  "category": {
+    "categoryId": "engagement-journey",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Abandoned Cart: Product – Reminder",
+    "journeyGoal": "Remind users who added products to cart but did not complete purchase",
+    "entryTrigger": "user_abandoned_cart_product",
+    "journeyCategory": "Re-Engagement",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after product purchased or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_abandoned_cart_product",
+    "eventId": "evt_cart_product_001",
+    "conditions": [
+      {
+        "field": "cartStatus",
+        "operator": "EQUALS",
+        "value": "PENDING"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Abandoned Cart Product Users – Reminder"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Product Cart Reminder Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "You left products in your cart – complete your purchase now!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "push_cart_product_reminder",
+        "deliveryId": "del_push_40",
+        "trackingEvents": [
+          "push_open",
+          "product_purchase"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Product Cart Reminder Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Your selected products are waiting – complete your purchase today!",
+      "cta": "Complete Purchase",
+      "tracking": {
+        "campaignId": "email_cart_product_reminder",
+        "deliveryId": "del_email_40",
+        "trackingEvents": [
+          "email_open",
+          "product_purchase"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_abandoned_cart_product",
+        "eventId": "evt_cart_product_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "productPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "product_purchase",
+          "field": "productPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "product_purchase",
+      "eventId": "evt_product_004",
+      "condition": "productPurchased == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "product_purchase"
+    ],
+    "eventMapping": {
+      "product_purchase": "evt_product_004"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "product_purchase",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

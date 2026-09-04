@@ -1,0 +1,343 @@
+{
+  "id": "013",
+  "matrix_row_id": 13,
+  "matrix_row_name": "NFL+ Subscriber Welcome Series",
+  "template": "tpl_welcome_series",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a 6-day NFL+ subscriber welcome series with email and push.",
+    "Create a welcome series for new NFL+ subscribers. Day 0 email confirming the account and introducing the brand. Day 2 push prompting fav-team setup if not yet set. Day 4 email featuring social proof and top moments from the current season. Day 6 push promoting first NFL+ content tailored to fav team. Suppress fans who already churned.",
+    "Need an NFL+ onboarding flow that mixes email and push across 6 days, with a fav-team set-on-profile activation goal."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-plus-welcome-series",
+    "metadata": {
+      "name": "NFL+ Subscriber Welcome Series",
+      "internal_name": "NFL_Plus_Welcome_Series_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Onboard new NFL+ subscribers across a 6-day welcome series mixing email and push, with fav-team set as an activation goal.",
+      "archetype": "welcome",
+      "launch_date": "2026-06-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Activate new NFL+ subscribers.",
+          "kpi": "First-watch rate within 7 days of signup",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Day 0 email confirms account and introduces brand. Day 2 push prompts fav-team setup if missing. Day 4 email features social proof and top moments. Day 6 push promotes first NFL+ content tailored to fav-team.",
+        "timing_rationale": "6-day onboarding window matches NFL+ engagement-half-life.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "GET PUMPED"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_new_nfl_plus_sub",
+        "name": "New NFL+ subscriber (last 24h)",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "nfl_plus.status",
+              "op": "equals",
+              "value": "active"
+            },
+            {
+              "field": "nfl_plus.days_since_signup",
+              "op": "equals",
+              "value": 0
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      },
+      {
+        "id": "supp_churned",
+        "name": "Already churned",
+        "scope": "global",
+        "criteria": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "churned"
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "New NFL+ subscriber",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "nfl_plus_subscribed"
+        }
+      },
+      {
+        "id": "email_d0",
+        "type": "action",
+        "label": "Email Day 0 - Welcome to NFL+",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Welcome to NFL+, {{FN}}",
+          "cta_label": "Set up your profile"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_2d",
+        "type": "wait",
+        "label": "Wait 2 days",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team set?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "favorite_team",
+          "op": "is_not_null"
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_d2_fav_team",
+        "type": "action",
+        "label": "Push Day 2 - Set your favorite team",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Set your favorite team for personalized content"
+        }
+      },
+      {
+        "id": "wait_2d_more",
+        "type": "wait",
+        "label": "Wait to Day 4",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_d4",
+        "type": "action",
+        "label": "Email Day 4 - Top moments + social proof",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "What fans are watching on NFL+ this season",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Top moments reel"
+            },
+            {
+              "rank": "secondary",
+              "name": "Social proof testimonials"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "wait_2d_more2",
+        "type": "wait",
+        "label": "Wait to Day 6",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "push_d6",
+        "type": "action",
+        "label": "Push Day 6 - Fav-team content",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "New {{FT}} content on NFL+"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_d0"
+      },
+      {
+        "from": "email_d0",
+        "to": "wait_2d"
+      },
+      {
+        "from": "wait_2d",
+        "to": "dec_has_fav_team"
+      },
+      {
+        "from": "dec_has_fav_team",
+        "to": "wait_2d_more",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_has_fav_team",
+        "to": "dec_push_optin",
+        "branch_label": "no"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_d2_fav_team",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_2d_more",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_d2_fav_team",
+        "to": "wait_2d_more"
+      },
+      {
+        "from": "wait_2d_more",
+        "to": "email_d4"
+      },
+      {
+        "from": "email_d4",
+        "to": "wait_2d_more2"
+      },
+      {
+        "from": "wait_2d_more2",
+        "to": "push_d6"
+      },
+      {
+        "from": "push_d6",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "First-watch rate within 7d"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Favorite-team set rate"
+        },
+        {
+          "name": "Email open / click by touch"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

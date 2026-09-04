@@ -1,0 +1,267 @@
+{
+  "id": "028",
+  "matrix_row_id": 28,
+  "matrix_row_name": "NFL+ Trial Page Browse Abandon",
+  "template": "tpl_browse_abandonment",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a browse-abandon journey for NFL+ trial-page viewers.",
+    "Triggered when a known fan views the NFL+ pricing or trial page but doesn't start a trial within 30 minutes. Web modal on the fan's next NFL.com visit within 24h, plus an email 24h post-view with trial CTA and a content preview of fav-team coverage. Suppress active NFL+ subscribers.",
+    "Need an NFL+ trial-page browse abandon recovery \u2014 modal on next visit, then a 24h email."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-plus-trial-browse-abandon",
+    "metadata": {
+      "name": "NFL+ Trial Page Browse Abandon",
+      "internal_name": "NFL_Plus_TrialBrowse_Abandon_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Recover known fans who viewed NFL+ pricing or trial page without starting a trial.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-06-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Convert NFL+ trial browse abandoners.",
+          "kpi": "Trial-start rate among abandoners",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Trigger when known fan views pricing/trial page but doesn't start a trial within 30 minutes. Web modal on next NFL.com visit within 24h, plus email 24h after view.",
+        "timing_rationale": "30-min trial-start window; 24h recovery window with single recovery channel.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "web_modal",
+        "email"
+      ],
+      "moments_that_matter": [
+        "PLAN & COMMIT"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_trial_browse_known",
+        "name": "Known fan viewed trial page",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "nfl_plus.trial_page_viewed_within_minutes",
+              "op": "lte",
+              "value": 30
+            },
+            {
+              "field": "nfl_plus.trial_started_in_session",
+              "op": "equals",
+              "value": false
+            },
+            {
+              "field": "identity.hashed_email",
+              "op": "is_not_null"
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_already_sub",
+        "name": "Already NFL+ subscriber",
+        "scope": "global",
+        "criteria": {
+          "field": "nfl_plus.status",
+          "op": "equals",
+          "value": "active"
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_web_modal",
+        "type": "web_modal",
+        "platform": "nfl_web"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 7,
+        "unit": "day"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trial page viewed but no trial started",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "trial_page_viewed_no_start"
+        }
+      },
+      {
+        "id": "wait_30min",
+        "type": "wait",
+        "label": "Wait 30 minutes",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 30,
+            "unit": "minute"
+          }
+        }
+      },
+      {
+        "id": "dec_returned",
+        "type": "decision",
+        "label": "Started trial?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nfl_plus.trial_started_within_24h",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "modal_next_visit",
+        "type": "action",
+        "label": "Web Modal on next NFL.com visit",
+        "channel": "ch_web_modal",
+        "touch_id": "WM1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Start your NFL+ trial - free for 7 days",
+          "cta_label": "Start trial"
+        }
+      },
+      {
+        "id": "wait_to_24h",
+        "type": "wait",
+        "label": "Wait to 24h after view",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 23,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "email_24h",
+        "type": "action",
+        "label": "Email 24h - Start your trial",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "Your NFL+ trial is one click away - {{FT}} coverage included",
+          "cta_label": "Start trial"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Trial started",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "wait_30min"
+      },
+      {
+        "from": "wait_30min",
+        "to": "dec_returned"
+      },
+      {
+        "from": "dec_returned",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_returned",
+        "to": "modal_next_visit",
+        "branch_label": "no"
+      },
+      {
+        "from": "modal_next_visit",
+        "to": "wait_to_24h"
+      },
+      {
+        "from": "wait_to_24h",
+        "to": "email_24h"
+      },
+      {
+        "from": "email_24h",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Trial-start rate among abandoners"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Modal CTR"
+        },
+        {
+          "name": "Email CTR"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,238 @@
+{
+  "useCaseId": "free-to-paid-conversion-journey",
+  "name": "Free-to-Paid Conversion Journey",
+  "category": {
+    "categoryId": "conversion-monetization",
+    "categoryName": "Conversion & Monetization"
+  },
+  "journeyTable": {
+    "journeyName": "Free-to-Paid Conversion Journey",
+    "journeyGoal": "Convert free users into paying subscribers through value demonstration, personalization, and time-bound offers",
+    "entryTrigger": "free_user_active",
+    "journeyCategory": "Conversion & Monetization",
+    "totalDuration": "14 days",
+    "exitClause": "Exit when subscription_purchased OR trial_activated"
+  },
+  "entryCriteria": {
+    "event": "free_user_active",
+    "eventId": "evt_free_user_active_001",
+    "conditions": [
+      {
+        "field": "subscriptionType",
+        "operator": "EQUALS",
+        "value": "FREE"
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Free_Tier_Active_Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 0",
+      "timing": {
+        "description": "Immediately after activation in journey",
+        "offsetHours": 0
+      },
+      "channel": [
+        "IN_APP",
+        "EMAIL"
+      ],
+      "messageTheme": "You're getting the most out of [Platform] – unlock everything; benefits list",
+      "cta": "Start Free Trial",
+      "tracking": {
+        "campaignId": "onboarding_trial_offer",
+        "deliveryId": "del_inapp_email_1401",
+        "trackingEvents": [
+          "inapp_view",
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "firstName",
+        "usageSummary",
+        "featureHighlights"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 5",
+      "timing": {
+        "description": "5 days after journey entry",
+        "offsetHours": 120
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Here's what you're missing – specific locked content personalised to viewing history",
+      "cta": "Unlock Now",
+      "tracking": {
+        "campaignId": "locked_content_nudge",
+        "deliveryId": "del_push_email_1402",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "lockedContentList",
+        "watchHistory",
+        "recommendations"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 14",
+      "timing": {
+        "description": "14 days after journey entry",
+        "offsetHours": 336
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Limited offer – first month discounted or extended trial",
+      "cta": "Claim Offer",
+      "tracking": {
+        "campaignId": "trial_conversion_offer",
+        "deliveryId": "del_email_1403",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "discountOffer",
+        "trialExtensionOption",
+        "pricingPlan"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "userActivationDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "free_user_active",
+        "eventId": "evt_free_user_active_001"
+      },
+      {
+        "id": "n2",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n3",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_purchased",
+          "field": "subscriptionPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n4"
+      },
+      {
+        "id": "n4",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n6",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_purchased",
+          "field": "subscriptionPurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n7"
+      },
+      {
+        "id": "n7",
+        "type": "WAIT",
+        "durationHours": 216
+      },
+      {
+        "id": "n8",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n9",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_purchased",
+      "eventId": "evt_subscription_purchased_001",
+      "action": "IMMEDIATE_EXIT"
+    },
+    {
+      "event": "trial_activated",
+      "eventId": "evt_trial_activated_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowDays": 14
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "subscription_purchased == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "subscription_purchased",
+      "trial_activated"
+    ],
+    "eventMapping": {
+      "free_user_active": "evt_free_user_active_001",
+      "subscription_purchased": "evt_subscription_purchased_001",
+      "trial_activated": "evt_trial_activated_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "subscription_purchased",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "inapp_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 14
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

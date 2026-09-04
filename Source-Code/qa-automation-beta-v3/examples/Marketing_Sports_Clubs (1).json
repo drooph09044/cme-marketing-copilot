@@ -1,0 +1,1535 @@
+[
+  {
+    "useCaseId": "ticket-purchase-growth",
+    "name": "Ticket Purchase Growth Journey",
+    "category": {
+      "categoryId": "commerce",
+      "categoryName": "Commerce"
+    },
+    "journeyTable": {
+      "journeyName": "Ticket Purchase Growth",
+      "journeyGoal": "Increase repeat ticket purchases and season ticket upgrades",
+      "entryTrigger": "ticket_purchase_detected",
+      "journeyCategory": "Sales",
+      "totalDuration": "14 days",
+      "exitClause": "Exit after repeat purchase or season ticket upgrade"
+    },
+    "entryCriteria": {
+      "event": "ticket_purchase_detected",
+      "eventId": "evt_ticket_001",
+      "conditions": [
+        {
+          "field": "ticketPurchaseType",
+          "operator": "IN",
+          "value": [
+            "SINGLE_MATCH",
+            "SEASON_TICKET_HOLDER"
+          ]
+        },
+        {
+          "field": "marketingOptIn",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Ticket_Purchasers_and_STH"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Upcoming Match Recommendation",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Don’t miss the next big match",
+        "cta": "Buy Tickets",
+        "tracking": {
+          "campaignId": "email_match_recommendation",
+          "deliveryId": "del_email_t1",
+          "trackingEvents": [
+            "email_open",
+            "ticket_purchase"
+          ]
+        }
+      },
+      {
+        "tpId": "TP2",
+        "label": "Season Ticket Upgrade Offer",
+        "timing": {
+          "offsetHours": 120
+        },
+        "channel": "SMS",
+        "messageTheme": "Upgrade to a season pass for exclusive benefits",
+        "cta": "Upgrade Now",
+        "tracking": {
+          "campaignId": "sms_season_upgrade",
+          "deliveryId": "del_sms_t2",
+          "trackingEvents": [
+            "sms_click",
+            "season_upgrade"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ticket_purchase_detected",
+          "eventId": "evt_ticket_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "repeatPurchase",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "season_upgrade",
+            "field": "seasonTicketUpgrade",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n6"
+        },
+        {
+          "id": "n6",
+          "type": "WAIT",
+          "durationHours": 96
+        },
+        {
+          "id": "n7",
+          "type": "MESSAGE",
+          "tpId": "TP2"
+        },
+        {
+          "id": "n8",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_purchase",
+        "eventId": "evt_ticket_purchase_002",
+        "condition": "repeatPurchase == true",
+        "action": "EXIT"
+      },
+      {
+        "event": "season_upgrade",
+        "eventId": "evt_upgrade_002",
+        "condition": "seasonTicketUpgrade == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_purchase",
+        "season_upgrade"
+      ],
+      "eventMapping": {
+        "ticket_purchase": "evt_ticket_purchase_002",
+        "season_upgrade": "evt_upgrade_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_purchase",
+      "secondaryKPIs": [
+        "season_upgrade",
+        "email_open",
+        "sms_click"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "reengage-dormant-12m",
+    "name": "Re-engage Dormant Fans Journey (12 Months)",
+    "category": {
+      "categoryId": "reengagement",
+      "categoryName": "Re-engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Re-engage Dormant Fans (12 Months)",
+      "journeyGoal": "Bring back fans inactive for 12 months",
+      "entryTrigger": "fan_dormant_12m_detected",
+      "journeyCategory": "Re-engagement",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after reactivation or any engagement event"
+    },
+    "entryCriteria": {
+      "event": "fan_inactive_detected",
+      "eventId": "evt_inactive_001",
+      "conditions": [
+        {
+          "field": "daysSinceLastActivity",
+          "operator": "GREATER_THAN_EQUALS",
+          "value": 365
+        },
+        {
+          "field": "appOpens",
+          "operator": "EQUALS",
+          "value": 0
+        },
+        {
+          "field": "purchases",
+          "operator": "EQUALS",
+          "value": 0
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Dormant_12M_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "We Miss You Message",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "EMAIL",
+        "messageTheme": "We’ve missed you — see what’s new",
+        "cta": "Explore Updates",
+        "tracking": {
+          "campaignId": "email_reengage_12m",
+          "deliveryId": "del_email_r12",
+          "trackingEvents": [
+            "email_open",
+            "app_open"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "fan_inactive_detected",
+          "eventId": "evt_inactive_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "app_open",
+            "field": "engaged",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "app_open",
+        "eventId": "evt_app_open_001",
+        "condition": "engaged == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 1,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "app_open"
+      ],
+      "eventMapping": {
+        "app_open": "evt_app_open_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "app_open",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "single_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "ticket-high-value",
+    "name": "High Value Ticket Purchase Journey",
+    "category": {
+      "categoryId": "ticketing",
+      "categoryName": "Ticketing"
+    },
+    "journeyTable": {
+      "journeyName": "High Value Ticket Buyers",
+      "journeyGoal": "Increase ticket purchases from high-value fans",
+      "entryTrigger": "high_value_ticket_segment",
+      "journeyCategory": "Revenue",
+      "totalDuration": "14 days",
+      "exitClause": "Exit after incremental purchase or escalation to season ticket"
+    },
+    "entryCriteria": {
+      "event": "ticket_purchase_event",
+      "eventId": "evt_ticket_001",
+      "conditions": [
+        {
+          "field": "ticketsPurchasedSeason",
+          "operator": "GREATER_THAN",
+          "value": 5
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Value_Ticket_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "VIP Match Access",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Exclusive access to upcoming matches",
+        "cta": "Book Now",
+        "tracking": {
+          "campaignId": "email_vip_ticket",
+          "deliveryId": "del_email_tvh1",
+          "trackingEvents": [
+            "email_open",
+            "ticket_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ticket_purchase_event",
+          "eventId": "evt_ticket_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "incrementalPurchase",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_purchase",
+        "eventId": "evt_ticket_buy_001",
+        "condition": "incrementalPurchase == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_purchase"
+      ],
+      "eventMapping": {
+        "ticket_purchase": "evt_ticket_buy_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_purchase",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "ticket-medium-value",
+    "name": "Medium Value Ticket Purchase Journey",
+    "category": {
+      "categoryId": "ticketing",
+      "categoryName": "Ticketing"
+    },
+    "journeyTable": {
+      "journeyName": "Medium Value Ticket Buyers",
+      "journeyGoal": "Increase purchase frequency of medium-tier fans",
+      "entryTrigger": "medium_ticket_segment",
+      "journeyCategory": "Revenue",
+      "totalDuration": "14 days",
+      "exitClause": "Exit after purchase increase"
+    },
+    "entryCriteria": {
+      "event": "ticket_purchase_event",
+      "eventId": "evt_ticket_002",
+      "conditions": [
+        {
+          "field": "ticketsPurchasedSeason",
+          "operator": "BETWEEN",
+          "value": [
+            2,
+            4
+          ]
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Medium_Value_Ticket_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Next Match Reminder",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Don’t miss your next match",
+        "cta": "Buy Tickets",
+        "tracking": {
+          "campaignId": "email_mid_ticket",
+          "deliveryId": "del_email_tm1",
+          "trackingEvents": [
+            "email_open",
+            "ticket_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ticket_purchase_event",
+          "eventId": "evt_ticket_002"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "purchaseIncreased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_purchase",
+        "eventId": "evt_ticket_buy_002",
+        "condition": "purchaseIncreased == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_purchase"
+      ],
+      "eventMapping": {
+        "ticket_purchase": "evt_ticket_buy_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_purchase",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "ticket-low-value",
+    "name": "Low Value Ticket Purchase Journey",
+    "category": {
+      "categoryId": "ticketing",
+      "categoryName": "Ticketing"
+    },
+    "journeyTable": {
+      "journeyName": "Low Value Ticket Buyers",
+      "journeyGoal": "Increase repeat purchase from one-time ticket buyers",
+      "entryTrigger": "low_ticket_segment",
+      "journeyCategory": "Revenue",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after second purchase"
+    },
+    "entryCriteria": {
+      "event": "ticket_purchase_event",
+      "eventId": "evt_ticket_003",
+      "conditions": [
+        {
+          "field": "ticketsPurchasedSeason",
+          "operator": "EQUALS",
+          "value": 1
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Low_Value_Ticket_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Come Back Offer",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "SMS",
+        "messageTheme": "Get 10% off your next match",
+        "cta": "Book Now",
+        "tracking": {
+          "campaignId": "sms_low_ticket",
+          "deliveryId": "del_sms_t1",
+          "trackingEvents": [
+            "sms_click",
+            "ticket_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "ticket_purchase_event",
+          "eventId": "evt_ticket_003"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "ticket_purchase",
+            "field": "secondPurchase",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "ticket_purchase",
+        "eventId": "evt_ticket_buy_003",
+        "condition": "secondPurchase == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 1,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "ticket_purchase"
+      ],
+      "eventMapping": {
+        "ticket_purchase": "evt_ticket_buy_003"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "ticket_purchase",
+      "secondaryKPIs": [
+        "sms_click"
+      ],
+      "attribution": {
+        "model": "single_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "merch-high-value",
+    "name": "High Value Merchandise Purchase Journey",
+    "category": {
+      "categoryId": "merchandising",
+      "categoryName": "Shop - Merchandise"
+    },
+    "journeyTable": {
+      "journeyName": "High Value Merchandise Buyers",
+      "journeyGoal": "Increase cross-sell and repeat high-value merch purchases",
+      "entryTrigger": "high_merch_segment",
+      "journeyCategory": "Revenue",
+      "totalDuration": "14 days",
+      "exitClause": "Exit after repeat purchase or upgrade segment"
+    },
+    "entryCriteria": {
+      "event": "merch_purchase_event",
+      "eventId": "evt_merch_001",
+      "conditions": [
+        {
+          "field": "averageOrderValue",
+          "operator": "GREATER_THAN",
+          "value": 300
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "High_Value_Merch_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "VIP Merchandise Drop",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Exclusive merch collection just for you",
+        "cta": "Shop Now",
+        "tracking": {
+          "campaignId": "email_merch_vip",
+          "deliveryId": "del_email_mh1",
+          "trackingEvents": [
+            "email_open",
+            "product_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "merch_purchase_event",
+          "eventId": "evt_merch_001"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "product_purchase",
+            "field": "repeatMerchPurchase",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "product_purchase",
+        "eventId": "evt_product_001",
+        "condition": "repeatMerchPurchase == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "product_purchase"
+      ],
+      "eventMapping": {
+        "product_purchase": "evt_product_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "product_purchase",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "merch-medium-value",
+    "name": "Medium Value Merchandise Purchase Journey",
+    "category": {
+      "categoryId": "merchandising",
+      "categoryName": "Shop - Merchandise"
+    },
+    "journeyTable": {
+      "journeyName": "Medium Value Merchandise Buyers",
+      "journeyGoal": "Increase order frequency for mid-value merch customers",
+      "entryTrigger": "medium_merch_segment",
+      "journeyCategory": "Revenue",
+      "totalDuration": "10 days",
+      "exitClause": "Exit after purchase increase"
+    },
+    "entryCriteria": {
+      "event": "merch_purchase_event",
+      "eventId": "evt_merch_002",
+      "conditions": [
+        {
+          "field": "averageOrderValue",
+          "operator": "BETWEEN",
+          "value": [
+            50,
+            299
+          ]
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Medium_Value_Merch_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "New Collection Drop",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "EMAIL",
+        "messageTheme": "Fresh merch just landed",
+        "cta": "Explore",
+        "tracking": {
+          "campaignId": "email_merch_mid",
+          "deliveryId": "del_email_mm1",
+          "trackingEvents": [
+            "email_open",
+            "product_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "merch_purchase_event",
+          "eventId": "evt_merch_002"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "product_purchase",
+            "field": "repeatPurchase",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "product_purchase",
+        "eventId": "evt_product_002",
+        "condition": "repeatPurchase == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 336
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "product_purchase"
+      ],
+      "eventMapping": {
+        "product_purchase": "evt_product_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "product_purchase",
+      "secondaryKPIs": [
+        "email_open"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 336
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "merch-low-value",
+    "name": "Low Value Merchandise Purchase Journey",
+    "category": {
+      "categoryId": "merchandising",
+      "categoryName": "Shop - Merchandise"
+    },
+    "journeyTable": {
+      "journeyName": "Low Value Merchandise Buyers",
+      "journeyGoal": "Increase repeat purchases from low-value merch customers",
+      "entryTrigger": "low_merch_segment",
+      "journeyCategory": "Revenue",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after second purchase or upgrade to higher tier"
+    },
+    "entryCriteria": {
+      "event": "merch_purchase_event",
+      "eventId": "evt_merch_003",
+      "conditions": [
+        {
+          "field": "averageOrderValue",
+          "operator": "LESS_THAN",
+          "value": 50
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Low_Value_Merch_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Discount Incentive Offer",
+        "timing": {
+          "offsetHours": 24
+        },
+        "channel": "SMS",
+        "messageTheme": "Enjoy 15% off your next merch order",
+        "cta": "Shop Now",
+        "tracking": {
+          "campaignId": "sms_merch_low",
+          "deliveryId": "del_sms_ml1",
+          "trackingEvents": [
+            "sms_click",
+            "product_purchase"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "merch_purchase_event",
+          "eventId": "evt_merch_003"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "product_purchase",
+            "field": "repeatPurchase",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 24
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "product_purchase",
+        "eventId": "evt_product_003",
+        "condition": "repeatPurchase == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 1,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "product_purchase"
+      ],
+      "eventMapping": {
+        "product_purchase": "evt_product_003"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "product_purchase",
+      "secondaryKPIs": [
+        "sms_click"
+      ],
+      "attribution": {
+        "model": "single_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "engagement-medium",
+    "name": "Medium Engagement Fans Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Medium Engagement Fans",
+      "journeyGoal": "Increase engagement for moderately active fans",
+      "entryTrigger": "medium_engagement_detected",
+      "journeyCategory": "Engagement",
+      "totalDuration": "10 days",
+      "exitClause": "Exit after reaching high engagement threshold"
+    },
+    "entryCriteria": {
+      "event": "engagement_event",
+      "eventId": "evt_engage_002",
+      "conditions": [
+        {
+          "field": "avgMinutesWatched",
+          "operator": "BETWEEN",
+          "value": [
+            11,
+            59
+          ]
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Medium_Engagement_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Content Recommendation",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "IN_APP",
+        "messageTheme": "More content you might enjoy",
+        "cta": "Watch Now",
+        "tracking": {
+          "campaignId": "inapp_eng_mid",
+          "deliveryId": "del_inapp_em1",
+          "trackingEvents": [
+            "inapp_view",
+            "video_watch"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "engagement_event",
+          "eventId": "evt_engage_002"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "video_watch",
+            "field": "engagementIncreased",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "video_watch",
+        "eventId": "evt_video_001",
+        "condition": "engagementIncreased == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 3,
+        "timeWindowHours": 240
+      },
+      "prioritization": {
+        "priority": "MEDIUM"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "video_watch"
+      ],
+      "eventMapping": {
+        "video_watch": "evt_video_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "video_watch",
+      "secondaryKPIs": [
+        "inapp_view"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 240
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "engagement-low",
+    "name": "Low Engagement Fans Journey",
+    "category": {
+      "categoryId": "engagement",
+      "categoryName": "Engagement"
+    },
+    "journeyTable": {
+      "journeyName": "Low Engagement Fans",
+      "journeyGoal": "Activate low-engaged fans into active viewers",
+      "entryTrigger": "low_engagement_detected",
+      "journeyCategory": "Engagement",
+      "totalDuration": "7 days",
+      "exitClause": "Exit after first meaningful engagement"
+    },
+    "entryCriteria": {
+      "event": "engagement_event",
+      "eventId": "evt_engage_003",
+      "conditions": [
+        {
+          "field": "avgMinutesWatched",
+          "operator": "LESS_THAN",
+          "value": 10
+        }
+      ],
+      "identity": {
+        "primaryId": "fanId",
+        "namespace": "ECID"
+      },
+      "audienceName": "Low_Engagement_Fans"
+    },
+    "touchpoints": [
+      {
+        "tpId": "TP1",
+        "label": "Reactivation Content Push",
+        "timing": {
+          "offsetHours": 0
+        },
+        "channel": "PUSH",
+        "messageTheme": "Catch today’s highlights",
+        "cta": "Watch Highlights",
+        "tracking": {
+          "campaignId": "push_eng_low",
+          "deliveryId": "del_push_el1",
+          "trackingEvents": [
+            "push_open",
+            "video_watch"
+          ]
+        }
+      }
+    ],
+    "journey": {
+      "type": "event-based",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "engagement_event",
+          "eventId": "evt_engage_003"
+        },
+        {
+          "id": "n2",
+          "type": "CONDITION",
+          "condition": {
+            "eventToCheck": "video_watch",
+            "field": "firstEngagement",
+            "operator": "EQUALS",
+            "value": true
+          },
+          "trueBranch": "EXIT",
+          "falseBranch": "n3"
+        },
+        {
+          "id": "n3",
+          "type": "WAIT",
+          "durationHours": 0
+        },
+        {
+          "id": "n4",
+          "type": "MESSAGE",
+          "tpId": "TP1"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [
+      {
+        "event": "video_watch",
+        "eventId": "evt_video_002",
+        "condition": "firstEngagement == true",
+        "action": "EXIT"
+      }
+    ],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": true,
+        "maxMessagesPerUser": 2,
+        "timeWindowHours": 168
+      },
+      "prioritization": {
+        "priority": "HIGH"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "video_watch"
+      ],
+      "eventMapping": {
+        "video_watch": "evt_video_002"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "video_watch",
+      "secondaryKPIs": [
+        "push_open"
+      ],
+      "attribution": {
+        "model": "single_touch",
+        "lookbackHours": 168
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "real-time-event-qualification-layer",
+    "name": "Real-Time Event Qualification & Signal Generation Layer",
+    "category": {
+      "categoryId": "data-intelligence",
+      "categoryName": "Intelligence Layer"
+    },
+    "journeyTable": {
+      "journeyName": "Event Qualification Engine",
+      "journeyGoal": "Convert raw behavioral events into enriched, decision-ready signals for activation across CDP, AJO, and Target",
+      "entryTrigger": "all_event_stream_ingestion",
+      "journeyCategory": "System Intelligence",
+      "totalDuration": "continuous",
+      "exitClause": "Always-on system process"
+    },
+    "entryCriteria": {
+      "event": "raw_event_stream",
+      "eventId": "evt_raw_001",
+      "conditions": [
+        {
+          "field": "eventReceived",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "ECID",
+        "namespace": "AEP_IDENTITY"
+      },
+      "audienceName": "All_Users"
+    },
+    "touchpoints": [],
+    "journey": {
+      "type": "system-processing",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "raw_event_stream"
+        },
+        {
+          "id": "n2",
+          "type": "PROCESS",
+          "name": "event_deduplication_and_stitching"
+        },
+        {
+          "id": "n3",
+          "type": "PROCESS",
+          "name": "behavioral_signal_scoring"
+        },
+        {
+          "id": "n4",
+          "type": "PROCESS",
+          "name": "context_enrichment"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": false,
+        "maxMessagesPerUser": 0,
+        "timeWindowHours": 0
+      },
+      "prioritization": {
+        "priority": "SYSTEM_CRITICAL"
+      }
+    },
+    "tracking": {
+      "globalEvents": [],
+      "eventMapping": {}
+    },
+    "analytics": {
+      "primaryKPI": "signal_accuracy",
+      "secondaryKPIs": [
+        "event_latency",
+        "noise_reduction_rate",
+        "conversion_lift_from_signals"
+      ],
+      "attribution": {
+        "model": "none",
+        "lookbackHours": 0
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  },
+  {
+    "useCaseId": "unified-kpi-attribution-layer",
+    "name": "Unified Cross-Journey KPI Attribution Engine",
+    "category": {
+      "categoryId": "measurement-intelligence",
+      "categoryName": "Analytics & Attribution"
+    },
+    "journeyTable": {
+      "journeyName": "Attribution Intelligence System",
+      "journeyGoal": "Provide a single source of truth for conversion attribution across all journeys, channels, and platforms",
+      "entryTrigger": "conversion_event_stream",
+      "journeyCategory": "System Measurement",
+      "totalDuration": "continuous",
+      "exitClause": "Always-on measurement layer"
+    },
+    "entryCriteria": {
+      "event": "conversion_event",
+      "eventId": "evt_conversion_001",
+      "conditions": [
+        {
+          "field": "conversionTracked",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ],
+      "identity": {
+        "primaryId": "ECID",
+        "namespace": "AEP_IDENTITY"
+      },
+      "audienceName": "All_Users"
+    },
+    "touchpoints": [],
+    "journey": {
+      "type": "system-measurement",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "ENTRY",
+          "event": "conversion_event"
+        },
+        {
+          "id": "n2",
+          "type": "PROCESS",
+          "name": "multi_touch_attribution_calculation"
+        },
+        {
+          "id": "n3",
+          "type": "PROCESS",
+          "name": "cross_channel_identity_stitching"
+        },
+        {
+          "id": "n4",
+          "type": "PROCESS",
+          "name": "revenue_mapping_and_aggregation"
+        },
+        {
+          "id": "n5",
+          "type": "EXIT"
+        }
+      ]
+    },
+    "exitConditions": [],
+    "ajoConfig": {
+      "frequencyCapping": {
+        "enabled": false,
+        "maxMessagesPerUser": 0,
+        "timeWindowHours": 0
+      },
+      "prioritization": {
+        "priority": "SYSTEM_CRITICAL"
+      }
+    },
+    "tracking": {
+      "globalEvents": [
+        "conversion_event"
+      ],
+      "eventMapping": {
+        "conversion_event": "evt_conversion_001"
+      }
+    },
+    "analytics": {
+      "primaryKPI": "journey_roi",
+      "secondaryKPIs": [
+        "incremental_revenue",
+        "attribution_confidence_score",
+        "cross_channel_conversion_rate"
+      ],
+      "attribution": {
+        "model": "multi_touch",
+        "lookbackHours": 720
+      }
+    },
+    "version": "1.0",
+    "status": "READY"
+  }
+]

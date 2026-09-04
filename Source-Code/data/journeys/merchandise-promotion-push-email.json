@@ -1,0 +1,168 @@
+{
+  "useCaseId": "merchandise-promotion-push-email",
+  "name": "Merchandise Promotion – Push & Email Journey",
+  "category": {
+    "categoryId": "promotion-journey",
+    "categoryName": "Promotion"
+  },
+  "journeyTable": {
+    "journeyName": "Merchandise Promotion – Push & Email",
+    "journeyGoal": "Promote merchandise to users to drive engagement and sales",
+    "entryTrigger": "user_browsed_merchandise",
+    "journeyCategory": "Promotion",
+    "totalDuration": "2 days",
+    "exitClause": "Exit after merchandise viewed or 2 days"
+  },
+  "entryCriteria": {
+    "event": "user_browsed_merchandise",
+    "eventId": "evt_browse_merch_001",
+    "conditions": [
+      {
+        "field": "productCategory",
+        "operator": "EQUALS",
+        "value": "Merchandise"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Browsed Merchandise Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Merchandise Push",
+      "timing": {
+        "offsetHours": 1
+      },
+      "channel": "PUSH",
+      "messageTheme": "Check out our latest merchandise – don’t miss out!",
+      "cta": "View Merchandise",
+      "tracking": {
+        "campaignId": "push_merch_promo",
+        "deliveryId": "del_push_28",
+        "trackingEvents": [
+          "push_open",
+          "merch_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Merchandise Email",
+      "timing": {
+        "offsetHours": 4
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Explore our exclusive merchandise collection now!",
+      "cta": "View Merchandise",
+      "tracking": {
+        "campaignId": "email_merch_promo",
+        "deliveryId": "del_email_28",
+        "trackingEvents": [
+          "email_open",
+          "merch_view"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_browsed_merchandise",
+        "eventId": "evt_browse_merch_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "merch_view",
+          "field": "merchViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 1
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "merch_view",
+          "field": "merchViewed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 3
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "merch_view",
+      "eventId": "evt_merch_001",
+      "condition": "merchViewed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 48
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "merch_view"
+    ],
+    "eventMapping": {
+      "merch_view": "evt_merch_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "merch_view",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 48
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

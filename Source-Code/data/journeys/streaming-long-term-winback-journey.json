@@ -1,0 +1,227 @@
+{
+  "useCaseId": "streaming-long-term-winback-journey",
+  "name": "Streaming Long-Term Win-Back Journey",
+  "category": {
+    "categoryId": "retention-churn",
+    "categoryName": "Retention & Churn Prevention"
+  },
+  "journeyTable": {
+    "journeyName": "Streaming Long-Term Win-Back Journey",
+    "journeyGoal": "Re-engage long-term inactive users through content discovery, incentives, and final reactivation offers",
+    "entryTrigger": "long_term_inactive_user",
+    "journeyCategory": "Retention & Churn Prevention",
+    "totalDuration": "60 days",
+    "exitClause": "Exit when subscription_reactivated OR journey completed"
+  },
+  "entryCriteria": {
+    "event": "user_inactive_long_term",
+    "eventId": "evt_user_inactive_long_001",
+    "conditions": [
+      {
+        "field": "daysSinceLastLogin",
+        "operator": "GREATER_THAN",
+        "value": 30
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Long_Term_Inactive_Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 7",
+      "timing": {
+        "description": "7 days after entering journey",
+        "offsetHours": 168
+      },
+      "channel": "EMAIL",
+      "messageTheme": "We've added something new – highlight new content drops since they left; no hard sell",
+      "cta": "See What's New",
+      "tracking": {
+        "campaignId": "email_longterm_new_content",
+        "deliveryId": "del_email_1301",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "lastWatchedGenre",
+        "newContentDrops",
+        "recommendedTitles"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 30",
+      "timing": {
+        "description": "30 days after entering journey",
+        "offsetHours": 720
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Come back with a discount – 50% off first month back; show what they've missed",
+      "cta": "Restart My Subscription",
+      "tracking": {
+        "campaignId": "email_reactivation_discount",
+        "deliveryId": "del_email_1302",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "discountOffer",
+        "missedContentSummary",
+        "recommendations"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 60",
+      "timing": {
+        "description": "60 days after entering journey",
+        "offsetHours": 1440
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Last chance offer – best available reactivation offer; preference update option",
+      "cta": "Rejoin Now",
+      "tracking": {
+        "campaignId": "email_final_reactivation_offer",
+        "deliveryId": "del_email_1303",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "bestAvailableOffer",
+        "preferenceCenterLink",
+        "contentPreferences"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "lastLoginDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "user_inactive_long_term",
+        "eventId": "evt_user_inactive_long_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 168
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_reactivated",
+          "field": "subscriptionReactivated",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 552
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_reactivated",
+          "field": "subscriptionReactivated",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 720
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_reactivated",
+      "eventId": "evt_subscription_reactivated_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowDays": 60
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_reactivated",
+        "condition": "subscription_reactivated == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "subscription_reactivated"
+    ],
+    "eventMapping": {
+      "user_inactive_long_term": "evt_user_inactive_long_001",
+      "subscription_reactivated": "evt_subscription_reactivated_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "subscription_reactivated",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "content_viewed"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 60
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

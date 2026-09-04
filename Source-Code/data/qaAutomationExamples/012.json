@@ -1,0 +1,268 @@
+{
+  "id": "012",
+  "matrix_row_id": 12,
+  "matrix_row_name": "Off-season Pre-Draft Reactivation",
+  "template": "tpl_calendar_reactivation",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an off-season pre-Draft reactivation push cadence for 12-month-lapsed fans.",
+    "Create a content-driven push series running March through April for 12-month-lapsed fans. Touches tied to Free Agency open (Mar 11), Combine wrap (Mar 29), top-prospects content for fav team (Apr 12), and a Draft Week tune-in CTA (Apr 22). Push only - email-opted-out fans only.",
+    "Need a pre-Draft re-engagement series for lapsed fans, all-push, tied to off-season news beats and the fan's favorite team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-offseason-predraft-reactivation",
+    "metadata": {
+      "name": "Off-season Pre-Draft Reactivation",
+      "internal_name": "NFL_Offseason_PreDraft_Reactivation_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL App"
+      },
+      "purpose": "Re-engage 12-month-lapsed fans across the off-season with content-driven push touches tied to Free Agency, Combine, and Draft.",
+      "archetype": "reactivation",
+      "launch_date": "2026-03-01",
+      "end_date": "2026-04-30",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Reactivate 12-month lapsed fans during off-season.",
+          "kpi": "Reactivated-fan rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single-channel push cadence. Free Agency open (Mar 11), Combine results (Mar wrap), draft-prospect content tied to fav-team draft position, and Draft Week tune-in CTA (Apr 23).",
+        "timing_rationale": "Off-season news beats are the highest re-engagement leverage for 12M-lapsed fans.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "push"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "GET PUMPED"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_12mo_lapsed",
+        "name": "12-month lapsed fans (push opted in)",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "activity.last_active_within_days",
+              "op": "gt",
+              "value": 365
+            },
+            {
+              "field": "consent.push_nfl_app",
+              "op": "equals",
+              "value": true
+            },
+            {
+              "field": "country",
+              "op": "equals",
+              "value": "US"
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [],
+    "channels": [
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Off-season campaign opens (Mar 1)",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "push_free_agency",
+        "type": "action",
+        "label": "Push - Free Agency opens",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-03-11"
+        },
+        "copy": {
+          "headline": "Free Agency is here - {{FT}} moves to watch"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_combine_wrap",
+        "type": "wait",
+        "label": "Wait to Combine wrap",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 18,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "push_combine_wrap",
+        "type": "action",
+        "label": "Push - Combine results",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-03-29"
+        },
+        "copy": {
+          "headline": "Combine results: prospects on {{FT}}'s radar"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_prospects",
+        "type": "wait",
+        "label": "Wait to prospects content",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 14,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "push_prospects",
+        "type": "action",
+        "label": "Push - Top prospects for fav team's pick",
+        "channel": "ch_push",
+        "touch_id": "P3",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-04-12"
+        },
+        "copy": {
+          "headline": "Who could {{FT}} pick? Top prospects ahead of Draft Week"
+        },
+        "personalization_used": [
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_to_draft_week",
+        "type": "wait",
+        "label": "Wait to Draft Week",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 10,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "push_draft_tunein",
+        "type": "action",
+        "label": "Push - Draft Week tune-in CTA",
+        "channel": "ch_push",
+        "touch_id": "P4",
+        "timing": {
+          "type": "scheduled",
+          "calendar_date": "2026-04-22"
+        },
+        "copy": {
+          "headline": "Draft Week starts tomorrow - tune in"
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "push_free_agency"
+      },
+      {
+        "from": "push_free_agency",
+        "to": "wait_to_combine_wrap"
+      },
+      {
+        "from": "wait_to_combine_wrap",
+        "to": "push_combine_wrap"
+      },
+      {
+        "from": "push_combine_wrap",
+        "to": "wait_to_prospects"
+      },
+      {
+        "from": "wait_to_prospects",
+        "to": "push_prospects"
+      },
+      {
+        "from": "push_prospects",
+        "to": "wait_to_draft_week"
+      },
+      {
+        "from": "wait_to_draft_week",
+        "to": "push_draft_tunein"
+      },
+      {
+        "from": "push_draft_tunein",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Reactivated-fan rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Push view rate by beat"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

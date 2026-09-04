@@ -1,0 +1,172 @@
+{
+  "useCaseId": "fast-to-svod-conversion",
+  "name": "FAST to SVOD Conversion Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "FAST to SVOD Conversion",
+    "journeyGoal": "Convert FAST viewers into SVOD subscribers",
+    "entryTrigger": "fast_auth_viewer_detected",
+    "journeyCategory": "Conversion",
+    "totalDuration": "10 days",
+    "exitClause": "Exit after SVOD subscription"
+  },
+  "entryCriteria": {
+    "event": "fast_session",
+    "eventId": "evt_fast_001",
+    "conditions": [
+      {
+        "field": "sessionsCount",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 5
+      },
+      {
+        "field": "isAuthenticated",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "FAST_Authenticated_Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "In-App SVOD Offer",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "IN_APP",
+      "messageTheme": "Unlock premium content you’re missing",
+      "cta": "Start Free Trial",
+      "tracking": {
+        "campaignId": "inapp_fast_svod",
+        "deliveryId": "del_fast_1",
+        "trackingEvents": [
+          "inapp_view",
+          "trial_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Email SVOD Upgrade",
+      "timing": {
+        "offsetHours": 96
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Upgrade to SVOD and watch ad-free",
+      "cta": "Upgrade Now",
+      "tracking": {
+        "campaignId": "email_fast_svod",
+        "deliveryId": "del_fast_2",
+        "trackingEvents": [
+          "email_open",
+          "trial_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fast_session",
+        "eventId": "evt_fast_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "trial_start",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "trial_start",
+          "field": "started",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "trial_start",
+      "eventId": "evt_trial_001",
+      "condition": "started == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 240
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "trial_start"
+    ],
+    "eventMapping": {
+      "trial_start": "evt_trial_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "trial_start",
+    "secondaryKPIs": [
+      "inapp_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 240
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

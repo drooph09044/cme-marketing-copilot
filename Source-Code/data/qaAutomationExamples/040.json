@@ -1,0 +1,141 @@
+{
+  "id": "040",
+  "matrix_row_id": 40,
+  "matrix_row_name": "NBA Draft Lottery May 10 Tune-In",
+  "template": "tpl_event_tune_in",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a tune-in journey for the NBA Draft Lottery on May 10.",
+    "Create an NBA Draft Lottery tune-in journey. Announcement email Apr 30, push reminder May 7, and a day-of tune-in push at lottery start on May 10 for fans of the 14 non-playoff teams eligible for the lottery. Broadcast on ESPN.",
+    "Need a Draft Lottery cadence for fans of the 14 lottery teams — pre-lottery email and push, then a day-of tune-in push at lottery start."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-draft-lottery-2026-tune-in",
+    "metadata": {
+      "name": "NBA Draft Lottery May 10 Tune-In",
+      "internal_name": "NBA_Draft_Lottery_2026_TuneIn",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA App"},
+      "purpose": "Drive tune-in to the 2026 NBA Draft Lottery on May 10 (ESPN) by routing fans of the 14 non-playoff teams through a pre-lottery announcement, mid-window reminder, and day-of tipoff push.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-04-30",
+      "end_date": "2026-05-10",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to the Draft Lottery on ESPN.", "kpi": "Draft Lottery viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Two-week cadence centered on the 14 lottery-eligible teams' fanbases. Apr 30 announcement email, May 7 push reminder, May 10 day-of tune-in push. Broadcast info points to ESPN.",
+        "timing_rationale": "Draft Lottery May 10 evening ET; cadence works backward.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lottery_team_fan",
+        "name": "Fan with fav team in the 14-team lottery",
+        "description": "Fan whose favorite team is one of the 14 non-playoff teams in this year's draft lottery.",
+        "criteria": {
+          "all_of": [
+            {"field": "favorite_team", "op": "is_not_null"},
+            {"field": "fav_team.in_lottery_2026", "op": "equals", "value": true}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "nba_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Pre-lottery announcement (Apr 30)", "entry_criteria": {"trigger": "schedule"}},
+      {
+        "id": "email_announce",
+        "type": "action",
+        "label": "Email - Lottery announcement",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "scheduled", "calendar_date": "2026-04-30"},
+        "copy": {
+          "subject": "The 2026 NBA Draft Lottery is set for May 10",
+          "preview": "Where will {{FT}} land?",
+          "cta_label": "See the odds"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin_pre",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_reminder",
+        "type": "action",
+        "label": "Push T-3d - Lottery reminder",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-07"},
+        "copy": {"headline": "Lottery night next Sunday - find out where {{FT}} picks"}
+      },
+      {
+        "id": "wait_to_dayof",
+        "type": "wait",
+        "label": "Wait to May 10",
+        "timing": {"type": "wait", "duration": {"value": 3, "unit": "day"}}
+      },
+      {
+        "id": "dec_push_optin_dayof",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_dayof",
+        "type": "action",
+        "label": "Push Day-of - Lottery starts now (ESPN)",
+        "channel": "ch_push",
+        "touch_id": "P2",
+        "timing": {"type": "scheduled", "calendar_date": "2026-05-10", "time_local": "20:00 ET"},
+        "copy": {"headline": "Draft Lottery starts now on ESPN - watch {{FT}} pick"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_announce"},
+      {"from": "email_announce", "to": "dec_push_optin_pre"},
+      {"from": "dec_push_optin_pre", "to": "push_reminder", "branch_label": "yes"},
+      {"from": "dec_push_optin_pre", "to": "wait_to_dayof", "branch_label": "no"},
+      {"from": "push_reminder", "to": "wait_to_dayof"},
+      {"from": "wait_to_dayof", "to": "dec_push_optin_dayof"},
+      {"from": "dec_push_optin_dayof", "to": "push_dayof", "branch_label": "yes"},
+      {"from": "dec_push_optin_dayof", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_dayof", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Draft Lottery viewership"}],
+      "secondary_kpis": [{"name": "Push click-through rate"}, {"name": "Email open rate by fav team"}],
+      "tests": []
+    }
+  }
+}

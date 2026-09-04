@@ -1,0 +1,181 @@
+{
+  "id": "080",
+  "matrix_row_id": 80,
+  "matrix_row_name": "Lapsed ESPN+ college basketball fan win-back",
+  "template": "tpl_win_back",
+  "league": "NCAA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an ESPN+ win-back journey for lapsed subscribers who follow college basketball.",
+    "Create a 30/60/90-day win-back for lapsed ESPN+ subscribers with college basketball affinity. Storylines should tie to Feast Week, conference tournaments, Selection Sunday, or basketball transfer-portal news depending on time of year.",
+    "Need to win back ESPN+ subscribers who care about college hoops. Three touches at 30, 60, 90 days post-lapse. Pull in seasonal storylines that matter to college basketball fans."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cbb-espn-plus-winback",
+    "metadata": {
+      "name": "Lapsed ESPN+ College Basketball Win-Back",
+      "internal_name": "NCAA_CBB_ESPNPlus_WinBack_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": "ESPN+"},
+      "purpose": "Win back lapsed ESPN+ subscribers with college basketball affinity using season-relevant storylines tied to Feast Week, conference tournaments, Selection Sunday, or transfer-portal news.",
+      "archetype": "win_back",
+      "launch_date": "2025-11-01",
+      "end_date": "2026-04-30",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Reactivate lapsed ESPN+ subscribers with college basketball affinity.", "kpi": "Re-subscription rate among CBB-affinity lapsed users", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Standard 30/60/90 cadence. Storyline at each touch is timed to the college basketball calendar: Feast Week and early-season tournaments in November, conference play in January-February, Selection Sunday in mid-March, March Madness through early April. Transfer-portal news provides off-season content.",
+        "timing_rationale": "Anchored to subscription lapse date with a fixed 30/60/90 cadence.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_lapsed_espn_cbb",
+        "name": "Lapsed ESPN+ subscriber with CBB affinity",
+        "description": "ESPN+ subscriber whose subscription lapsed 30-120 days ago and whose viewing history shows college basketball affinity (favorite-school set plus CBB content engagement).",
+        "criteria": {
+          "all_of": [
+            {"field": "espn_plus.status", "op": "equals", "value": "churned"},
+            {"field": "espn_plus.days_since_lapse", "op": "between", "value": [30, 120]},
+            {"field": "ncaa.favorite_school", "op": "is_not_null"},
+            {"field": "ncaa.cbb_content_engagement_last_year", "op": "equals", "value": true}
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_resubscribed", "name": "Already re-subscribed", "scope": "global", "criteria": {"field": "espn_plus.status", "op": "equals", "value": "active"}},
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "espn_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Entry: 30 days post-lapse",
+        "entry_criteria": {
+          "trigger": "audience_membership",
+          "criteria": {"field": "espn_plus.days_since_lapse", "op": "equals", "value": 30}
+        }
+      },
+      {
+        "id": "email_d30_we_miss_you",
+        "type": "action",
+        "label": "Email Day 30 - We miss you (CBB seasonal hook)",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "{{FT}} hoops is rolling - here's what you've missed",
+          "cta_label": "Come back to ESPN+",
+          "modules": [
+            {"rank": "primary", "name": "Seasonal storyline (Feast Week / conference play / Selection Sunday / portal news depending on date)"},
+            {"rank": "secondary", "name": "Top fav-school games available on ESPN+"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_30_days",
+        "type": "wait",
+        "label": "Wait 30 days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d30",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "espn_plus.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d60_storyline",
+        "type": "action",
+        "label": "Email Day 60 - Storyline depth",
+        "channel": "ch_email",
+        "touch_id": "T60",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Looking ahead to March: {{FT}} bracket projections",
+          "cta_label": "Restart your ESPN+ subscription"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {
+        "id": "push_d60_optin",
+        "type": "action",
+        "label": "Push Day 60 - Fav-school game tonight",
+        "channel": "ch_push",
+        "touch_id": "P60",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "{{FT}} tips off tonight - watch on ESPN+"}
+      },
+      {
+        "id": "wait_30_more",
+        "type": "wait",
+        "label": "Wait 30 more days",
+        "timing": {"type": "wait", "duration": {"value": 30, "unit": "day"}}
+      },
+      {
+        "id": "dec_back_after_d60",
+        "type": "decision",
+        "label": "Already re-subscribed?",
+        "decision_basis": "behavior",
+        "condition": {"field": "espn_plus.status", "op": "equals", "value": "active"}
+      },
+      {
+        "id": "email_d90_incentive",
+        "type": "action",
+        "label": "Email Day 90 - 30% renewal offer",
+        "channel": "ch_email",
+        "touch_id": "T90",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Last invite back: 30% off ESPN+ through the Final Four",
+          "cta_label": "Renew at 30% off"
+        }
+      },
+      {"id": "end_converted", "type": "end", "label": "Journey End - Reactivated", "reason": "converted"},
+      {"id": "end_completed", "type": "end", "label": "Journey End - Completed", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "email_d30_we_miss_you"},
+      {"from": "email_d30_we_miss_you", "to": "wait_30_days"},
+      {"from": "wait_30_days", "to": "dec_back_after_d30"},
+      {"from": "dec_back_after_d30", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d30", "to": "email_d60_storyline", "branch_label": "no"},
+      {"from": "email_d60_storyline", "to": "push_d60_optin"},
+      {"from": "push_d60_optin", "to": "wait_30_more"},
+      {"from": "wait_30_more", "to": "dec_back_after_d60"},
+      {"from": "dec_back_after_d60", "to": "end_converted", "branch_label": "yes"},
+      {"from": "dec_back_after_d60", "to": "email_d90_incentive", "branch_label": "no"},
+      {"from": "email_d90_incentive", "to": "end_completed"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "CBB-affinity re-subscription rate"}],
+      "secondary_kpis": [{"name": "Email open / click rates by seasonal storyline"}, {"name": "Push view rate at Day 60"}],
+      "tests": []
+    }
+  }
+}

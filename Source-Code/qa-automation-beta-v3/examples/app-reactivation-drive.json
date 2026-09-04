@@ -1,0 +1,27 @@
+{
+  "categoryId": "fan-engagement",
+  "categoryName": "Fan Engagement",
+  "categoryDescription": "Journeys that reactivate app activity, content consumption, and post-event engagement.",
+  "subCategoryId": "engagements",
+  "subCategoryName": "Engagements",
+  "slug": "app-reactivation-drive",
+  "name": "App Reactivation Drive",
+  "active": false,
+  "brief": "Users with the app installed have not launched it recently. Use content-led email and push, plus a personalized content variant, to restart sessions before the next important date.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-05-10",
+  "journeyOverrides": {
+    "name": "App Reactivation Drive",
+    "objective": "Restart app sessions among dormant installed users before the upcoming peak period.",
+    "audience": "App_Dormant_21d",
+    "variantA": "Standard content highlight cadence",
+    "variantB": "Personalized content spotlight"
+  },
+  "nodeOverrides": {
+    "n3": { "title": ["Email 1"], "subtitle": ["Top content", "open the app"] },
+    "n3b": { "title": ["Email 1B"], "subtitle": ["Personalized feed", "launch CTA"] },
+    "n6": { "title": ["Push 1"], "subtitle": ["Open now", "content unlock"] },
+    "n9": { "title": ["Email 2"], "subtitle": ["Catch up now", "exclusive recap"] },
+    "n11": { "title": ["App", "Opened?"] }
+  }
+}

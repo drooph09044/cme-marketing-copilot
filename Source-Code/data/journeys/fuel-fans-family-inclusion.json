@@ -1,0 +1,265 @@
+{
+  "useCaseId": "fuel-fans-family-inclusion",
+  "name": "Family Inclusion & Shared Fandom Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Family & Shared Fandom Activation",
+    "journeyGoal": "Encourage fans to involve family members in the fandom ecosystem to increase engagement and household-level loyalty",
+    "entryTrigger": "fan_high_engagement_detected",
+    "journeyCategory": "Engagement",
+    "totalDuration": "14 days",
+    "exitClause": "Exit if referral or family account creation occurs"
+  },
+  "entryCriteria": {
+    "event": "fan_engagement_score_update",
+    "eventId": "evt_fan_family_001",
+    "conditions": [
+      {
+        "field": "engagementScore",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 80
+      },
+      {
+        "field": "isHouseholdLead",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Engagement_Household_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Family Fandom Invitation Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Share your passion with your family",
+      "cta": "Invite Family Members",
+      "tracking": {
+        "campaignId": "email_family_1",
+        "deliveryId": "del_family_1",
+        "trackingEvents": [
+          "email_open",
+          "referral_send"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Family Watch Experience Push",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "PUSH",
+      "messageTheme": "Make game day a family moment",
+      "cta": "Plan Family Viewing",
+      "tracking": {
+        "campaignId": "push_family_2",
+        "deliveryId": "del_family_2",
+        "trackingEvents": [
+          "push_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Family Bundle Offer Email",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Get more value with a family plan",
+      "cta": "Explore Family Plans",
+      "tracking": {
+        "campaignId": "email_family_3",
+        "deliveryId": "del_family_3",
+        "trackingEvents": [
+          "email_open",
+          "offer_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Limited-Time Family Bonus SMS",
+      "timing": {
+        "offsetHours": 240
+      },
+      "channel": "SMS",
+      "messageTheme": "Bring your family onboard and unlock rewards",
+      "cta": "Add Family Now",
+      "tracking": {
+        "campaignId": "sms_family_4",
+        "deliveryId": "del_family_4",
+        "trackingEvents": [
+          "sms_click",
+          "family_add"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_engagement_score_update",
+        "eventId": "evt_fan_family_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "family_account_created",
+          "field": "created",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "family_account_created",
+          "field": "created",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "family_account_created",
+          "field": "created",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n9"
+      },
+      {
+        "id": "n9",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n10",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n11",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "family_account_created",
+          "field": "created",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n12"
+      },
+      {
+        "id": "n12",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n13",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n14",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "family_account_created",
+      "eventId": "evt_family_account_001",
+      "condition": "created == true",
+      "action": "EXIT"
+    },
+    {
+      "event": "referral_completed",
+      "eventId": "evt_referral_family_001",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowHours": 336
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "email_open",
+      "push_open",
+      "offer_click",
+      "family_add",
+      "referral_send"
+    ],
+    "eventMapping": {
+      "family_account_created": "evt_family_account_001",
+      "referral_completed": "evt_referral_family_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "family_account_created",
+    "secondaryKPIs": [
+      "referral_send",
+      "offer_click",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 336
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

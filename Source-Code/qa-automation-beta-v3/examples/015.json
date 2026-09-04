@@ -1,0 +1,476 @@
+{
+  "id": "015",
+  "matrix_row_id": 15,
+  "matrix_row_name": "NFL+ Premium Annual Renewal Window",
+  "template": "tpl_renewal",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an NFL+ Premium Annual renewal cadence at 30/14/7/2/1 days pre-expiry with an SMS cap.",
+    "Renew NFL+ Premium Annual subscribers via a pre-expiry sequence: email at T-30, T-7, T-1; push at T-14 and T-7; SMS at T-1 for opted-in fans. Cap SMS at 1 per 30 days. Suppress fans who have already renewed.",
+    "Need an NFL+ Premium Annual renewal series \u2014 multi-channel sequence with an SMS frequency cap in the renewal window."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-plus-premium-annual-renewal",
+    "metadata": {
+      "name": "NFL+ Premium Annual Renewal Window",
+      "internal_name": "NFL_Plus_Premium_Annual_Renewal_2026",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL+"
+      },
+      "purpose": "Renew NFL+ Premium Annual subscribers via a 30/14/7/2/1-day pre-expiry cadence emphasizing upcoming-season hooks.",
+      "archetype": "renewal",
+      "launch_date": "2026-06-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Renew NFL+ Premium Annual subscriptions.",
+          "kpi": "Renewal rate",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Pre-expiry sequence at T-30, T-14, T-7, T-2, T-1 days. Channels: email at T-30, T-7, T-1; push at T-14 and T-7; SMS at T-1 for opted-in fans. SMS cap of 1 in the window.",
+        "timing_rationale": "Hooks: schedule reveal, playoff race, fav-team storylines.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push",
+        "sms"
+      ],
+      "moments_that_matter": [
+        "EXTEND MY EXPERIENCE",
+        "PLAN & COMMIT"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_premium_annual_expiring",
+        "name": "Premium Annual expiring in 30 days",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "nfl_plus.tier",
+              "op": "equals",
+              "value": "premium_annual"
+            },
+            {
+              "field": "nfl_plus.days_to_expiry",
+              "op": "lte",
+              "value": 30
+            },
+            {
+              "field": "nfl_plus.status",
+              "op": "equals",
+              "value": "active"
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_renewed",
+        "name": "Already renewed",
+        "scope": "global",
+        "criteria": {
+          "field": "nfl_plus.renewed_for_next_term",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_sms",
+        "type": "sms",
+        "vendor": "Attentive"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [
+      {
+        "scope": "channel",
+        "limit": 1,
+        "window": {
+          "value": 30,
+          "unit": "day"
+        },
+        "applies_to": [
+          "ch_sms"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "T-30d before NFL+ expiry",
+        "entry_criteria": {
+          "trigger": "audience_membership"
+        }
+      },
+      {
+        "id": "email_t30",
+        "type": "action",
+        "label": "Email T-30 - Renewal opens",
+        "channel": "ch_email",
+        "touch_id": "T30",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 30,
+            "unit": "day"
+          }
+        },
+        "copy": {
+          "subject": "Renew your NFL+ Premium Annual - one click",
+          "cta_label": "Renew now"
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ]
+      },
+      {
+        "id": "wait_t14",
+        "type": "wait",
+        "label": "Wait to T-14",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 14,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_renewed_1",
+        "type": "decision",
+        "label": "Renewed?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nfl_plus.renewed_for_next_term",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_t14",
+        "type": "action",
+        "label": "Push T-14 - Renew before season",
+        "channel": "ch_push",
+        "touch_id": "P14",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 14,
+            "unit": "day"
+          }
+        },
+        "copy": {
+          "headline": "Renew NFL+ before the season"
+        }
+      },
+      {
+        "id": "wait_t7",
+        "type": "wait",
+        "label": "Wait to T-7",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 7,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_t7",
+        "type": "action",
+        "label": "Email T-7 - One week to renew",
+        "channel": "ch_email",
+        "touch_id": "T7",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 7,
+            "unit": "day"
+          }
+        },
+        "copy": {
+          "subject": "One week left on your NFL+ - renew now",
+          "cta_label": "Renew"
+        }
+      },
+      {
+        "id": "push_t7",
+        "type": "action",
+        "label": "Push T-7 - One week",
+        "channel": "ch_push",
+        "touch_id": "P7",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 7,
+            "unit": "day"
+          }
+        },
+        "copy": {
+          "headline": "One week to renew NFL+"
+        }
+      },
+      {
+        "id": "wait_t1",
+        "type": "wait",
+        "label": "Wait to T-1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "dec_renewed_2",
+        "type": "decision",
+        "label": "Renewed?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "nfl_plus.renewed_for_next_term",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "email_t1",
+        "type": "action",
+        "label": "Email T-1 - Last chance",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "day"
+          }
+        },
+        "copy": {
+          "subject": "Last chance to renew NFL+",
+          "cta_label": "Renew"
+        }
+      },
+      {
+        "id": "dec_sms_optin",
+        "type": "decision",
+        "label": "SMS opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.sms",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "sms_t1",
+        "type": "action",
+        "label": "SMS T-1 - Final reminder (capped at 1 in window)",
+        "channel": "ch_sms",
+        "touch_id": "S1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "nfl_plus_expiry",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "day"
+          }
+        },
+        "copy": {
+          "body": "Your NFL+ expires tomorrow. Renew: nfl.com/plus"
+        }
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Renewed",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "email_t30"
+      },
+      {
+        "from": "email_t30",
+        "to": "wait_t14"
+      },
+      {
+        "from": "wait_t14",
+        "to": "dec_renewed_1"
+      },
+      {
+        "from": "dec_renewed_1",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_renewed_1",
+        "to": "dec_push_optin",
+        "branch_label": "no"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_t14",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "wait_t7",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t14",
+        "to": "wait_t7"
+      },
+      {
+        "from": "wait_t7",
+        "to": "email_t7"
+      },
+      {
+        "from": "email_t7",
+        "to": "push_t7"
+      },
+      {
+        "from": "push_t7",
+        "to": "wait_t1"
+      },
+      {
+        "from": "wait_t1",
+        "to": "dec_renewed_2"
+      },
+      {
+        "from": "dec_renewed_2",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_renewed_2",
+        "to": "email_t1",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_t1",
+        "to": "dec_sms_optin"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "sms_t1",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_sms_optin",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "sms_t1",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Premium Annual renewal rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Per-touch open / click rate"
+        },
+        {
+          "name": "SMS reply / opt-out rate"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

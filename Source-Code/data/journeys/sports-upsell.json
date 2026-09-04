@@ -1,0 +1,167 @@
+{
+  "useCaseId": "sports-upsell",
+  "name": "Sports Content Upsell Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Sports Upsell",
+    "journeyGoal": "Upgrade users to sports premium tier",
+    "entryTrigger": "sports_engagement_detected",
+    "journeyCategory": "Upsell",
+    "totalDuration": "10 days",
+    "exitClause": "Exit after tier upgrade"
+  },
+  "entryCriteria": {
+    "event": "sports_view",
+    "eventId": "evt_sports_001",
+    "conditions": [
+      {
+        "field": "sportsEventsWatched",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 3
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Sports_Enthusiasts"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Sports Bundle Offer",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Unlock full sports access",
+      "cta": "Upgrade Now",
+      "tracking": {
+        "campaignId": "email_sports_upgrade",
+        "deliveryId": "del_sports_1",
+        "trackingEvents": [
+          "email_open",
+          "upgrade"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "In-App Reminder",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "IN_APP",
+      "messageTheme": "Don't miss live games – upgrade your sports plan",
+      "cta": "Upgrade",
+      "tracking": {
+        "campaignId": "inapp_sports_reminder",
+        "deliveryId": "del_sports_2",
+        "trackingEvents": [
+          "inapp_view",
+          "upgrade"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "sports_view",
+        "eventId": "evt_sports_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "upgrade",
+          "field": "upgraded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "upgrade",
+          "field": "upgraded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 96
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "upgrade",
+      "eventId": "evt_upgrade_001",
+      "condition": "upgraded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 240
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "upgrade"
+    ],
+    "eventMapping": {
+      "upgrade": "evt_upgrade_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "upgrade",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 240
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

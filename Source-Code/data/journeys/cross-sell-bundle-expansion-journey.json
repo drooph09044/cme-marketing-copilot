@@ -1,0 +1,243 @@
+{
+  "useCaseId": "cross-sell-bundle-expansion-journey",
+  "name": "Cross-Sell Bundle Expansion Journey",
+  "category": {
+    "categoryId": "growth-cross-sell",
+    "categoryName": "Growth & Cross-Sell"
+  },
+  "journeyTable": {
+    "journeyName": "Cross-Sell Bundle Expansion Journey",
+    "journeyGoal": "Increase ARPU by promoting complementary products and bundled offers through personalized recommendations and social proof",
+    "entryTrigger": "eligible_for_cross_sell",
+    "journeyCategory": "Growth & Cross-Sell",
+    "totalDuration": "30 days",
+    "exitClause": "Exit when bundle_purchased OR opt_out"
+  },
+  "entryCriteria": {
+    "event": "eligible_for_cross_sell",
+    "eventId": "evt_cross_sell_eligibility_001",
+    "conditions": [
+      {
+        "field": "currentProducts",
+        "operator": "CONTAINS",
+        "value": "PRIMARY_SERVICE"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Cross_Sell_Eligible_Customers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Day 1",
+      "timing": {
+        "description": "1 day after eligibility trigger",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "You're getting great value – introduce complementary product (broadband, TV, family SIM)",
+      "cta": "See What Fits",
+      "tracking": {
+        "campaignId": "cross_sell_intro",
+        "deliveryId": "del_email_1801",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "currentPlan",
+        "recommendedProducts",
+        "usageInsights"
+      ]
+    },
+    {
+      "tpId": "TP2",
+      "label": "Day 10",
+      "timing": {
+        "description": "10 days after eligibility trigger",
+        "offsetHours": 240
+      },
+      "channel": [
+        "PUSH",
+        "EMAIL"
+      ],
+      "messageTheme": "Customers like you also have… – social proof + simplified bundle pricing",
+      "cta": "Build My Bundle",
+      "tracking": {
+        "campaignId": "cross_sell_social_proof",
+        "deliveryId": "del_push_email_1802",
+        "trackingEvents": [
+          "push_sent",
+          "push_click",
+          "email_open",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "peerAdoptionStats",
+        "bundlePricing",
+        "recommendedBundle"
+      ]
+    },
+    {
+      "tpId": "TP3",
+      "label": "Day 30",
+      "timing": {
+        "description": "30 days after eligibility trigger",
+        "offsetHours": 720
+      },
+      "channel": [
+        "SMS",
+        "EMAIL"
+      ],
+      "messageTheme": "Limited-time bundle offer – discounted add-on price for next 30 days",
+      "cta": "Add Now",
+      "tracking": {
+        "campaignId": "cross_sell_urgency_offer",
+        "deliveryId": "del_sms_email_1803",
+        "trackingEvents": [
+          "sms_sent",
+          "sms_click",
+          "email_sent",
+          "email_click"
+        ]
+      },
+      "personalization": [
+        "discountOffer",
+        "expiryDate",
+        "bundleRecommendation"
+      ]
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "timeReference": "eligibilityDate",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "eligible_for_cross_sell",
+        "eventId": "evt_cross_sell_eligibility_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "bundle_purchased",
+          "field": "bundlePurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n5"
+      },
+      {
+        "id": "n5",
+        "type": "WAIT",
+        "durationHours": 216
+      },
+      {
+        "id": "n6",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n7",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "bundle_purchased",
+          "field": "bundlePurchased",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n8"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 480
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "bundle_purchased",
+      "eventId": "evt_bundle_purchased_001",
+      "action": "IMMEDIATE_EXIT"
+    },
+    {
+      "event": "opt_out",
+      "eventId": "evt_opt_out_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowDays": 30
+    },
+    "suppressionRules": [
+      {
+        "ruleId": "already_converted",
+        "condition": "bundle_purchased == true"
+      }
+    ],
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "journey_entered",
+      "journey_exited",
+      "bundle_purchased",
+      "opt_out"
+    ],
+    "eventMapping": {
+      "eligible_for_cross_sell": "evt_cross_sell_eligibility_001",
+      "bundle_purchased": "evt_bundle_purchased_001",
+      "opt_out": "evt_opt_out_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "bundle_purchased",
+    "secondaryKPIs": [
+      "email_open",
+      "email_click",
+      "push_click",
+      "sms_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackDays": 30
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

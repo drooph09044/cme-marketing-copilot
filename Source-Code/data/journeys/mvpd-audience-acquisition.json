@@ -1,0 +1,167 @@
+{
+  "useCaseId": "mvpd-audience-acquisition",
+  "name": "MVPD Partner Audience Acquisition Journey",
+  "category": {
+    "categoryId": "acquisition",
+    "categoryName": "Acquisition"
+  },
+  "journeyTable": {
+    "journeyName": "MVPD Audience Acquisition",
+    "journeyGoal": "Acquire new subscribers via MVPD partner audiences",
+    "entryTrigger": "partner_match_detected",
+    "journeyCategory": "Acquisition",
+    "totalDuration": "21 days",
+    "exitClause": "Exit after subscription creation"
+  },
+  "entryCriteria": {
+    "event": "partner_data_match",
+    "eventId": "evt_mvpd_001",
+    "conditions": [
+      {
+        "field": "hashedMatch",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "hashedEmail",
+      "namespace": "PARTNER"
+    },
+    "audienceName": "MVPD_Lookalike_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Personalized Offer",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Watch premium content now",
+      "cta": "Start Watching",
+      "tracking": {
+        "campaignId": "display_mvpd_acq",
+        "deliveryId": "del_mvpd_1",
+        "trackingEvents": [
+          "ad_click",
+          "subscription_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Follow-up Email",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Still interested? Exclusive partner offer",
+      "cta": "Claim Offer",
+      "tracking": {
+        "campaignId": "email_mvpd_followup",
+        "deliveryId": "del_mvpd_2",
+        "trackingEvents": [
+          "email_open",
+          "subscription_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "partner_data_match",
+        "eventId": "evt_mvpd_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_start",
+          "field": "active",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "subscription_start",
+          "field": "active",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 72
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "subscription_start",
+      "eventId": "evt_sub_001",
+      "condition": "active == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 720
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "subscription_start"
+    ],
+    "eventMapping": {
+      "subscription_start": "evt_sub_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "subscription_start",
+    "secondaryKPIs": [
+      "ad_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

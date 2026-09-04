@@ -1,0 +1,140 @@
+{
+  "id": "064",
+  "matrix_row_id": 64,
+  "matrix_row_name": "MLS fan birthday wish",
+  "template": "tpl_anniversary_milestone",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a birthday wish journey for MLS supporters with a matchday ticket offer or shop coupon.",
+    "Create an MLS fan birthday wish: birthday email in fan's favorite club's voice with matchday ticket offer plus an opt-in push directing to next home match. Two channels (email + push), single-day cadence on the fan's birthday.",
+    "Need a birthday touch for MLS supporters that uses the fav club's voice and offers a ticket or shop incentive."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-birthday-wish",
+    "metadata": {
+      "name": "MLS Fan Birthday Wish",
+      "internal_name": "MLS_Birthday_Wish_2026",
+      "brand": {"vertical": "sports_league", "league": "MLS", "team": null, "product": "MLS"},
+      "purpose": "Send a birthday wish in the fan's favorite club's voice with a matchday ticket offer or MLS Store coupon.",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": "2026-12-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Reinforce affinity with fav-club on fan's birthday.", "kpi": "Email open rate and offer redemption", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single birthday email sent in fav-club's voice (logo, colors, club-signed greeting) with a matchday ticket offer or 15% MLS Store coupon depending on whether fan has attended a match in last 12 months. Push reinforcement for opted-in supporters.",
+        "timing_rationale": "Triggered by birthday field match on the fan's birthday.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_mls_fan_with_birthday",
+        "name": "MLS fan with birthday on file",
+        "criteria": {"all_of": [{"field": "favorite_team", "op": "is_not_null"}, {"field": "profile.birthday", "op": "is_not_null"}]},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 11, "unit": "month"}, "max_entries": 1},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: birthday match",
+        "entry_criteria": {"trigger": "event", "event_name": "fan_birthday"}
+      },
+      {
+        "id": "dec_recent_attendee",
+        "type": "decision",
+        "label": "Attended a match in last 12 months?",
+        "decision_basis": "behavior",
+        "condition": {"field": "mls.match_attendance_last_12m", "op": "gte", "value": 1}
+      },
+      {
+        "id": "email_birthday_ticket_offer",
+        "type": "action",
+        "label": "Email - Birthday wish with matchday ticket offer",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Happy birthday from {{FC}}, {{FN}}",
+          "headline": "Happy birthday, {{FN}} - on us, here's 20% off your next ticket",
+          "cta_label": "Get your ticket"
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_birthday_shop_coupon",
+        "type": "action",
+        "label": "Email - Birthday wish with shop coupon",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Happy birthday from {{FC}}",
+          "headline": "Happy birthday, {{FN}} - rep your club with 15% off",
+          "cta_label": "Shop {{FC}} gear"
+        },
+        "personalization_used": ["FN", "FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_birthday",
+        "type": "action",
+        "label": "Push - Happy birthday from {{FC}}",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Happy birthday from {{FC}}, {{FN}}"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_recent_attendee"},
+      {"from": "dec_recent_attendee", "to": "email_birthday_ticket_offer", "branch_label": "yes"},
+      {"from": "dec_recent_attendee", "to": "email_birthday_shop_coupon", "branch_label": "no"},
+      {"from": "email_birthday_ticket_offer", "to": "dec_push_optin"},
+      {"from": "email_birthday_shop_coupon", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_birthday", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_birthday", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Email open rate"}, {"name": "Offer redemption rate"}],
+      "secondary_kpis": [{"name": "Ticket-offer vs shop-coupon CTR"}],
+      "tests": []
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "ajo": {
+    "defaults": {
+      "collection_url": "https://platform.adobe.io/ajo/im/executions/unitary",
+      "sandbox_name": "exlservice-ucp",
+      "ims_org_id": "61761D4866A1EC800A495C1C@AdobeOrg",
+      "authorization_env": [
+        "AJO_AUTHORIZATION",
+        "AJO_BEARER_TOKEN"
+      ],
+      "default_email_env": "AJO_DEFAULT_EMAIL",
+      "api_key_env": {
+        "automotive": "AJO_AUTOMOTIVE_API_KEY",
+        "sports": "AJO_SPORTS_API_KEY"
+      }
+    },
+    "payloads": {
+      "automotive": {
+        "requestId": "0ce990c0-5908-11f1-a3fe-99c380def187",
+        "campaignId": "2536fc25-932e-4546-bf59-17949a141dec",
+        "recipients": [
+          {
+            "type": "aep",
+            "userId": "${AJO_DEFAULT_EMAIL}",
+            "namespace": "Email",
+            "channelData": {
+              "emailAddress": "${AJO_DEFAULT_EMAIL}"
+            },
+            "context": {
+              "tire_change_status": "OVERDUE",
+              "dealership_id": "DLR-1097",
+              "current_mileage": 70000,
+              "last_name": "Sahoo",
+              "first_name": "Kaushik",
+              "vin": "1GJHK83DJGF223456",
+              "miles_since_tire_change": 70000,
+              "customer_id": "CUST-894019",
+              "vehicle_name": "GMC-HUMMER"
+            }
+          }
+        ]
+      },
+      "sports": {
+        "requestId": "9306f990-59d5-11f1-b396-535e9456e2b0",
+        "campaignId": "2b44fdee-5477-45cc-b368-c6b73655777d",
+        "recipients": [
+          {
+            "type": "aep",
+            "userId": "sindhwani.anurag@gmail.com",
+            "namespace": "Email",
+            "channelData": {
+              "emailAddress": "sindhwani.anurag@gmail.com"
+            },
+            "context": {
+              "stadiumPreference": "Premium Club Seating",
+              "nextOpponent": "Green Bay Packers",
+              "nextGameDate": "Sunday, September 14, 2026 at 1:00 PM ET",
+              "favoriteTeam": "Detroit Lions",
+              "firstName": "Anurag",
+              "nextBestActionUrl": "https://www.detroitlions.com/tickets/single-game-tickets",
+              "unsubscribeLink": "https://www.detroitlions.com/email-preferences/unsubscribe?email=sindhwani.anurag@gmail.com",
+              "name": "Anurag Sindhwani"
+            }
+          },
+          {
+            "type": "aep",
+            "userId": "${AJO_DEFAULT_EMAIL}",
+            "namespace": "Email",
+            "channelData": {
+              "emailAddress": "${AJO_DEFAULT_EMAIL}"
+            },
+            "context": {
+              "stadiumPreference": "Premium Club Seating",
+              "nextOpponent": "Green Bay Packers",
+              "nextGameDate": "Sunday, September 14, 2026 at 1:00 PM ET",
+              "favoriteTeam": "Detroit Lions",
+              "firstName": "Kaushik",
+              "nextBestActionUrl": "https://www.detroitlions.com/tickets/single-game-tickets",
+              "unsubscribeLink": "https://www.detroitlions.com/email-preferences/unsubscribe?email=${AJO_DEFAULT_EMAIL}",
+              "name": "Kaushik Sahoo"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

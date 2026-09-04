@@ -1,0 +1,231 @@
+{
+  "id": "087",
+  "matrix_row_id": 87,
+  "matrix_row_name": "Peacock Premier League subscription abandon cart",
+  "template": "tpl_abandon_cart",
+  "league": "EPL",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an abandon-cart journey for Peacock Premier League subscriptions with an identity matrix fanout.",
+    "Create a Peacock Premier League abandon-cart journey for US supporters. Identity-matrix audience: app-known, app-unknown, web-known, web-unknown. Modal at funnel entry, then matchday-morning push for opted-in supporters of fan's favorite club, and an email follow-up within 24h with EPL season-pass value props.",
+    "Need a Peacock EPL abandon cart in the US — fan out across app/web and known/unknown, modal first then matchday push + 24h email."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "peacock-epl-abandon-cart-2026",
+    "metadata": {
+      "name": "Peacock Premier League Subscription Abandon Cart",
+      "internal_name": "Peacock_EPL_AC_2026",
+      "brand": {"vertical": "streaming", "league": "EPL", "team": null, "product": "Peacock"},
+      "purpose": "Recover Peacock Premier League subscription funnel abandoners across the four identity-matrix states with a modal-first, then matchday-push and email cadence.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-08-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Recover Peacock Premier League subscription funnel abandoners.", "kpi": "Recovered-subscription rate", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix fanout: app-known supporters get an app modal then a matchday-morning push routed by fav-club fixture; web-known supporters get a web modal then a 24h email; unknown profiles get only the modal at funnel entry. Matchday-morning push fires only on a fav-club matchday within 7 days of cart abandonment.",
+        "timing_rationale": "EPL matchdays are the highest-intent moment for a supporter to act on a streaming subscription.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["app_modal", "web_modal", "push", "email"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_ac_app_known",
+        "name": "Cart abandoner - app, known",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.peacock_epl_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "app"},
+            {"field": "identity.known", "op": "equals", "value": true}
+          ]
+        },
+        "identity_state": "app_known"
+      },
+      {
+        "id": "aud_ac_app_unknown",
+        "name": "Cart abandoner - app, unknown",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.peacock_epl_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "app"},
+            {"field": "identity.known", "op": "equals", "value": false}
+          ]
+        },
+        "identity_state": "app_unknown"
+      },
+      {
+        "id": "aud_ac_web_known",
+        "name": "Cart abandoner - web, known",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.peacock_epl_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "web"},
+            {"field": "identity.known", "op": "equals", "value": true}
+          ]
+        },
+        "identity_state": "web_known"
+      },
+      {
+        "id": "aud_ac_web_unknown",
+        "name": "Cart abandoner - web, unknown",
+        "criteria": {
+          "all_of": [
+            {"field": "funnel.peacock_epl_cart_abandoned", "op": "equals", "value": true},
+            {"field": "abandon_surface", "op": "equals", "value": "web"},
+            {"field": "identity.known", "op": "equals", "value": false}
+          ]
+        },
+        "identity_state": "web_unknown"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}},
+      {"id": "supp_active_sub", "name": "Already active Peacock subscriber", "scope": "global", "criteria": {"field": "peacock.status", "op": "equals", "value": "active"}}
+    ],
+    "channels": [
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "peacock_app"},
+      {"id": "ch_web_modal", "type": "web_modal", "platform": "peacock_web"},
+      {"id": "ch_push", "type": "push", "platform": "peacock_app"},
+      {"id": "ch_email", "type": "email"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {"id": "start", "type": "start", "label": "Cart abandonment trigger", "entry_criteria": {"trigger": "event", "event_name": "peacock_epl_cart_abandoned"}},
+      {
+        "id": "split_identity_matrix",
+        "type": "audience_split",
+        "label": "4-way identity-matrix split",
+        "audiences": ["aud_ac_app_known", "aud_ac_app_unknown", "aud_ac_web_known", "aud_ac_web_unknown"],
+        "mode": "waterfall"
+      },
+      {
+        "id": "modal_app_known",
+        "type": "action",
+        "label": "App modal - Known supporter, club-themed",
+        "channel": "ch_app_modal",
+        "touch_id": "M1",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Don't miss a {{FT}} match - finish signing up", "cta_label": "Resume sign-up"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "modal_app_unknown",
+        "type": "action",
+        "label": "App modal - Unknown",
+        "channel": "ch_app_modal",
+        "touch_id": "M2",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Catch every Premier League match on Peacock", "cta_label": "Sign up"}
+      },
+      {
+        "id": "modal_web_known",
+        "type": "action",
+        "label": "Web modal - Known supporter, club-themed",
+        "channel": "ch_web_modal",
+        "touch_id": "M3",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Pick up where you left off - {{FT}} is on this weekend", "cta_label": "Resume sign-up"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "modal_web_unknown",
+        "type": "action",
+        "label": "Web modal - Unknown",
+        "channel": "ch_web_modal",
+        "touch_id": "M4",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Catch every Premier League match on Peacock", "cta_label": "Sign up"}
+      },
+      {
+        "id": "wait_to_matchday",
+        "type": "wait",
+        "label": "Wait until fav-club matchday or 7d max",
+        "timing": {
+          "type": "wait_until",
+          "until": {"field": "favorite_club.next_match_within_hours", "op": "lte", "value": 24},
+          "check_every": {"value": 6, "unit": "hour"},
+          "max_wait": {"value": 7, "unit": "day"}
+        }
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_peacock", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_matchday_morning",
+        "type": "action",
+        "label": "Push matchday morning - fav-club kickoff",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "favorite_club_kickoff",
+          "direction": "before",
+          "offset": {"value": 4, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FT}} kick off in 4 hours - watch on Peacock"},
+        "personalization_used": ["FT"]
+      },
+      {
+        "id": "email_24h_followup",
+        "type": "action",
+        "label": "Email T+24h - EPL season value props",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "peacock_epl_cart_abandoned",
+          "direction": "after",
+          "offset": {"value": 24, "unit": "hour"}
+        },
+        "copy": {
+          "subject": "Every Premier League match, one subscription",
+          "cta_label": "Subscribe to Peacock"
+        },
+        "personalization_used": ["FN", "FT"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_identity_matrix"},
+      {"from": "split_identity_matrix", "to": "modal_app_known", "branch_label": "app_known"},
+      {"from": "split_identity_matrix", "to": "modal_app_unknown", "branch_label": "app_unknown"},
+      {"from": "split_identity_matrix", "to": "modal_web_known", "branch_label": "web_known"},
+      {"from": "split_identity_matrix", "to": "modal_web_unknown", "branch_label": "web_unknown"},
+      {"from": "modal_app_known", "to": "wait_to_matchday"},
+      {"from": "modal_web_known", "to": "wait_to_matchday"},
+      {"from": "modal_app_unknown", "to": "end_journey"},
+      {"from": "modal_web_unknown", "to": "end_journey"},
+      {"from": "wait_to_matchday", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_matchday_morning", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "email_24h_followup", "branch_label": "no"},
+      {"from": "push_matchday_morning", "to": "email_24h_followup"},
+      {"from": "email_24h_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Recovered-subscription rate"}],
+      "secondary_kpis": [{"name": "Modal CTR by identity state"}, {"name": "Matchday push CTR"}],
+      "tests": []
+    }
+  }
+}

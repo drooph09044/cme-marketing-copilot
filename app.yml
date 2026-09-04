@@ -1,0 +1,97 @@
+
+command:
+  - sh
+  - -c
+  - exec gunicorn app:app --bind 0.0.0.0:${DATABRICKS_APP_PORT:-8000} --workers 1 --threads 8 --timeout 240
+
+env:
+
+  - name: CODEX_DATA_SOURCE
+    value: uc
+  - name: CODEX_FRONTEND_DIST
+    value: Source-Code/dist
+  - name: CODEX_ALLOW_UC_FILESTYLE_IO
+    value: "1"
+  - name: CODEX_UC_BATCH_SIZE
+    value: "500"
+
+  - name: CODEX_TABLE_READ_ROW_LIMIT
+    value: "5000"
+  - name: CODEX_PIPELINE_TABLE_READ_ROW_LIMIT
+    value: "1000000"
+  - name: CODEX_UC_INLINE_PAGE_SIZE
+    value: "5000"
+  - name: CODEX_DATA_OVERVIEW_LIVE_DISCOVERY
+    value: "0"
+  - name: CODEX_DATA_OVERVIEW_LIVE_METADATA
+    value: "1"
+  - name: CODEX_ALLOW_UC_TABLE_DISCOVERY
+    value: "0"
+  - name: CODEX_DATA_OVERVIEW_COUNT_FALLBACK
+    value: "0"
+  - name: CODEX_UC_FAST_METADATA_COUNT_FALLBACK
+    value: "1"
+  - name: CODEX_UC_METADATA_COUNT_TIMEOUT_SECONDS
+    value: "3"
+  - name: CODEX_UC_METADATA_BATCH_TIMEOUT_SECONDS
+    value: "10"
+  - name: CODEX_UC_SQL_CACHE_SECONDS
+    value: "300"
+
+  - name: CODEX_SQL_TIMEOUT_SECONDS
+    value: "240"
+
+  - name: CODEX_SEGMENT_ROW_LIMIT
+    value: "10000"
+
+  - name: CODEX_ENABLE_PARALLEL_PROFILE
+    value: "1"
+  - name: CODEX_ENABLE_PARALLEL_DATA_OVERVIEW
+    value: "1"
+  - name: CODEX_ENABLE_PARALLEL_SEGMENTS
+    value: "1"
+  - name: CODEX_ENABLE_PARALLEL_PIPELINE_SOURCES
+    value: "0"
+  - name: CODEX_API_IO_WORKERS
+    value: "4"
+  - name: CODEX_UC_METADATA_WORKERS
+    value: "4"
+  - name: CODEX_PIPELINE_SOURCE_WORKERS
+    value: "3"
+  - name: CODEX_ENABLE_ROUTE_TIMING
+    value: "1"
+  - name: CODEX_ENABLE_API_CACHE
+    value: "1"
+  - name: CODEX_ENABLE_JSON_READ_CACHE
+    value: "1"
+  - name: CODEX_JSON_READ_CACHE_SECONDS
+    value: "60"
+  - name: CODEX_DATA_OVERVIEW_CACHE_SECONDS
+    value: "60"
+  - name: CODEX_PROFILE_CACHE_SECONDS
+    value: "60"
+  - name: CODEX_SEGMENTS_CACHE_SECONDS
+    value: "60"
+  - name: CODEX_ENABLE_UC_AUTO_TAG
+    value: "0"
+  - name: CODEX_WARM_WAREHOUSE_ON_START
+    value: "1"
+  - name: CODEX_LAZY_BACKEND_AUTOSTART
+    value: "1"
+  - name: CODEX_STARTUP_API_WAIT_SECONDS
+    value: "8"
+
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse-2
+  - name: CODEX_TABLE_OVERRIDES
+    valueFrom: table-overrides
+  - name: JWT_SECRET_KEY
+    valueFrom: jwt-secret
+  - name: GEMINI_API_KEY
+    valueFrom: gemini-api-key
+  - name: GEMINI_TIMEOUT_MS
+    value: "90000"
+  - name: GEMINI_MAX_ATTEMPTS
+    value: "2"
+  - name: CODEX_SEGMENT_JOB_WORKERS
+    value: "2"

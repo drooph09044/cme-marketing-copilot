@@ -1,0 +1,837 @@
+{
+  "categoryId": "sports",
+  "categoryName": "Sports",
+  "categoryDescription": "Ticketing, season engagement, attendance, and fan lifecycle journeys.",
+  "subCategoryId": "conversions",
+  "subCategoryName": "Conversions",
+  "clientTag": "",
+  "slug": "new-journey",
+  "name": "New Journey",
+  "isPreset": false,
+  "blueprintForm": {
+    "orchestrationType": "journey",
+    "singleChannel": "email",
+    "singleTriggerType": "event",
+    "singleTriggerEvent": "audienceQualified",
+    "singleSendOffsetHours": 0,
+    "singleOutcomeWindowHours": 24,
+    "singleUseHoldout": true,
+    "singleUseAB": false,
+    "brief": "Convert interested fans into group ticket bookings through guided sales engagement and personalized offers Entry trigger: group_interest. Set wait period to 4 days",
+    "journeyCategory": "sports",
+    "journeyType": "new-journey",
+    "platform": "Adobe AJO",
+    "targetDate": "2026-05-10"
+  },
+  "journeyForm": {
+    "name": "New Journey",
+    "objective": "Convert interested fans into group ticket bookings through guided sales engagement and personalized offers",
+    "entryTrigger": "group_interest",
+    "audience": "Group_Ticket_Prospects",
+    "channels": {
+      "email": true,
+      "push": false,
+      "sms": false,
+      "inApp": false
+    },
+    "duration": "21 days",
+    "frequencyCap": "Max 4 per 21 days",
+    "variantA": "Bring Your Group \u2013 group ticket overview, pricing tie\u2026",
+    "variantB": "Your Custom Quote \u2013 personalised group package propos\u2026",
+    "split": 50,
+    "holdout": 10,
+    "attribution": "Last-touch (21-day)"
+  },
+  "nodes": [
+    {
+      "id": "n0",
+      "lane": "trigger",
+      "column": 0,
+      "kind": "start",
+      "title": [
+        "Audience",
+        "Qualified"
+      ],
+      "subtitle": [
+        "interestType equals GROUP_TICKETS",
+        "entry event observed"
+      ],
+      "accent": "#2680EB"
+    },
+    {
+      "id": "n1",
+      "lane": "trigger",
+      "column": 1,
+      "kind": "holdout",
+      "title": [
+        "Holdout",
+        "Gate"
+      ],
+      "subtitle": [
+        "10% exit",
+        "no messages"
+      ],
+      "accent": "#0FB8B8"
+    },
+    {
+      "id": "n2",
+      "lane": "trigger",
+      "column": 2,
+      "kind": "split",
+      "title": [
+        "A/B",
+        "Split"
+      ],
+      "subtitle": [
+        "50% Var A",
+        "50% Var B"
+      ],
+      "accent": "#8B5CF6"
+    },
+    {
+      "id": "n3",
+      "lane": "email",
+      "column": 3,
+      "kind": "action",
+      "title": [
+        "Touchpoint 1"
+      ],
+      "subtitle": [
+        "Enquire About Groups",
+        "Bring Your Group \u2013 group ticket\u2026"
+      ],
+      "accent": "#C89B3C"
+    },
+    {
+      "id": "n3b",
+      "lane": "email",
+      "column": 3,
+      "kind": "action",
+      "title": [
+        "Touchpoint 3"
+      ],
+      "subtitle": [
+        "View My Proposal",
+        "Your Custom Quote \u2013 personalise\u2026"
+      ],
+      "accent": "#E5C97A",
+      "variantBadge": "VAR B",
+      "offsetY": 74
+    },
+    {
+      "id": "n4",
+      "lane": "decision",
+      "column": 4,
+      "kind": "decision",
+      "title": [
+        "Email",
+        "Opened?"
+      ],
+      "subtitle": [
+        "24h check",
+        "branch next"
+      ],
+      "accent": "#8B5CF6"
+    },
+    {
+      "id": "n5",
+      "lane": "trigger",
+      "column": 5,
+      "kind": "wait",
+      "title": [
+        "Wait 4d"
+      ],
+      "subtitle": [
+        "post-open",
+        "4-day hold"
+      ],
+      "accent": "#4A9EF5"
+    },
+    {
+      "id": "n6",
+      "lane": "push",
+      "column": 6,
+      "kind": "action",
+      "title": [
+        "Push 1"
+      ],
+      "subtitle": [
+        "D-5 urgency",
+        "deep link"
+      ],
+      "accent": "#F59E0B"
+    },
+    {
+      "id": "n7",
+      "lane": "decision",
+      "column": 7,
+      "kind": "decision",
+      "title": [
+        "Push",
+        "Clicked?"
+      ],
+      "subtitle": [
+        "24h check",
+        "branch next"
+      ],
+      "accent": "#8B5CF6"
+    },
+    {
+      "id": "n8",
+      "lane": "trigger",
+      "column": 8,
+      "kind": "wait",
+      "title": [
+        "Wait 4d"
+      ],
+      "subtitle": [
+        "retargeting",
+        "4-day hold"
+      ],
+      "accent": "#4A9EF5"
+    },
+    {
+      "id": "n9",
+      "lane": "email",
+      "column": 9,
+      "kind": "action",
+      "title": [
+        "Touchpoint 4"
+      ],
+      "subtitle": [
+        "Confirm My Booking",
+        "Last chance \u2013 offer expiry remi\u2026"
+      ],
+      "accent": "#E5C97A",
+      "variantBadge": "VAR B"
+    },
+    {
+      "id": "n10",
+      "lane": "push",
+      "column": 10,
+      "kind": "action",
+      "title": [
+        "Push 2"
+      ],
+      "subtitle": [
+        "D-1 last chance",
+        "app link"
+      ],
+      "accent": "#F59E0B"
+    },
+    {
+      "id": "n11",
+      "lane": "decision",
+      "column": 11,
+      "kind": "decision",
+      "title": [
+        "Ticket",
+        "Purchased?"
+      ],
+      "subtitle": [
+        "conversion",
+        "or timeout"
+      ],
+      "accent": "#8B5CF6"
+    },
+    {
+      "id": "n12",
+      "lane": "exit",
+      "column": 12,
+      "kind": "end",
+      "title": [
+        "Exit",
+        "Converted"
+      ],
+      "subtitle": [
+        "purchase",
+        "captured"
+      ],
+      "accent": "#22C55E"
+    },
+    {
+      "id": "n13",
+      "lane": "exit",
+      "column": 12,
+      "kind": "endDashed",
+      "title": [
+        "Exit",
+        "21d TTL"
+      ],
+      "subtitle": [
+        "time-to-live",
+        "expired"
+      ],
+      "accent": "#4A5568",
+      "offsetY": 74
+    },
+    {
+      "id": "n14",
+      "lane": "exit",
+      "column": 1,
+      "kind": "end",
+      "title": [
+        "Exit",
+        "Holdout"
+      ],
+      "subtitle": [
+        "baseline",
+        "measure only"
+      ],
+      "accent": "#0FB8B8",
+      "offsetY": 74
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "n0",
+      "to": "n1",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e1",
+      "from": "n1",
+      "to": "n2",
+      "type": "flow",
+      "label": "90%"
+    },
+    {
+      "id": "e2",
+      "from": "n1",
+      "to": "n14",
+      "type": "holdout",
+      "label": "10%"
+    },
+    {
+      "id": "e3",
+      "from": "n2",
+      "to": "n3",
+      "type": "varA",
+      "label": "Var A"
+    },
+    {
+      "id": "e4",
+      "from": "n2",
+      "to": "n3b",
+      "type": "varB",
+      "label": "Var B"
+    },
+    {
+      "id": "e5",
+      "from": "n3",
+      "to": "n4",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e6",
+      "from": "n3b",
+      "to": "n4",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e7",
+      "from": "n4",
+      "to": "n5",
+      "type": "yes",
+      "label": "Yes"
+    },
+    {
+      "id": "e8",
+      "from": "n4",
+      "to": "n6",
+      "type": "no",
+      "label": "No"
+    },
+    {
+      "id": "e9",
+      "from": "n5",
+      "to": "n6",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e10",
+      "from": "n6",
+      "to": "n7",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e11",
+      "from": "n7",
+      "to": "n8",
+      "type": "yes",
+      "label": "Yes"
+    },
+    {
+      "id": "e12",
+      "from": "n7",
+      "to": "n11",
+      "type": "no",
+      "label": "No"
+    },
+    {
+      "id": "e13",
+      "from": "n8",
+      "to": "n9",
+      "type": "varB",
+      "label": "Var B"
+    },
+    {
+      "id": "e14",
+      "from": "n8",
+      "to": "n10",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e15",
+      "from": "n9",
+      "to": "n11",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e16",
+      "from": "n10",
+      "to": "n11",
+      "type": "flow",
+      "label": ""
+    },
+    {
+      "id": "e17",
+      "from": "n11",
+      "to": "n12",
+      "type": "yes",
+      "label": "Yes"
+    },
+    {
+      "id": "e18",
+      "from": "n11",
+      "to": "n13",
+      "type": "no",
+      "label": "No"
+    }
+  ],
+  "nodeDetails": [
+    {
+      "id": "n0",
+      "title": "Audience Entry",
+      "kind": "start",
+      "accent": "#2680EB",
+      "rows": [
+        {
+          "key": "segment",
+          "value": "Group_Ticket_Prospects"
+        },
+        {
+          "key": "conditions",
+          "value": "interestType equals GROUP_TICKETS"
+        },
+        {
+          "key": "entryEvent",
+          "value": "group_interest"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "journeyEntry, audienceQualified"
+        }
+      ],
+      "note": "Entry is triggered by group_interest."
+    },
+    {
+      "id": "n1",
+      "title": "Holdout Gate",
+      "kind": "holdout",
+      "accent": "#0FB8B8",
+      "rows": [
+        {
+          "key": "holdoutPct",
+          "value": "10%"
+        },
+        {
+          "key": "assignment",
+          "value": "deterministic hash on fanId"
+        },
+        {
+          "key": "exitRule",
+          "value": "immediate exit with passive measurement"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "holdoutAssigned, liftBaselineTracked"
+        }
+      ],
+      "note": "This node protects incrementality measurement by excluding the holdout population from message delivery."
+    },
+    {
+      "id": "n2",
+      "title": "A/B Split",
+      "kind": "split",
+      "accent": "#8B5CF6",
+      "rows": [
+        {
+          "key": "variantA",
+          "value": "50% standard cadence"
+        },
+        {
+          "key": "variantB",
+          "value": "50% personalized plus Gold early access"
+        },
+        {
+          "key": "assignment",
+          "value": "stable hash on fanId"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "experimentAssigned, experimentExposure"
+        }
+      ],
+      "note": "The split is deterministic so repeat entry checks keep a profile in the same arm."
+    },
+    {
+      "id": "n3",
+      "title": "Email 1A",
+      "kind": "action",
+      "accent": "#C89B3C",
+      "rows": [
+        {
+          "key": "templateId",
+          "value": "email_group_intro"
+        },
+        {
+          "key": "subject",
+          "value": "Bring Your Group \u2013 group ticket overview, pricing tiers, past group experience photos"
+        },
+        {
+          "key": "sendTime",
+          "value": "1 day after expressing interest"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "email_sent, email_open, email_click"
+        }
+      ],
+      "note": "Variant A follows the baseline messaging path from the imported journey definition."
+    },
+    {
+      "id": "n3b",
+      "title": "Email 1B",
+      "kind": "action",
+      "accent": "#E5C97A",
+      "rows": [
+        {
+          "key": "templateId",
+          "value": "email_group_quote"
+        },
+        {
+          "key": "subject",
+          "value": "Your Custom Quote \u2013 personalised group package proposal with deadline"
+        },
+        {
+          "key": "sendTime",
+          "value": "10 days after expressing interest"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "email_sent, email_open, email_click"
+        }
+      ],
+      "note": "Variant B follows the personalized arm from the imported journey definition."
+    },
+    {
+      "id": "n4",
+      "title": "Email Opened?",
+      "kind": "decision",
+      "accent": "#8B5CF6",
+      "rows": [
+        {
+          "key": "condition",
+          "value": "emailOpen within 24h"
+        },
+        {
+          "key": "yesPath",
+          "value": "wait 4 days before push"
+        },
+        {
+          "key": "noPath",
+          "value": "advance directly to push urgency"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "decisionEvaluated, pathRouted"
+        }
+      ],
+      "note": "This branch reduces over-messaging for profiles that already signaled interest with an open."
+    },
+    {
+      "id": "n5",
+      "title": "Wait 4d",
+      "kind": "wait",
+      "accent": "#4A9EF5",
+      "rows": [
+        {
+          "key": "duration",
+          "value": "P4D"
+        },
+        {
+          "key": "exitRule",
+          "value": "exit early if ticketPurchase is observed"
+        },
+        {
+          "key": "reEval",
+          "value": "check purchase event every 4h"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "waitEntered, waitCompleted"
+        }
+      ],
+      "note": "The wait node gives opened-email profiles a short buffer before the next paid-media touch."
+    },
+    {
+      "id": "n6",
+      "title": "Push 1",
+      "kind": "action",
+      "accent": "#F59E0B",
+      "rows": [
+        {
+          "key": "templateId",
+          "value": "ajo_push_urgency_d5"
+        },
+        {
+          "key": "message",
+          "value": "Only a limited number of seats remain for Game 62"
+        },
+        {
+          "key": "deepLink",
+          "value": "clippers://tickets/game-62?section={{seat_section}}"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "pushSend, pushOpen, pushClick"
+        }
+      ],
+      "note": "Push 1 is tuned for urgency and uses app deep linking when the profile is app-capable."
+    },
+    {
+      "id": "n7",
+      "title": "Push Clicked?",
+      "kind": "decision",
+      "accent": "#8B5CF6",
+      "rows": [
+        {
+          "key": "condition",
+          "value": "pushClick within 24h"
+        },
+        {
+          "key": "yesPath",
+          "value": "hold two days then continue nurturing"
+        },
+        {
+          "key": "noPath",
+          "value": "jump to purchase decision checkpoint"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "decisionEvaluated, pushEngagement"
+        }
+      ],
+      "note": "Push engagement is treated as a high-intent signal, so the next message is delayed slightly."
+    },
+    {
+      "id": "n8",
+      "title": "Wait 4d",
+      "kind": "wait",
+      "accent": "#4A9EF5",
+      "rows": [
+        {
+          "key": "duration",
+          "value": "P4D"
+        },
+        {
+          "key": "exitRule",
+          "value": "exit early on ticketPurchase"
+        },
+        {
+          "key": "monitor",
+          "value": "watch orderComplete and checkoutStart"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "waitEntered, waitCompleted"
+        }
+      ],
+      "note": "The retargeting wait keeps the journey from becoming noisy while conversion signals are monitored."
+    },
+    {
+      "id": "n9",
+      "title": "Email 2B",
+      "kind": "action",
+      "accent": "#E5C97A",
+      "rows": [
+        {
+          "key": "templateId",
+          "value": "group_booking_last_call"
+        },
+        {
+          "key": "subject",
+          "value": "Last chance \u2013 offer expiry reminder + rep direct contact for any questions"
+        },
+        {
+          "key": "sendTime",
+          "value": "21 days after expressing interest"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "email_sent, email_open, email_click, call_attempted, call_connected"
+        }
+      ],
+      "note": "This follow-up message reflects the latest imported email touchpoint."
+    },
+    {
+      "id": "n10",
+      "title": "Push 2",
+      "kind": "action",
+      "accent": "#F59E0B",
+      "rows": [
+        {
+          "key": "templateId",
+          "value": "ajo_push_last_chance_d1"
+        },
+        {
+          "key": "message",
+          "value": "Game 62 is tomorrow - this is the final chance to buy"
+        },
+        {
+          "key": "deepLink",
+          "value": "clippers://tickets/game-62"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "pushSend, pushOpen, pushClick, purchaseAssist"
+        }
+      ],
+      "note": "Push 2 is the final urgency touch and is intended to capture last-minute converters."
+    },
+    {
+      "id": "n11",
+      "title": "Ticket Purchased?",
+      "kind": "decision",
+      "accent": "#8B5CF6",
+      "rows": [
+        {
+          "key": "condition",
+          "value": "group_booking_confirmed within 21 days"
+        },
+        {
+          "key": "yesPath",
+          "value": "Exit Converted"
+        },
+        {
+          "key": "noPath",
+          "value": "Exit 21d TTL"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "conversionChecked, pathRouted"
+        }
+      ],
+      "note": "This decision is the primary conversion checkpoint used by both AJO exit logic and CJA reporting."
+    },
+    {
+      "id": "n12",
+      "title": "Exit Converted",
+      "kind": "end",
+      "accent": "#22C55E",
+      "rows": [
+        {
+          "key": "trigger",
+          "value": "group_booking_confirmed confirmed"
+        },
+        {
+          "key": "suppression",
+          "value": "stop all remaining messages"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "journeyConversion, orderComplete"
+        },
+        {
+          "key": "downstream",
+          "value": "eligible for next lifecycle journey"
+        }
+      ],
+      "note": "Converted profiles exit immediately and become eligible for the next fan-life-cycle experience."
+    },
+    {
+      "id": "n13",
+      "title": "Exit 21d TTL",
+      "kind": "end",
+      "accent": "#4A5568",
+      "rows": [
+        {
+          "key": "trigger",
+          "value": "journey reached 21-day time-to-live"
+        },
+        {
+          "key": "suppression",
+          "value": "remove from active journey audience"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "journeyExpired"
+        },
+        {
+          "key": "downstream",
+          "value": "eligible for lapsed win-back audience"
+        }
+      ],
+      "note": "TTL expiration closes the play without a conversion and prepares the profile for re-engagement logic."
+    },
+    {
+      "id": "n14",
+      "title": "Exit Holdout",
+      "kind": "end",
+      "accent": "#0FB8B8",
+      "rows": [
+        {
+          "key": "trigger",
+          "value": "holdout gate selected profile"
+        },
+        {
+          "key": "delivery",
+          "value": "no outbound channel actions"
+        },
+        {
+          "key": "cjaEvents",
+          "value": "holdoutAssigned, passiveLiftTracking"
+        },
+        {
+          "key": "downstream",
+          "value": "used only for incrementality comparison"
+        }
+      ],
+      "note": "Holdout profiles never receive the journey treatment, but their downstream outcomes are still measured."
+    }
+  ],
+  "phaseHeaders": [
+    "Entry",
+    "Holdout",
+    "A/B",
+    "Email D-7",
+    "Decision",
+    "Wait",
+    "Push D-5",
+    "Decision",
+    "Wait",
+    "Email D-3",
+    "Push D-1",
+    "Decision",
+    "Exit"
+  ]
+}

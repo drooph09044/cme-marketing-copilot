@@ -1,0 +1,55 @@
+{
+  "useCaseId": "golf-travel",
+  "clientTag": "PGA",
+  "name": "Golf Travel Booking Journey",
+  "active": false,
+  "subCategoryId": "loyalty-commerce",
+  "subCategoryName": "Loyalty & Commerce",
+  "category": {
+    "categoryId": "revenue",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Golf Travel",
+    "journeyGoal": "Drive golf travel bookings",
+    "entryTrigger": "destination_view",
+    "totalDuration": "7 days"
+  },
+  "entryCriteria": {
+    "event": "destination_view",
+    "eventId": "evt_travel_001",
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Super_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "channel": "EMAIL",
+      "messageTheme": "Plan your dream golf trip",
+      "cta": "Book Now",
+      "tracking": {
+        "campaignId": "email_travel",
+        "deliveryId": "del_email_t1",
+        "trackingEvents": [
+          "booking_completed"
+        ]
+      }
+    }
+  ],
+  "exitConditions": [
+    {
+      "event": "booking_completed",
+      "eventId": "evt_booking_001",
+      "condition": "bookingDone == true",
+      "action": "EXIT"
+    }
+  ],
+  "analytics": {
+    "primaryKPI": "booking_completed"
+  },
+  "version": "1.0",
+  "status": "READY"
+}

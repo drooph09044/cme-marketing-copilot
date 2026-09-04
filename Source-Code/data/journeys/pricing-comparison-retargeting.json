@@ -1,0 +1,173 @@
+{
+  "useCaseId": "pricing-comparison-retargeting",
+  "name": "Pricing Comparison Retargeting Journey",
+  "category": {
+    "categoryId": "retargeting",
+    "categoryName": "Retargeting"
+  },
+  "journeyTable": {
+    "journeyName": "Pricing Comparison Retargeting",
+    "journeyGoal": "Convert price-sensitive shoppers",
+    "entryTrigger": "pricing_comparison_detected",
+    "journeyCategory": "Conversion",
+    "totalDuration": "7 days",
+    "exitClause": "Exit after conversion"
+  },
+  "entryCriteria": {
+    "event": "pricing_comparison_detected",
+    "eventId": "evt_price_001",
+    "conditions": [
+      {
+        "field": "productPageVisits",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 3
+      },
+      {
+        "field": "comparisonWindowDays",
+        "operator": "LESS_THAN_EQUALS",
+        "value": 7
+      }
+    ],
+    "identity": {
+      "primaryId": "visitorId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Price_Comparison_Shoppers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Limited-Time Offer",
+      "timing": {
+        "offsetHours": 12
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Best value plan for your needs",
+      "cta": "Compare Plans",
+      "tracking": {
+        "campaignId": "email_price_compare",
+        "deliveryId": "del_email_pc1",
+        "trackingEvents": [
+          "email_open",
+          "conversion"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Retargeting Ad",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "DISPLAY_AD",
+      "messageTheme": "Switch today and save more",
+      "cta": "View Pricing",
+      "tracking": {
+        "campaignId": "display_price_retarget",
+        "deliveryId": "del_display_pc2",
+        "trackingEvents": [
+          "ad_click",
+          "conversion"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "pricing_comparison_detected",
+        "eventId": "evt_price_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "conversion",
+          "field": "converted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 12
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "conversion",
+          "field": "converted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 36
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "conversion",
+      "eventId": "evt_conversion_001",
+      "condition": "converted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "conversion"
+    ],
+    "eventMapping": {
+      "conversion": "evt_conversion_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "conversion",
+    "secondaryKPIs": [
+      "email_open",
+      "ad_click"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

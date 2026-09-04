@@ -1,0 +1,168 @@
+{
+  "id": "044",
+  "matrix_row_id": 44,
+  "matrix_row_name": "MLB fan birthday wish",
+  "template": "tpl_anniversary_milestone",
+  "league": "MLB",
+  "sport": "baseball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an MLB fan birthday journey themed to favorite team with a ballpark experience offer.",
+    "Create a birthday wish journey for MLB fans. Birthday-morning email from fan's favorite team with a ballpark experience offer (single-game ticket discount or MLB Shop coupon), plus a push later in the day driving to the next fav-team home game at the ballpark.",
+    "Need an MLB birthday touch — fav-team-themed wish, ballpark ticket or shop offer, plus a push CTA into the next home game."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mlb-fan-birthday",
+    "metadata": {
+      "name": "MLB Fan Birthday",
+      "internal_name": "MLB_Fan_Birthday_2026",
+      "brand": {"vertical": "sports_league", "league": "MLB", "team": null, "product": "MLB"},
+      "purpose": "Wish MLB fans a happy birthday with content from their favorite team and an offer for a ballpark experience (single-game tickets or MLB Shop coupon).",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Drive birthday engagement and personal connection to fan's favorite MLB team.", "kpi": "Birthday email open / click rate", "forecast": null},
+        {"rank": "secondary", "description": "Drive single-game ticket or MLB Shop purchases.", "kpi": "Ticket and Shop conversions from birthday offer", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Birthday-morning email themed to fav-team voice with a 15% off ballpark ticket code or MLB Shop coupon valid 7 days. Push later that day promotes the next home game at the ballpark.",
+        "timing_rationale": "Birthday-morning sends maximize relevance.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_mlb_fan_with_birthdate",
+        "name": "MLB fan with birthdate on file",
+        "criteria": {
+          "all_of": [
+            {"field": "mlb.profile_active", "op": "equals", "value": true},
+            {"field": "profile.birthdate", "op": "is_not_null"}
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mlb_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 1, "unit": "month"}},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Birthday trigger",
+        "entry_criteria": {"trigger": "event", "event_name": "fan_birthday_today"}
+      },
+      {
+        "id": "dec_has_fav_team",
+        "type": "decision",
+        "label": "Has favorite team?",
+        "decision_basis": "pull",
+        "condition": {"field": "favorite_team", "op": "is_not_null"}
+      },
+      {
+        "id": "email_fav_team_wish",
+        "type": "action",
+        "label": "Email - Fav-team birthday wish with ballpark offer",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from your {{FT}}",
+          "preview": "A gift from the ballpark",
+          "modules": [
+            {"rank": "primary", "name": "Fav-team-themed birthday card"},
+            {"rank": "secondary", "name": "15% off single-game tickets or MLB Shop (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_generic_wish",
+        "type": "action",
+        "label": "Email - Generic MLB birthday wish",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 0, "unit": "hour"},
+          "time_local": "08:00 local"
+        },
+        "copy": {
+          "subject": "Happy birthday from Major League Baseball",
+          "modules": [
+            {"rank": "primary", "name": "Generic MLB birthday card"},
+            {"rank": "secondary", "name": "15% off MLB Shop (7-day code)"}
+          ]
+        },
+        "personalization_used": ["FN"]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (MLB App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mlb_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_next_home_game",
+        "type": "action",
+        "label": "Push - Next fav-team home game at the ballpark",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fan_birthday",
+          "direction": "after",
+          "offset": {"value": 4, "unit": "hour"}
+        },
+        "copy": {"headline": "Come to the ballpark: {{FT}} next home game"},
+        "personalization_used": ["FT"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav_team"},
+      {"from": "dec_has_fav_team", "to": "email_fav_team_wish", "branch_label": "yes"},
+      {"from": "dec_has_fav_team", "to": "email_generic_wish", "branch_label": "no"},
+      {"from": "email_fav_team_wish", "to": "dec_push_optin"},
+      {"from": "email_generic_wish", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_next_home_game", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_next_home_game", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Birthday email open and click rate"}],
+      "secondary_kpis": [{"name": "Ticket / MLB Shop conversions from birthday code"}],
+      "tests": []
+    }
+  }
+}

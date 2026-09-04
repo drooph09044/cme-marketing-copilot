@@ -1,0 +1,348 @@
+{
+  "id": "009",
+  "matrix_row_id": 9,
+  "matrix_row_name": "Combine 2026 Local Registration Drive (Indianapolis)",
+  "template": "tpl_event_registration_drive",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a Combine 2026 Indianapolis-local registration drive.",
+    "Create an Indianapolis-local Combine registration drive for fans within 150 miles of Lucas Oil Stadium. Waterfall the audience by geo proximity (50mi first, then 50-150mi, then Combine content engagers outside the local area). T-3w registration-open email, T-2w push for opted-in fans, T-1w final email, on-site web banner during Combine week. Suppress fans who already registered.",
+    "Need a Combine event registration drive for the Indianapolis market with email + push + on-site web banner. Layer audience by geo proximity in priority order."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-combine-2026-indianapolis-local",
+    "metadata": {
+      "name": "Combine 2026 Indianapolis Local Registration Drive",
+      "internal_name": "NFL_Combine2026_IND_Local",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": "NFL Combine"
+      },
+      "purpose": "Drive Indianapolis-local fans to register for the 2026 NFL Combine fan experience.",
+      "archetype": "event_promotion",
+      "launch_date": "2026-02-01",
+      "end_date": "2026-03-05",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive Combine fan-experience registrations.",
+          "kpi": "# of fans who register for Combine experience",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Waterfall audience prioritizes by drive distance and engagement signal. Email + push pre-event, on-site web banner during the Combine week.",
+        "timing_rationale": "Combine runs late Feb-early Mar; cadence opens T-3w with reg open.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "email",
+        "push",
+        "web_target_banner"
+      ],
+      "moments_that_matter": [
+        "LEARN & FOLLOW",
+        "PLAN & COMMIT"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_local_ind_50mi",
+        "name": "Indianapolis local 50mi",
+        "description": "Fans within 50 miles of Lucas Oil Stadium.",
+        "criteria": {
+          "field": "geolocation.miles_from_lucas_oil_stadium",
+          "op": "lte",
+          "value": 50
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_local_ind_150mi",
+        "name": "Indianapolis regional 150mi",
+        "description": "Fans within 50-150 miles of Lucas Oil Stadium.",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "geolocation.miles_from_lucas_oil_stadium",
+              "op": "lte",
+              "value": 150
+            },
+            {
+              "field": "geolocation.miles_from_lucas_oil_stadium",
+              "op": "gt",
+              "value": 50
+            }
+          ]
+        },
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_combine_engaged",
+        "name": "Combine content engagers (any geo)",
+        "criteria": {
+          "field": "combine.content_engaged_within_days",
+          "op": "lte",
+          "value": 180
+        },
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_already_reg",
+        "name": "Already registered",
+        "scope": "global",
+        "criteria": {
+          "field": "combine.registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      },
+      {
+        "id": "ch_web_target",
+        "type": "web_target_banner"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "LO",
+        "name": "Location"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": false
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Combine reg opens (T-3w)",
+        "entry_criteria": {
+          "trigger": "schedule"
+        }
+      },
+      {
+        "id": "split_geo",
+        "type": "audience_split",
+        "label": "Geo waterfall (50mi first, then 150mi, then engagers)",
+        "audiences": [
+          "aud_local_ind_50mi",
+          "aud_local_ind_150mi",
+          "aud_combine_engaged"
+        ],
+        "mode": "waterfall"
+      },
+      {
+        "id": "email_t3w",
+        "type": "action",
+        "label": "Email T-3w - Combine registration open",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "combine_day_1",
+          "direction": "before",
+          "offset": {
+            "value": 3,
+            "unit": "week"
+          }
+        },
+        "copy": {
+          "subject": "Register now: 2026 NFL Combine fan experience in Indianapolis",
+          "cta_label": "Register"
+        },
+        "personalization_used": [
+          "FN",
+          "LO"
+        ]
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {
+          "field": "consent.push_nfl_app",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "push_t2w",
+        "type": "action",
+        "label": "Push T-2w - Don't miss Combine",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "combine_day_1",
+          "direction": "before",
+          "offset": {
+            "value": 2,
+            "unit": "week"
+          }
+        },
+        "copy": {
+          "headline": "2 weeks until the NFL Combine - register today"
+        }
+      },
+      {
+        "id": "email_t1w",
+        "type": "action",
+        "label": "Email T-1w - Final registration push",
+        "channel": "ch_email",
+        "touch_id": "T2",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "combine_day_1",
+          "direction": "before",
+          "offset": {
+            "value": 1,
+            "unit": "week"
+          }
+        },
+        "copy": {
+          "subject": "1 week to Combine - last chance to register"
+        },
+        "personalization_used": [
+          "FN"
+        ]
+      },
+      {
+        "id": "dec_registered",
+        "type": "decision",
+        "label": "Registered?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "combine.registered",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "banner_onsite",
+        "type": "action",
+        "label": "Web banner - NFL.com Combine reg banner",
+        "channel": "ch_web_target",
+        "touch_id": "W1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "Register for the Combine fan experience"
+        }
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Registered",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "split_geo"
+      },
+      {
+        "from": "split_geo",
+        "to": "email_t3w"
+      },
+      {
+        "from": "email_t3w",
+        "to": "dec_push_optin"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "push_t2w",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_push_optin",
+        "to": "email_t1w",
+        "branch_label": "no"
+      },
+      {
+        "from": "push_t2w",
+        "to": "email_t1w"
+      },
+      {
+        "from": "email_t1w",
+        "to": "dec_registered"
+      },
+      {
+        "from": "dec_registered",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_registered",
+        "to": "banner_onsite",
+        "branch_label": "no"
+      },
+      {
+        "from": "banner_onsite",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Combine registrations attributable to journey"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Email open / click rate by touch"
+        },
+        {
+          "name": "Web banner CTR"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

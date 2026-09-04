@@ -1,0 +1,292 @@
+{
+  "roots": {
+    "app_root": ".",
+    "backend_root": "backend",
+    "legacy_root": "legacy_idres",
+    "legacy_backend_root": "legacy_idres/backend"
+  },
+  "directories": {
+    "app_root": {
+      "root": "app_root",
+      "path": "."
+    },
+    "backend_root": {
+      "root": "app_root",
+      "path": "backend"
+    },
+    "legacy_root": {
+      "root": "app_root",
+      "path": "legacy_idres"
+    },
+    "legacy_backend_root": {
+      "root": "app_root",
+      "path": "legacy_idres/backend"
+    },
+    "frontend_dist": {
+      "root": "app_root",
+      "path": "dist"
+    },
+    "preset_journeys": {
+      "root": "app_root",
+      "path": "data/journeys"
+    },
+    "custom_journeys": {
+      "root": "app_root",
+      "path": "data/customJourneys"
+    },
+    "custom_segments": {
+      "root": "app_root",
+      "path": "data/customSegments"
+    },
+    "qa_automation_examples": {
+      "root": "app_root",
+      "path": "data/qaAutomationExamples"
+    },
+    "generated_data": {
+      "root": "legacy_root",
+      "path": "generated_data"
+    },
+    "generated_enriched": {
+      "root": "legacy_root",
+      "path": "generated_data/enriched"
+    },
+    "consent_enriched": {
+      "root": "legacy_root",
+      "path": "consent_data/enriched"
+    },
+    "enrichment": {
+      "root": "legacy_root",
+      "path": "generated_data/enrichment"
+    },
+    "preprocessed": {
+      "root": "legacy_root",
+      "path": "preprocessed_data"
+    },
+    "standardized": {
+      "root": "legacy_root",
+      "path": "standardized_data"
+    },
+    "golden_records_output": {
+      "root": "legacy_root",
+      "path": "golden_records_output"
+    },
+    "evaluation_output": {
+      "root": "legacy_root",
+      "path": "evaluation_output"
+    },
+    "clustering_output": {
+      "root": "legacy_root",
+      "path": "clustering_output"
+    },
+    "matching_output": {
+      "root": "legacy_root",
+      "path": "matching_output"
+    },
+    "segmentation": {
+      "root": "legacy_root",
+      "path": "Segmentation"
+    },
+    "ai_segments": {
+      "root": "legacy_root",
+      "path": "data/ai_segments"
+    },
+    "gm_cdp_csv": {
+      "root": "legacy_root",
+      "path": "gm_cdp_csv"
+    }
+  },
+  "paths": {
+    "blocking_config": {
+      "root": "legacy_root",
+      "file": "blocking_config.json",
+      "category": "Configuration File",
+      "recommendation": "Move to YAML configuration"
+    },
+    "tag_mappings": {
+      "root": "legacy_root",
+      "file": "tag_mappings.json",
+      "category": "Metadata File",
+      "recommendation": "Move to YAML configuration or UC Volume metadata"
+    },
+    "source_preferences": {
+      "root": "legacy_root",
+      "file": "source_preferences.json",
+      "category": "Configuration File",
+      "recommendation": "Move to YAML configuration"
+    },
+    "data_overview_registered_sources": {
+      "root": "legacy_root",
+      "file": "data_overview_registered_sources.json",
+      "category": "Metadata File",
+      "recommendation": "Store in UC Volume metadata"
+    },
+    "evaluation_report": {
+      "root": "legacy_root",
+      "file": "evaluation_report.json",
+      "category": "Generated Output",
+      "recommendation": "Store in UC Volume"
+    },
+    "golden_summary": {
+      "root": "legacy_root",
+      "file": "golden_record_summary.json",
+      "category": "Generated Output",
+      "recommendation": "Store in UC Volume"
+    },
+    "golden_records": {
+      "root": "legacy_root",
+      "file": "golden_records",
+      "category": "UC Table Candidate",
+      "recommendation": "Store/read as Unity Catalog table"
+    },
+    "customer_profile_export": {
+      "root": "legacy_root",
+      "file": "customer_profile_export",
+      "category": "Export File",
+      "recommendation": "Store in UC Volume or UC table depending downstream use"
+    },
+    "activity_detail_fields": {
+      "root": "legacy_root",
+      "file": "activity_detail_fields",
+      "category": "Metadata File",
+      "recommendation": "Store in YAML or UC Volume metadata"
+    },
+    "superseded_ids": {
+      "root": "legacy_root",
+      "file": "superseded_ids",
+      "category": "UC Table Candidate",
+      "recommendation": "Store/read as Unity Catalog table"
+    },
+    "provenance": {
+      "root": "legacy_root",
+      "file": "golden_record_provenance.json",
+      "category": "Generated Output",
+      "recommendation": "Store in UC Volume"
+    },
+    "household_links": {
+      "root": "legacy_root",
+      "file": "household_links",
+      "category": "UC Table Candidate",
+      "recommendation": "Store/read as Unity Catalog table"
+    },
+    "ground_truth": {
+      "root": "legacy_root",
+      "file": "generated_data/ground_truth.json",
+      "category": "Reference Data",
+      "recommendation": "Store in UC Table if structured, otherwise UC Volume"
+    },
+    "data_classification": {
+      "root": "legacy_root",
+      "file": "data_source_classification.json",
+      "category": "Metadata File",
+      "recommendation": "Move to YAML configuration"
+    },
+    "copilot_segments": {
+      "root": "legacy_backend_root",
+      "file": "copilot_segments.json",
+      "category": "Generated Output",
+      "recommendation": "Store in UC Volume"
+    },
+    "profile_mode_flag": {
+      "root": "legacy_root",
+      "file": ".profile_mode",
+      "category": "Temporary Artifact",
+      "recommendation": "Use config/state store; UC Volume for Databricks"
+    },
+    "measurement_general_data": {
+      "root": "app_root",
+      "file": "data/General_data.csv",
+      "category": "UC Table Candidate",
+      "recommendation": "Store/read as Unity Catalog table"
+    },
+    "campaigns_journeys_report": {
+      "root": "app_root",
+      "file": "data/campaigns_journeys_report.json",
+      "category": "Generated Output",
+      "recommendation": "Store/read as UC Volume artifact"
+    },
+    "streaming_segmentation_schema": {
+      "root": "legacy_root",
+      "file": "Segmentation/schema.json",
+      "category": "Metadata File",
+      "recommendation": "Move to YAML configuration"
+    },
+    "automotive_segmentation_schema": {
+      "root": "legacy_root",
+      "file": "Segmentation/automotive_schema.json",
+      "category": "Metadata File",
+      "recommendation": "Move to YAML configuration"
+    },
+    "consent_golden_record": {
+      "root": "legacy_root",
+      "file": "generated_data/enriched/consent_golden_record",
+      "category": "UC Table Candidate",
+      "recommendation": "Store/read as Unity Catalog table"
+    },
+    "consent_event_ledger": {
+      "root": "legacy_root",
+      "file": "generated_data/enriched/consent_event_ledger",
+      "category": "UC Table Candidate",
+      "recommendation": "Store/read as Unity Catalog table"
+    },
+    "consent_last_refresh": {
+      "root": "legacy_root",
+      "file": "generated_data/enriched/.consent_last_refresh",
+      "category": "Temporary Artifact",
+      "recommendation": "Store in UC Volume only if still required"
+    }
+  },
+  "dynamic_patterns": {
+    "preprocessed_by_source": {
+      "directory": "preprocessed",
+      "pattern": "{source}/all_preprocessed"
+    },
+    "standardized_by_source": {
+      "directory": "standardized",
+      "pattern": "{source}/all_standardized"
+    },
+    "enhanced_prepared_by_source": {
+      "directory": "matching_output",
+      "pattern": "{source}/enhanced_prepared_records"
+    },
+    "golden_records_by_source": {
+      "directory": "golden_records_output",
+      "pattern": "{source}/golden_records"
+    },
+    "superseded_by_source": {
+      "directory": "golden_records_output",
+      "pattern": "{source}/superseded_ids"
+    },
+    "provenance_by_source": {
+      "directory": "golden_records_output",
+      "pattern": "{source}/golden_record_provenance.json"
+    },
+    "evaluation_by_source": {
+      "directory": "evaluation_output",
+      "pattern": "{source}/evaluation_report.json"
+    },
+    "golden_summary_by_source": {
+      "directory": "golden_records_output",
+      "pattern": "{source}/golden_record_summary.json"
+    },
+    "clustered_records_by_source": {
+      "directory": "clustering_output",
+      "pattern": "{source}/clustered_records"
+    },
+    "cluster_summary_by_source": {
+      "directory": "clustering_output",
+      "pattern": "{source}/cluster_summary.json"
+    },
+    "cluster_index_json_by_source": {
+      "directory": "clustering_output",
+      "pattern": "{source}/cluster_index.json"
+    },
+    "cluster_index_sqlite_by_source": {
+      "directory": "clustering_output",
+      "pattern": "{source}/cluster_index.sqlite"
+    },
+    "candidate_pairs_by_source": {
+      "directory": "matching_output",
+      "pattern": "{source}/candidate_pairs"
+    }
+  }
+}

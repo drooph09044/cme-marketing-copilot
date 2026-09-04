@@ -1,0 +1,185 @@
+{
+  "id": "061",
+  "matrix_row_id": 61,
+  "matrix_row_name": "MLS Season Pass abandon cart",
+  "template": "tpl_abandon_cart",
+  "league": "MLS",
+  "sport": "soccer",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build an identity-matrix abandon cart for MLS Season Pass on Apple TV.",
+    "Create an MLS Season Pass abandon-cart journey with identity-matrix routing across app-known, app-unknown, web-known, and web-unknown states. Modal at funnel entry within 15 minutes of abandonment, then matchday-morning push to opted-in supporters of fan's favorite club, and an email follow-up within 24h with subscription CTA. Suppress supporters who have already subscribed.",
+    "Need a Season Pass abandon cart on Apple TV. Use identity-aware routing: modal in funnel, push on next matchday for opted-in supporters of fan's fav club, then a 24h email follow-up."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "mls-season-pass-abandon-cart",
+    "metadata": {
+      "name": "MLS Season Pass Abandon Cart",
+      "internal_name": "MLS_SeasonPass_AbandonCart_2026",
+      "brand": {"vertical": "streaming", "league": "MLS", "team": null, "product": "MLS Season Pass (Apple TV)"},
+      "purpose": "Recover abandoned MLS Season Pass subscription funnel sessions via identity-matrix routing across app and web, known and unknown states.",
+      "archetype": "abandon_cart",
+      "launch_date": "2026-01-15",
+      "end_date": "2026-12-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Convert abandoned Season Pass funnel sessions into paid subscriptions.", "kpi": "Recovery rate among abandoners", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Identity-matrix routing: app-known supporters get an in-app modal at funnel entry then a matchday push; app-unknown get a modal only; web-known supporters get a web modal then a 24h email follow-up; web-unknown get a web modal only. All paths converge on a matchday-morning push for opted-in fans of fav club.",
+        "timing_rationale": "Modal fires within 15 minutes of funnel abandonment; push timed to next fav-club matchday morning; email at 24h post-abandonment.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["app_modal", "web_modal", "email", "push", "identity_matrix"],
+      "moments_that_matter": ["GET PUMPED", "EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_app_known",
+        "name": "App-known abandoner",
+        "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "app"}, {"field": "identity.state", "op": "equals", "value": "known"}]},
+        "identity_state": "app_known"
+      },
+      {
+        "id": "aud_app_unknown",
+        "name": "App-unknown abandoner",
+        "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "app"}, {"field": "identity.state", "op": "equals", "value": "unknown"}]},
+        "identity_state": "app_unknown"
+      },
+      {
+        "id": "aud_web_known",
+        "name": "Web-known abandoner",
+        "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "web"}, {"field": "identity.state", "op": "equals", "value": "known"}]},
+        "identity_state": "web_known"
+      },
+      {
+        "id": "aud_web_unknown",
+        "name": "Web-unknown abandoner",
+        "criteria": {"all_of": [{"field": "session.surface", "op": "equals", "value": "web"}, {"field": "identity.state", "op": "equals", "value": "unknown"}]},
+        "identity_state": "web_unknown"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_already_subscribed", "name": "Already subscribed", "scope": "global", "criteria": {"field": "mls_season_pass.status", "op": "equals", "value": "active"}}
+    ],
+    "channels": [
+      {"id": "ch_app_modal", "type": "app_modal", "platform": "mls_app"},
+      {"id": "ch_web_modal", "type": "web_modal"},
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "mls_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FC", "name": "Favorite Club"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 7, "unit": "day"}, "max_entries": 3},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: Season Pass funnel abandoned",
+        "entry_criteria": {"trigger": "event", "event_name": "season_pass_funnel_abandoned"}
+      },
+      {
+        "id": "split_identity",
+        "type": "audience_split",
+        "label": "Identity matrix split",
+        "audiences": ["aud_app_known", "aud_app_unknown", "aud_web_known", "aud_web_unknown"],
+        "mode": "parallel"
+      },
+      {
+        "id": "app_modal",
+        "type": "action",
+        "label": "App Modal - Season Pass in-funnel",
+        "channel": "ch_app_modal",
+        "touch_id": "M1",
+        "timing": {"type": "realtime", "refresh_minutes": 15},
+        "copy": {"headline": "Don't miss a match - finish signing up for MLS Season Pass"}
+      },
+      {
+        "id": "web_modal",
+        "type": "action",
+        "label": "Web Modal - Season Pass in-funnel",
+        "channel": "ch_web_modal",
+        "touch_id": "M2",
+        "timing": {"type": "realtime", "refresh_minutes": 15},
+        "copy": {"headline": "Finish signing up for MLS Season Pass"}
+      },
+      {
+        "id": "dec_known_state",
+        "type": "decision",
+        "label": "Identity known?",
+        "decision_basis": "audience",
+        "condition": {"field": "identity.state", "op": "equals", "value": "known"}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_mls_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_matchday",
+        "type": "action",
+        "label": "Push - Matchday morning ({{FC}})",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_club_next_matchday",
+          "direction": "before",
+          "offset": {"value": 6, "unit": "hour"}
+        },
+        "copy": {"headline": "{{FC}} kicks off today - subscribe to Season Pass to watch"},
+        "personalization_used": ["FC"],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait 24h",
+        "timing": {"type": "wait", "duration": {"value": 24, "unit": "hour"}}
+      },
+      {
+        "id": "email_followup",
+        "type": "action",
+        "label": "Email - 24h Season Pass follow-up",
+        "channel": "ch_email",
+        "touch_id": "T1",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Pick up where you left off - MLS Season Pass",
+          "cta_label": "Complete sign-up"
+        },
+        "personalization_used": ["FN", "FC"]
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "split_identity"},
+      {"from": "split_identity", "to": "app_modal", "branch_label": "app"},
+      {"from": "split_identity", "to": "web_modal", "branch_label": "web"},
+      {"from": "app_modal", "to": "dec_known_state"},
+      {"from": "web_modal", "to": "dec_known_state"},
+      {"from": "dec_known_state", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_known_state", "to": "end_journey", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_matchday", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "wait_24h", "branch_label": "no"},
+      {"from": "push_matchday", "to": "wait_24h"},
+      {"from": "wait_24h", "to": "email_followup"},
+      {"from": "email_followup", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Recovery rate among Season Pass abandoners"}],
+      "secondary_kpis": [{"name": "Modal CTR by surface"}, {"name": "24h email open and click rate"}],
+      "tests": []
+    }
+  }
+}

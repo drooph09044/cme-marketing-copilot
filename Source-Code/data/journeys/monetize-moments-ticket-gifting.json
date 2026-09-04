@@ -1,0 +1,167 @@
+{
+  "useCaseId": "monetize-moments-ticket-gifting",
+  "name": "Ticket Gifting Monetization Journey",
+  "category": {
+    "categoryId": "revenue",
+    "categoryName": "Monetization"
+  },
+  "journeyTable": {
+    "journeyName": "Fan Ticket Gifting",
+    "journeyGoal": "Enable fans to gift tickets to friends and family to increase attendance and acquisition",
+    "entryTrigger": "fan_high_affinity_detected",
+    "journeyCategory": "Engagement to Acquisition",
+    "totalDuration": "10 days",
+    "exitClause": "Exit if ticket gift purchase is completed"
+  },
+  "entryCriteria": {
+    "event": "fan_affinity_event",
+    "eventId": "evt_fan_affinity_002",
+    "conditions": [
+      {
+        "field": "affinityScore",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 80
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "High_Affinity_Fans"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Gift Ticket Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Share the experience with someone you love",
+      "cta": "Gift a Ticket",
+      "tracking": {
+        "campaignId": "email_gift_1",
+        "deliveryId": "del_gift_1",
+        "trackingEvents": [
+          "email_open",
+          "gift_start"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Reminder Push",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "PUSH",
+      "messageTheme": "Make someone’s day with a live match ticket",
+      "cta": "Send a Gift",
+      "tracking": {
+        "campaignId": "push_gift_2",
+        "deliveryId": "del_gift_2",
+        "trackingEvents": [
+          "push_open",
+          "gift_start"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_affinity_event",
+        "eventId": "evt_fan_affinity_002"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_gift_purchase",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "ticket_gift_purchase",
+          "field": "completed",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "ticket_gift_purchase",
+      "eventId": "evt_ticket_gift_001",
+      "condition": "completed == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 3,
+      "timeWindowHours": 240
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "ticket_gift_purchase"
+    ],
+    "eventMapping": {
+      "ticket_gift_purchase": "evt_ticket_gift_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "ticket_gift_purchase",
+    "secondaryKPIs": [
+      "gift_start"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 240
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

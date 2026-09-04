@@ -1,0 +1,172 @@
+{
+  "useCaseId": "ad-tier-upgrade",
+  "name": "Ad Tier to Premium Upgrade Journey",
+  "category": {
+    "categoryId": "monetization",
+    "categoryName": "Revenue Growth"
+  },
+  "journeyTable": {
+    "journeyName": "Ad Tier Upgrade",
+    "journeyGoal": "Convert ad-supported users to premium tier",
+    "entryTrigger": "ad_engagement_high",
+    "journeyCategory": "Upsell",
+    "totalDuration": "30 days",
+    "exitClause": "Exit after upgrade"
+  },
+  "entryCriteria": {
+    "event": "ad_usage",
+    "eventId": "evt_ad_001",
+    "conditions": [
+      {
+        "field": "watchHoursWeekly",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 15
+      },
+      {
+        "field": "adSkipRate",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 60
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Ad_Supported_High_Engagers"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Premium Upgrade Offer",
+      "timing": {
+        "offsetHours": 48
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Watch without interruptions",
+      "cta": "Go Premium",
+      "tracking": {
+        "campaignId": "email_ad_upgrade",
+        "deliveryId": "del_ad_1",
+        "trackingEvents": [
+          "email_open",
+          "upgrade"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Discount Push Notification",
+      "timing": {
+        "offsetHours": 168
+      },
+      "channel": "PUSH",
+      "messageTheme": "Limited time: 30% off premium",
+      "cta": "Claim Discount",
+      "tracking": {
+        "campaignId": "push_ad_discount",
+        "deliveryId": "del_ad_2",
+        "trackingEvents": [
+          "push_open",
+          "upgrade"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "ad_usage",
+        "eventId": "evt_ad_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "upgrade",
+          "field": "converted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "upgrade",
+          "field": "converted",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 120
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "upgrade",
+      "eventId": "evt_upgrade_002",
+      "condition": "converted == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 720
+    },
+    "prioritization": {
+      "priority": "HIGH"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "upgrade"
+    ],
+    "eventMapping": {
+      "upgrade": "evt_upgrade_002"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "upgrade",
+    "secondaryKPIs": [
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 720
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

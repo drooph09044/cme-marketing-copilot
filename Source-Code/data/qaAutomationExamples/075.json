@@ -1,0 +1,141 @@
+{
+  "id": "075",
+  "matrix_row_id": 75,
+  "matrix_row_name": "NCAA football fan birthday wish",
+  "template": "tpl_anniversary_milestone",
+  "league": "NCAA",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a birthday wish journey for college football fans with bookstore or football merch offer.",
+    "Create a birthday wish for college football fans of fav school (alumni and non-alumni) with football-themed imagery, school traditions reference, and a bookstore or football merch offer. Email + push, with copy that leans on gameday traditions, the marching band, and rivalry-week framing.",
+    "Need a birthday touch for college football fans. Football-themed creative — Saturday gameday, marching band, fav-school traditions — with a merch offer."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "ncaa-cfb-birthday-wish",
+    "metadata": {
+      "name": "NCAA Football Fan Birthday Wish",
+      "internal_name": "NCAA_CFB_Birthday_Wish_2026",
+      "brand": {"vertical": "sports_league", "league": "NCAA", "team": null, "product": "NCAA"},
+      "purpose": "Send a birthday wish in fav school's football-program voice with a bookstore or football merch offer.",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": "2026-12-31",
+      "always_on": true,
+      "objectives": [
+        {"rank": "primary", "description": "Reinforce affinity with fav school on fan's birthday.", "kpi": "Email open rate and offer redemption", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single birthday email in fav-school football-program voice (logo, marching band imagery, Saturday gameday traditions) with 15% off bookstore or football merch coupon. Push reinforcement for opted-in fans. Routing differs slightly for alumni vs non-alumni (alumni see explicit alumni-association language).",
+        "timing_rationale": "Triggered on fan's birthday.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push", "dynamic_content"],
+      "moments_that_matter": ["EXTEND MY EXPERIENCE"]
+    },
+    "audiences": [
+      {
+        "id": "aud_cfb_fan_with_birthday",
+        "name": "College football fan with birthday on file",
+        "criteria": {"all_of": [{"field": "favorite_team", "op": "is_not_null"}, {"field": "ncaa.cfb_content_engagement_last_year", "op": "equals", "value": true}, {"field": "profile.birthday", "op": "is_not_null"}]},
+        "refresh": "dynamic"
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_email", "type": "email"},
+      {"id": "ch_push", "type": "push", "platform": "espn_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite School"}
+    ],
+    "reentry_policy": {"allowed": true, "cooldown": {"value": 11, "unit": "month"}, "max_entries": 1},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Trigger: birthday match",
+        "entry_criteria": {"trigger": "event", "event_name": "fan_birthday"}
+      },
+      {
+        "id": "dec_alumni",
+        "type": "decision",
+        "label": "Alumni of fav school?",
+        "decision_basis": "pull",
+        "condition": {"field": "ncaa.alumni_school", "op": "is_not_null"}
+      },
+      {
+        "id": "email_alumni",
+        "type": "action",
+        "label": "Email - Birthday wish (alumni variant)",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Happy birthday from {{FT}} football",
+          "headline": "Happy birthday, {{FN}} - the Saturday alumni greeting from {{FT}}",
+          "body": "Marching band, gameday traditions, and 15% off at the bookstore.",
+          "cta_label": "Shop {{FT}} football gear"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "email_fan",
+        "type": "action",
+        "label": "Email - Birthday wish (fan variant)",
+        "channel": "ch_email",
+        "touch_id": "TB",
+        "timing": {"type": "realtime"},
+        "copy": {
+          "subject": "Happy birthday from {{FT}} football",
+          "headline": "Happy birthday, {{FN}} - here's 15% off {{FT}} gear",
+          "cta_label": "Shop {{FT}} football gear"
+        },
+        "personalization_used": ["FN", "FT"],
+        "dynamic_content": true
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_espn_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_birthday",
+        "type": "action",
+        "label": "Push - Happy birthday from {{FT}} football",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {"type": "realtime"},
+        "copy": {"headline": "Happy birthday from {{FT}} football, {{FN}}"}
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_alumni"},
+      {"from": "dec_alumni", "to": "email_alumni", "branch_label": "yes"},
+      {"from": "dec_alumni", "to": "email_fan", "branch_label": "no"},
+      {"from": "email_alumni", "to": "dec_push_optin"},
+      {"from": "email_fan", "to": "dec_push_optin"},
+      {"from": "dec_push_optin", "to": "push_birthday", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_birthday", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Email open rate"}, {"name": "Merch offer redemption rate"}],
+      "secondary_kpis": [{"name": "Alumni vs fan variant CTR"}],
+      "tests": []
+    }
+  }
+}

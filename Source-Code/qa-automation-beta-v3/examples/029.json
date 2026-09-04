@@ -1,0 +1,257 @@
+{
+  "id": "029",
+  "matrix_row_id": 29,
+  "matrix_row_name": "Playoff Ticket Page Browse Abandon",
+  "template": "tpl_browse_abandonment",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a playoff ticket page browse-abandon with re-entry allowed each time the same page is re-viewed.",
+    "Fan viewed a specific playoff ticket page without purchasing. Web modal on next NFL.com visit, then email 24h post-view. Allow journey re-entry each time the fan re-views the same ticket page with a 1h cooldown so multiple browse sessions can each trigger fresh recovery.",
+    "Need a playoff-ticket browse abandon flow with re-entry policy so each new page view kicks off a fresh recovery."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-playoff-ticket-browse-abandon",
+    "metadata": {
+      "name": "Playoff Ticket Page Browse Abandon",
+      "internal_name": "NFL_Playoff_Ticket_Browse_Abandon_2027",
+      "brand": {
+        "vertical": "ticketing",
+        "league": "NFL",
+        "team": null,
+        "product": "Ticketmaster"
+      },
+      "purpose": "Recover fans who viewed a specific playoff ticket page without purchasing; allow re-entry each time the same page is re-viewed.",
+      "archetype": "abandon_cart",
+      "launch_date": "2027-01-04",
+      "end_date": "2027-02-08",
+      "always_on": false,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Recover playoff ticket browse abandoners.",
+          "kpi": "Ticket conversions attributable to journey",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Web modal on next visit within 24h, then email 24h post-view. Re-entry allowed on each page re-view with 1h cooldown so fans hopping between playoff games can be served fresh modals.",
+        "timing_rationale": "Playoff windows have short fan urgency; re-entry needs to be permissive.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": [
+        "web_modal",
+        "email"
+      ],
+      "moments_that_matter": [
+        "PLAN & COMMIT"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_playoff_ticket_browser",
+        "name": "Playoff ticket page browser",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "playoff.ticket_page_viewed_within_hours",
+              "op": "lte",
+              "value": 1
+            },
+            {
+              "field": "playoff.ticket_purchased_in_session",
+              "op": "equals",
+              "value": false
+            }
+          ]
+        },
+        "refresh": "realtime"
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_email_optout",
+        "name": "Email opted out",
+        "scope": "global",
+        "criteria": {
+          "field": "consent.email",
+          "op": "equals",
+          "value": false
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_web_modal",
+        "type": "web_modal",
+        "platform": "nfl_web"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "MTC",
+        "name": "Matchup"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 1,
+        "unit": "hour"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Playoff ticket page viewed",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "playoff_ticket_page_viewed"
+        }
+      },
+      {
+        "id": "wait_1h",
+        "type": "wait",
+        "label": "Wait 1h",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 1,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "dec_purchased",
+        "type": "decision",
+        "label": "Purchased?",
+        "decision_basis": "behavior",
+        "condition": {
+          "field": "playoff.ticket_purchased_in_session",
+          "op": "equals",
+          "value": true
+        }
+      },
+      {
+        "id": "modal_return",
+        "type": "action",
+        "label": "Web Modal - Return for {{MTC}}",
+        "channel": "ch_web_modal",
+        "touch_id": "WM1",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "headline": "{{MTC}} tickets are waiting",
+          "cta_label": "Buy tickets"
+        },
+        "personalization_used": [
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_24h",
+        "type": "wait",
+        "label": "Wait to 24h after view",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 23,
+            "unit": "hour"
+          }
+        }
+      },
+      {
+        "id": "email_24h",
+        "type": "action",
+        "label": "Email 24h - Tickets still available",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "realtime"
+        },
+        "copy": {
+          "subject": "{{MTC}} tickets still available",
+          "cta_label": "Buy tickets"
+        },
+        "personalization_used": [
+          "MTC"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "end_converted",
+        "type": "end",
+        "label": "Purchased",
+        "reason": "converted"
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "wait_1h"
+      },
+      {
+        "from": "wait_1h",
+        "to": "dec_purchased"
+      },
+      {
+        "from": "dec_purchased",
+        "to": "end_converted",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_purchased",
+        "to": "modal_return",
+        "branch_label": "no"
+      },
+      {
+        "from": "modal_return",
+        "to": "wait_24h"
+      },
+      {
+        "from": "wait_24h",
+        "to": "email_24h"
+      },
+      {
+        "from": "email_24h",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Playoff ticket conversions attributable to journey"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Modal CTR"
+        },
+        {
+          "name": "Email CTR"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

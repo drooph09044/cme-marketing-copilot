@@ -1,0 +1,198 @@
+{
+  "useCaseId": "fuel-fans-celebrate-anniversary",
+  "name": "Fan Birthday & Anniversary Celebration Journey",
+  "category": {
+    "categoryId": "engagement",
+    "categoryName": "Fan Engagement"
+  },
+  "journeyTable": {
+    "journeyName": "Fan Milestone Celebration",
+    "journeyGoal": "Strengthen emotional loyalty by celebrating fan birthdays and fandom anniversaries",
+    "entryTrigger": "fan_birthday_or_membership_anniversary",
+    "journeyCategory": "Engagement",
+    "totalDuration": "7 days",
+    "exitClause": "No exit – journey completes for all eligible fans"
+  },
+  "entryCriteria": {
+    "event": "fan_profile_event",
+    "eventId": "evt_fan_milestone_001",
+    "conditions": [
+      {
+        "field": "isBirthdayOrAnniversary",
+        "operator": "EQUALS",
+        "value": true
+      }
+    ],
+    "identity": {
+      "primaryId": "userId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Fan_Milestone_Audience"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Birthday / Anniversary Wish Email",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Celebrating your fandom journey with us",
+      "cta": "View Your Fan Story",
+      "tracking": {
+        "campaignId": "email_fan_milestone_1",
+        "deliveryId": "del_fan_milestone_1",
+        "trackingEvents": [
+          "email_open",
+          "content_click"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Personalized Video / Highlight Push",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "PUSH",
+      "messageTheme": "Your best moments as a fan this year",
+      "cta": "Watch Highlights",
+      "tracking": {
+        "campaignId": "push_fan_milestone_2",
+        "deliveryId": "del_fan_milestone_2",
+        "trackingEvents": [
+          "push_open",
+          "video_view"
+        ]
+      }
+    },
+    {
+      "tpId": "TP3",
+      "label": "Exclusive Reward Offer Email",
+      "timing": {
+        "offsetHours": 72
+      },
+      "channel": "EMAIL",
+      "messageTheme": "A gift from us to celebrate your loyalty",
+      "cta": "Claim Your Reward",
+      "tracking": {
+        "campaignId": "email_fan_milestone_3",
+        "deliveryId": "del_fan_milestone_3",
+        "trackingEvents": [
+          "email_open",
+          "reward_claim"
+        ]
+      }
+    },
+    {
+      "tpId": "TP4",
+      "label": "Referral Invitation",
+      "timing": {
+        "offsetHours": 120
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Share your fandom with friends and family",
+      "cta": "Invite Friends",
+      "tracking": {
+        "campaignId": "email_fan_milestone_4",
+        "deliveryId": "del_fan_milestone_4",
+        "trackingEvents": [
+          "email_open",
+          "referral_send"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "fan_profile_event",
+        "eventId": "evt_fan_milestone_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n5",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP3"
+      },
+      {
+        "id": "n8",
+        "type": "WAIT",
+        "durationHours": 48
+      },
+      {
+        "id": "n9",
+        "type": "MESSAGE",
+        "tpId": "TP4"
+      },
+      {
+        "id": "n10",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 4,
+      "timeWindowHours": 168
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "email_open",
+      "push_open",
+      "reward_claim",
+      "referral_send"
+    ],
+    "eventMapping": {
+      "reward_claim": "evt_reward_claim_001",
+      "referral_send": "evt_referral_send_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "reward_claim",
+    "secondaryKPIs": [
+      "email_open",
+      "referral_send",
+      "video_view"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 168
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

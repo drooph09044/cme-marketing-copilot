@@ -1,0 +1,377 @@
+{
+  "id": "002",
+  "matrix_row_id": 2,
+  "matrix_row_name": "Birthday - February cohort",
+  "template": "tpl_anniversary_milestone",
+  "league": "NFL",
+  "sport": "football",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": true,
+  "prompts": [
+    "Build an NFL fan birthday journey for the February cohort.",
+    "Create a birthday wish journey for NFL fans with a birthday this month. First-of-month send for fans whose birthday is the 1st, otherwise birthday-morning at 10am ET. Wait 2 days then send a shop offer, and a final last-chance reminder 3 days before end of month. Suppress international and collapsed profiles.",
+    "Need a birthday touchpoint for our February cohort \u2014 wish them happy birthday and pull them to the shop offer; route first-of-month birthdays to a separate template."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nfl-birthday-journey",
+    "metadata": {
+      "name": "Birthday Journey",
+      "internal_name": "NFL_Birthday_AlwaysOn_AJO",
+      "brand": {
+        "vertical": "sports_league",
+        "league": "NFL",
+        "team": null,
+        "product": null
+      },
+      "purpose": "Wish fans a happy birthday from the NFL and drive engagement with personalized birthday content and a shop offer.",
+      "archetype": "milestone_anniversary",
+      "launch_date": "2026-01-01",
+      "end_date": null,
+      "always_on": true,
+      "objectives": [
+        {
+          "rank": "primary",
+          "description": "Drive engagement with NFL on fan birthdays through personalized content.",
+          "kpi": "Email open rate / click rate on birthday touchpoints",
+          "forecast": null
+        },
+        {
+          "rank": "secondary",
+          "description": "Drive shop purchases via birthday offer.",
+          "kpi": "Shop conversions attributable to birthday journey",
+          "forecast": null
+        }
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Send a small set of high-personalization touchpoints around the fan's birthday: a wish on or near the birthday, then a final reminder of the shop offer 3 days before end of month.",
+        "timing_rationale": "First of month send for fans whose birthday is the 1st; for all other fans, send on birthday at 10am EST. Wait 2 days, then offer. Final reminder 3 days before end of month.",
+        "notes": "Drive all team managers (aka standard players) to smartlinks for every touchpoint. Priority is to get them on Fantasy app and keep them on Fantasy app."
+      },
+      "considerations": [
+        "Confirm audience logic and size with FJM team."
+      ],
+      "capabilities_used": [
+        "email",
+        "push",
+        "dynamic_content"
+      ],
+      "moments_that_matter": [
+        "EXTEND MY EXPERIENCE"
+      ]
+    },
+    "audiences": [
+      {
+        "id": "aud_1yr_active_with_birthdate",
+        "name": "1 year active AND birth date filled out",
+        "description": "Fans active in the last 1 year who have a birth date attribute populated.",
+        "size_estimate": 8600000,
+        "refresh": "dynamic",
+        "criteria": {
+          "all_of": [
+            {
+              "field": "activity.last_active_within_days",
+              "op": "lte",
+              "value": 365
+            },
+            {
+              "field": "profile.birthdate",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      }
+    ],
+    "suppressions": [
+      {
+        "id": "supp_intl",
+        "name": "International fans",
+        "scope": "global",
+        "criteria": {
+          "field": "country",
+          "op": "not_equals",
+          "value": "US"
+        }
+      },
+      {
+        "id": "supp_other_month",
+        "name": "Other month birthdays",
+        "scope": "global",
+        "criteria": {
+          "field": "profile.birth_month",
+          "op": "not_equals",
+          "value": "<current_journey_month>"
+        }
+      },
+      {
+        "id": "supp_collapsed",
+        "name": "Collapsed profiles",
+        "scope": "global",
+        "criteria": {
+          "field": "profile_status",
+          "op": "equals",
+          "value": "collapsed"
+        }
+      }
+    ],
+    "channels": [
+      {
+        "id": "ch_email",
+        "type": "email"
+      },
+      {
+        "id": "ch_push",
+        "type": "push",
+        "platform": "nfl_app"
+      }
+    ],
+    "personalization_tokens": [
+      {
+        "key": "FN",
+        "name": "First Name"
+      },
+      {
+        "key": "FT",
+        "name": "Favorite Team"
+      },
+      {
+        "key": "A",
+        "name": "Age"
+      }
+    ],
+    "reentry_policy": {
+      "allowed": true,
+      "cooldown": {
+        "value": 1,
+        "unit": "month"
+      }
+    },
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Birthdate trigger",
+        "entry_criteria": {
+          "trigger": "event",
+          "event_name": "fan_birthday_window"
+        }
+      },
+      {
+        "id": "dec_birthday_is_today",
+        "type": "decision",
+        "label": "Birthday is Today?",
+        "decision_basis": "time",
+        "condition": {
+          "field": "profile.birthdate",
+          "op": "equals",
+          "value": "<today>"
+        }
+      },
+      {
+        "id": "dec_birthday_first_of_month",
+        "type": "decision",
+        "label": "Is birthday 1st of month?",
+        "decision_basis": "time",
+        "condition": {
+          "field": "profile.birth_day_of_month",
+          "op": "equals",
+          "value": 1
+        }
+      },
+      {
+        "id": "email_ta_happy_birthday",
+        "type": "action",
+        "label": "Email TA - Happy Birthday from the NFL!",
+        "channel": "ch_email",
+        "touch_id": "TA",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "birthday",
+          "direction": "after",
+          "offset": {
+            "value": 0,
+            "unit": "hour"
+          },
+          "time_local": "10:00 ET"
+        },
+        "copy": {
+          "subject": "Happy Birthday from the NFL!",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Here's a message from Roger"
+            },
+            {
+              "rank": "secondary",
+              "name": "These players have the same birthday as you!"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ],
+        "dynamic_content": true
+      },
+      {
+        "id": "wait_2_days_after_birthday",
+        "type": "wait",
+        "label": "Wait 2 days",
+        "timing": {
+          "type": "wait",
+          "duration": {
+            "value": 2,
+            "unit": "day"
+          }
+        }
+      },
+      {
+        "id": "email_td_shop_offer",
+        "type": "action",
+        "label": "Email TD - Shop Offer (It's your birthday!)",
+        "channel": "ch_email",
+        "touch_id": "TD",
+        "timing": {
+          "type": "scheduled",
+          "time_local": "13:00 ET",
+          "tz": "America/New_York",
+          "recurrence": null,
+          "calendar_date": null
+        },
+        "copy": {
+          "subject": "It's your birthday! Here's a message from Roger",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Shop Offer"
+            }
+          ]
+        },
+        "dynamic_content": true
+      },
+      {
+        "id": "email_te_first_of_month",
+        "type": "action",
+        "label": "Email TE - Happy Birthday (first-of-month fans)",
+        "channel": "ch_email",
+        "touch_id": "TE",
+        "timing": {
+          "type": "scheduled",
+          "time_local": "10:00 ET",
+          "tz": "America/New_York",
+          "recurrence": "first day of month"
+        },
+        "copy": {
+          "subject": "Happy Birthday from the NFL!",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Here's a message from Roger"
+            },
+            {
+              "rank": "secondary",
+              "name": "These players have the same birthday as you!"
+            }
+          ]
+        },
+        "personalization_used": [
+          "FN",
+          "FT"
+        ]
+      },
+      {
+        "id": "email_tf_last_chance",
+        "type": "action",
+        "label": "Email TF - Last Chance for Shop Offer",
+        "channel": "ch_email",
+        "touch_id": "TF",
+        "timing": {
+          "type": "scheduled",
+          "time_local": "13:00 ET",
+          "tz": "America/New_York",
+          "recurrence": "3 days before end of month"
+        },
+        "copy": {
+          "subject": "Last chance for your birthday offer",
+          "modules": [
+            {
+              "rank": "primary",
+              "name": "Shop Offer"
+            }
+          ]
+        }
+      },
+      {
+        "id": "end_journey",
+        "type": "end",
+        "label": "Journey End",
+        "reason": "completed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "start",
+        "to": "dec_birthday_first_of_month"
+      },
+      {
+        "from": "dec_birthday_first_of_month",
+        "to": "email_te_first_of_month",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_birthday_first_of_month",
+        "to": "dec_birthday_is_today",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_te_first_of_month",
+        "to": "email_tf_last_chance"
+      },
+      {
+        "from": "dec_birthday_is_today",
+        "to": "email_ta_happy_birthday",
+        "branch_label": "yes"
+      },
+      {
+        "from": "dec_birthday_is_today",
+        "to": "end_journey",
+        "branch_label": "no"
+      },
+      {
+        "from": "email_ta_happy_birthday",
+        "to": "wait_2_days_after_birthday"
+      },
+      {
+        "from": "wait_2_days_after_birthday",
+        "to": "email_td_shop_offer"
+      },
+      {
+        "from": "email_td_shop_offer",
+        "to": "email_tf_last_chance"
+      },
+      {
+        "from": "email_tf_last_chance",
+        "to": "end_journey"
+      }
+    ],
+    "measurement": {
+      "primary_kpis": [
+        {
+          "name": "Birthday email open rate"
+        },
+        {
+          "name": "Birthday email click rate"
+        }
+      ],
+      "secondary_kpis": [
+        {
+          "name": "Shop offer conversions"
+        }
+      ],
+      "tests": []
+    }
+  }
+}

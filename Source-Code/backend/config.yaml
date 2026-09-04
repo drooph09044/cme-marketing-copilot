@@ -1,0 +1,670 @@
+version: 1
+
+databricks:
+  allow_uc_filestyle_io: true
+  catalog: cmegtmdev
+  schemas:
+    sources: marketing_sources
+    cdp: marketing_cdp
+    copilot: marketing_copilot
+    audit: marketing_audit
+  volumes:
+    root: /Volumes/cmegtmdev/marketing_sources/volumes
+    output_root: /Volumes/cmegtmdev/marketing_sources/volumes
+  warehouse:
+    env: DATABRICKS_WAREHOUSE_ID
+    id: 447e5ede90a60526
+  limits:
+    table_read_row_limit_env: CODEX_TABLE_READ_ROW_LIMIT
+    sql_timeout_seconds_env: CODEX_SQL_TIMEOUT_SECONDS
+    uc_sql_cache_seconds_env: CODEX_UC_SQL_CACHE_SECONDS
+    uc_volume_cache_seconds_env: CODEX_UC_VOLUME_CACHE_SECONDS
+  table_overrides:
+    app_events: [cdp, app_events]
+    med_app_events: [sources, med_app_events]
+
+sources:
+  default: media
+  supported:
+    media:
+      label: Media & OTT
+      prefixes: [med]
+      aliases: [media]
+    sports:
+      label: Sports
+      prefixes: [spt]
+      aliases: [sports]
+    automotive:
+      label: Automotive
+      prefixes: [aut, auto]
+      aliases: [automotive, automotice]
+    telecom:
+      label: Telecom
+      prefixes: [tel]
+      aliases: [telecom]
+
+legacy_pipeline:
+  default_source_systems: [media, sports, automotive]
+  household_source_systems: [media, sports, automotive, telecom]
+  source_volume_prefixes:
+    media: med
+    sports: spt
+    automotive: aut
+    telecom: tel
+  directories:
+    generated_data: generated_data
+    preprocessed_data: preprocessed_data
+    standardized_data: standardized_data
+    matching_output: matching_output
+    clustering_output: clustering_output
+    golden_records_output: golden_records_output
+    evaluation_output: evaluation_output
+  # Required identity-pipeline inputs. Optional/reference source tables remain
+  # registered under datasets.marketing_sources, but must not block a run.
+  semantic_source_files:
+    media:
+      subscription_billing: [subscription_billing, med_subscription_billing]
+      streaming_activity: [streaming_activity, med_streaming_activity]
+      app_events: [app_events, med_app_events]
+      customer_support: [customer_support, med_customer_support]
+      email_engagement: [email_engagement, med_email_engagement]
+    sports:
+      spt_fan_accounts: [spt_fan_accounts]
+      spt_ticket_orders: [spt_ticket_orders]
+      spt_loyalty_members: [spt_loyalty_members]
+      spt_app_events: [spt_app_events]
+      spt_commerce_orders: [spt_commerce_orders]
+      spt_ott_streaming_sessions: [spt_ott_streaming_sessions]
+      spt_fantasy_gaming_accounts: [spt_fantasy_gaming_accounts]
+      spt_marketing_campaign_events: [spt_marketing_campaign_events]
+    automotive:
+      aut_campaign_interactions: [aut_campaign_interactions]
+      aut_connected_services_subscriptions: [aut_connected_services_subscriptions]
+      aut_customer_addresses: [aut_customer_addresses]
+      aut_customer_consents: [aut_customer_consents]
+      aut_customer_contacts: [aut_customer_contacts]
+      aut_customers: [aut_customers]
+      aut_dtc_events: [aut_dtc_events]
+      aut_households: [aut_households]
+      aut_insurance_policies: [aut_insurance_policies]
+      aut_loyalty_accounts: [aut_loyalty_accounts]
+      aut_loyalty_transactions: [aut_loyalty_transactions]
+      aut_mobile_app_sessions: [aut_mobile_app_sessions]
+      aut_nps_surveys: [aut_nps_surveys]
+      aut_sales_transactions: [aut_sales_transactions]
+      aut_service_appointments: [aut_service_appointments]
+      aut_service_line_items: [aut_service_line_items]
+      aut_service_orders: [aut_service_orders]
+      aut_support_cases: [aut_support_cases]
+      aut_telematics_monthly_summary: [aut_telematics_monthly_summary]
+      aut_vehicle_health_reports: [aut_vehicle_health_reports]
+      aut_vehicle_ownership: [aut_vehicle_ownership]
+      aut_vehicles: [aut_vehicles]
+      aut_warranty_claims: [aut_warranty_claims]
+      aut_website_sessions: [aut_website_sessions]
+  preprocessing_source_files:
+    media:
+      med_subscription_billing: [med_subscription_billing]
+      med_streaming_activity: [med_streaming_activity]
+      med_app_events: [med_app_events]
+      med_customer_support: [med_customer_support]
+      med_email_engagement: [med_email_engagement]
+    sports:
+      spt_fan_accounts: [spt_fan_accounts]
+      spt_ticket_orders: [spt_ticket_orders]
+      spt_loyalty_members: [spt_loyalty_members]
+      spt_app_events: [spt_app_events]
+      spt_commerce_orders: [spt_commerce_orders]
+      spt_ott_streaming_sessions: [spt_ott_streaming_sessions]
+      spt_fantasy_gaming_accounts: [spt_fantasy_gaming_accounts]
+      spt_marketing_campaign_events: [spt_marketing_campaign_events]
+    automotive:
+      aut_campaign_interactions: [aut_campaign_interactions]
+      aut_connected_services_subscriptions: [aut_connected_services_subscriptions]
+      aut_customers: [aut_customers]
+      aut_customer_addresses: [aut_customer_addresses]
+      aut_customer_consents: [aut_customer_consents]
+      aut_customer_contacts: [aut_customer_contacts]
+      aut_dtc_events: [aut_dtc_events]
+      aut_households: [aut_households]
+      aut_insurance_policies: [aut_insurance_policies]
+      aut_loyalty_accounts: [aut_loyalty_accounts]
+      aut_loyalty_transactions: [aut_loyalty_transactions]
+      aut_mobile_app_sessions: [aut_mobile_app_sessions]
+      aut_nps_surveys: [aut_nps_surveys]
+      aut_sales_transactions: [aut_sales_transactions]
+      aut_service_appointments: [aut_service_appointments]
+      aut_service_line_items: [aut_service_line_items]
+      aut_service_orders: [aut_service_orders]
+      aut_support_cases: [aut_support_cases]
+      aut_telematics_monthly_summary: [aut_telematics_monthly_summary]
+      aut_vehicles: [aut_vehicles]
+      aut_vehicle_health_reports: [aut_vehicle_health_reports]
+      aut_vehicle_ownership: [aut_vehicle_ownership]
+      aut_warranty_claims: [aut_warranty_claims]
+      aut_website_sessions: [aut_website_sessions]
+  tag_mapping_aliases:
+    med_subscription_billing: subscription_billing
+    med_streaming_activity: streaming_activity
+    med_app_events: app_events
+    med_customer_support: customer_support
+    med_email_engagement: email_engagement
+  standardization_source_files:
+    media:
+      - preprocessed_med_subscription_billing
+      - preprocessed_med_streaming_activity
+      - preprocessed_med_app_events
+      - preprocessed_med_customer_support
+      - preprocessed_med_email_engagement
+    sports:
+      - preprocessed_spt_fan_accounts
+      - preprocessed_spt_ticket_orders
+      - preprocessed_spt_loyalty_members
+      - preprocessed_spt_app_events
+      - preprocessed_spt_commerce_orders
+      - preprocessed_spt_ott_streaming_sessions
+      - preprocessed_spt_fantasy_gaming_accounts
+      - preprocessed_spt_marketing_campaign_events
+    automotive:
+      - preprocessed_aut_campaign_interactions
+      - preprocessed_aut_connected_services_subscriptions
+      - preprocessed_aut_customers
+      - preprocessed_aut_customer_addresses
+      - preprocessed_aut_customer_consents
+      - preprocessed_aut_customer_contacts
+      - preprocessed_aut_dtc_events
+      - preprocessed_aut_households
+      - preprocessed_aut_insurance_policies
+      - preprocessed_aut_loyalty_accounts
+      - preprocessed_aut_loyalty_transactions
+      - preprocessed_aut_mobile_app_sessions
+      - preprocessed_aut_nps_surveys
+      - preprocessed_aut_sales_transactions
+      - preprocessed_aut_service_appointments
+      - preprocessed_aut_service_line_items
+      - preprocessed_aut_service_orders
+      - preprocessed_aut_support_cases
+      - preprocessed_aut_telematics_monthly_summary
+      - preprocessed_aut_vehicles
+      - preprocessed_aut_vehicle_health_reports
+      - preprocessed_aut_vehicle_ownership
+      - preprocessed_aut_warranty_claims
+      - preprocessed_aut_website_sessions
+  column_aliases:
+    automotive:
+      customer_id: customer_id
+      household_id: household_id
+      golden_record_id: golden_record_id
+      account_id: account_id
+      loyalty_id: loyalty_id
+      loyalty_account_id: loyalty_id
+      email: email
+      email_address: email
+      primary_email: email
+      phone: phone
+      phone_number: phone
+      mobile_phone: phone
+      home_phone: phone
+      primary_phone: phone
+      first_name: first_name
+      last_name: last_name
+      full_name: full_name
+      birth_date: dob
+      date_of_birth: dob
+      dob: dob
+      postal_code: zip
+      zip_code: zip
+      zip: zip
+      vehicle_id: device_id
+      vin: device_id
+      ip_address: ip_address
+      source_record_id: source_record_id
+  golden_record:
+    account_id_fields:
+      sports:
+        - fan_account_id
+        - ticketing_account_id
+        - ticket_account_id
+        - loyalty_member_id
+        - commerce_customer_id
+        - streaming_account_id
+        - fantasy_account_id
+        - oauth_user_id
+        - authenticated_user_id
+        - resolved_profile_id
+        - username
+      automotive:
+        - customer_id
+        - account_id
+        - loyalty_id
+  blocking:
+    source_rules:
+      media:
+        - name: Email Match
+          tags: [email]
+        - name: Phone Match
+          tags: [phone]
+        - name: Device ID
+          tags: [device_id]
+        - name: IP Address
+          tags: [ip_address]
+        - name: Name + Email Domain
+          tags: [first_name, last_name, email_domain]
+        - name: Phone + Zip
+          tags: [phone, zip]
+        - name: Name + Zip
+          tags: [first_name, last_name, zip]
+      sports:
+        - name: Customer/Fan ID
+          tags: [customer_id]
+        - name: Account ID
+          tags: [account_id]
+        - name: Loyalty ID
+          tags: [loyalty_id]
+        - name: Email Match
+          tags: [email]
+        - name: Phone Match
+          tags: [phone]
+        - name: Device ID
+          tags: [device_id]
+        - name: Name + DOB
+          tags: [first_name, last_name, date_of_birth]
+        - name: Name + Zip
+          tags: [first_name, last_name, zip]
+      automotive:
+        - name: Customer ID
+          tags: [customer_id]
+        - name: Email Match
+          tags: [email]
+        - name: Phone Match
+          tags: [phone]
+        - name: Email + Phone
+          tags: [email, phone]
+        - name: Customer ID + Email + Phone
+          tags: [customer_id, email, phone]
+        - name: Name + DOB + Zip
+          tags: [first_name, last_name, date_of_birth, zip]
+        - name: Phone + Zip
+          tags: [phone, zip]
+    tag_defaults:
+      customer_id: {comparison_method: exact, match_threshold: 1.0, weight: 55}
+      fan_id: {comparison_method: exact, match_threshold: 1.0, weight: 55}
+      account_id: {comparison_method: exact, match_threshold: 1.0, weight: 48}
+      loyalty_id: {comparison_method: exact, match_threshold: 1.0, weight: 45}
+      email_domain: {comparison_method: exact, match_threshold: 1.0, weight: 8}
+      date_of_birth: {comparison_method: exact, match_threshold: 1.0, weight: 20}
+
+table_resolution:
+  output_layers: [std, slv, gld, brz]
+  virtual_data_directories:
+    - generated_data
+    - preprocessed_data
+    - standardized_data
+    - enhanced_identity_config
+    - matching_output
+    - clustering_output
+    - evaluation_output
+    - golden_records_output
+    - standardization_reports
+    - consent_data
+    - segmentation
+    - Segmentation
+    - qaAutomationExamples
+    - login
+  json_directories:
+    - data/journeys
+    - data/customJourneys
+    - data/customSegments
+    - data/qaAutomationExamples
+    - legacy_idres/data/ai_segments
+  source_system_variants:
+    media: [media]
+    sports: [sports]
+    automotive: [automotive]
+    telecom: [telecom]
+
+datasets:
+  marketing_sources:
+    schema: marketing_sources
+    required: true
+    tables:
+      general_data:
+        table: general_data
+        aliases: [data/general_data, data/General_data.csv]
+      media:
+        med_customer_accounts:
+          table: med_customer_accounts
+          aliases: [customer_accounts, generated_data/media/med_customer_accounts]
+        med_campaigns:
+          table: med_campaigns
+          aliases: [campaigns, generated_data/media/med_campaigns]
+        med_consent_events:
+          table: med_consent_events
+          aliases: [consent_events, generated_data/media/med_consent_events]
+        med_content_catalog:
+          table: med_content_catalog
+          aliases: [content_catalog, generated_data/media/med_content_catalog]
+        med_billing_history: {table: med_billing_history, aliases: [billing_history, generated_data/media/med_billing_history]}
+        med_subscription_billing:
+          table: med_subscription_billing
+          aliases: [subscription_billing, generated_data/media/med_subscription_billing, standardized_data/standardized_subscription_billing]
+        med_subscription_billing_history:
+          table: med_subscription_billing_history
+          aliases: [subscription_billing_history, generated_data/media/med_subscription_billing_history]
+        med_subscription_history: {table: med_subscription_history, aliases: [subscription_history, generated_data/media/med_subscription_history]}
+        med_streaming_activity:
+          table: med_streaming_activity
+          aliases: [streaming_activity, generated_data/media/med_streaming_activity, standardized_data/standardized_streaming_activity]
+        med_streaming_events: {table: med_streaming_events, aliases: [streaming_events, generated_data/media/med_streaming_events]}
+        med_app_events:
+          table: med_app_events
+          aliases: [app_events, generated_data/media/med_app_events, standardized_data/standardized_app_events]
+        med_mobile_app_events: {table: med_mobile_app_events, aliases: [mobile_app_events, generated_data/media/med_mobile_app_events]}
+        med_push_events: {table: med_push_events, aliases: [push_events, generated_data/media/med_push_events]}
+        med_sms_events: {table: med_sms_events, aliases: [sms_events, generated_data/media/med_sms_events]}
+        med_customer_support:
+          table: med_customer_support
+          aliases: [customer_support, generated_data/media/med_customer_support, standardized_data/standardized_customer_support]
+        med_support_tickets: {table: med_support_tickets, aliases: [support_tickets, generated_data/media/med_support_tickets]}
+        med_email_engagement:
+          table: med_email_engagement
+          aliases: [email_engagement, generated_data/media/med_email_engagement, standardized_data/standardized_email_engagement]
+        med_email_events: {table: med_email_events, aliases: [email_events, generated_data/media/med_email_events]}
+        med_web_events:
+          table: med_web_events
+          aliases: [web_events, generated_data/media/med_web_events]
+      sports:
+        spt_fan_accounts:
+          table: spt_fan_accounts
+          aliases: [generated_data/sports/spt_fan_accounts]
+        spt_ticket_orders:
+          table: spt_ticket_orders
+          aliases: [sports_ticketing, generated_data/sports/spt_ticket_orders, generated_data/sports/sports_ticketing]
+        sports_attendance:
+          table: sports_attendance
+          aliases: [generated_data/sports/sports_attendance]
+        spt_loyalty_members:
+          table: spt_loyalty_members
+          aliases: [sports_loyalty_activity, generated_data/sports/spt_loyalty_members, generated_data/sports/sports_loyalty_activity]
+        spt_app_events:
+          table: spt_app_events
+          aliases: [sports_app_events, generated_data/sports/spt_app_events, generated_data/sports/sports_app_events]
+        spt_commerce_orders:
+          table: spt_commerce_orders
+          aliases: [sports_orders, generated_data/sports/spt_commerce_orders, generated_data/sports/sports_orders]
+        spt_ott_streaming_sessions:
+          table: spt_ott_streaming_sessions
+          aliases: [sports_streaming_events, generated_data/sports/spt_ott_streaming_sessions, generated_data/sports/sports_streaming_events]
+        spt_fantasy_gaming_accounts:
+          table: spt_fantasy_gaming_accounts
+          aliases: [generated_data/sports/spt_fantasy_gaming_accounts]
+        spt_marketing_campaign_events:
+          table: spt_marketing_campaign_events
+          aliases: [generated_data/sports/spt_marketing_campaign_events]
+        sports_support_tickets:
+          table: sports_support_tickets
+          aliases: [generated_data/sports/sports_support_tickets]
+      automotive:
+        aut_campaign_eligibility: {table: aut_campaign_eligibility}
+        aut_campaign_interactions: {table: aut_campaign_interactions, aliases: [auto_campaign_events]}
+        aut_campaign_validation_report: {table: aut_campaign_validation_report}
+        aut_connected_services_subscriptions:
+          table: aut_connected_services_subscriptions
+          aliases: [connected_services_subscriptions, Segmentation/automotive/connected_services_subscriptions]
+        aut_customers:
+          table: aut_customers
+          aliases: [customers, Segmentation/automotive/customers]
+        aut_customer_addresses: {table: aut_customer_addresses}
+        aut_customer_consents: {table: aut_customer_consents, aliases: [customer_consents]}
+        aut_customer_contacts: {table: aut_customer_contacts}
+        aut_dealers: {table: aut_dealers, aliases: [auto_dealer_interactions]}
+        aut_dealer_staff: {table: aut_dealer_staff}
+        aut_dtc_events: {table: aut_dtc_events}
+        aut_households:
+          table: aut_households
+          aliases: [households, Segmentation/automotive/households]
+        aut_insurance_claims: {table: aut_insurance_claims}
+        aut_insurance_policies: {table: aut_insurance_policies}
+        aut_loyalty_accounts: {table: aut_loyalty_accounts}
+        aut_loyalty_transactions: {table: aut_loyalty_transactions}
+        aut_mobile_app_sessions: {table: aut_mobile_app_sessions, aliases: [auto_app_events]}
+        aut_nps_surveys: {table: aut_nps_surveys, aliases: [auto_nps_survey]}
+        aut_recalls: {table: aut_recalls, aliases: [auto_recall_events]}
+        aut_recall_responses: {table: aut_recall_responses, aliases: [auto_recall_events]}
+        aut_sales_transactions: {table: aut_sales_transactions}
+        aut_service_appointments: {table: aut_service_appointments}
+        aut_service_line_items:
+          table: aut_service_line_items
+          aliases: [service_line_items, Segmentation/automotive/service_line_items]
+        aut_service_orders:
+          table: aut_service_orders
+          aliases: [service_orders, auto_service_history, Segmentation/automotive/service_orders]
+        aut_support_cases: {table: aut_support_cases}
+        aut_telematics_monthly_summary:
+          table: aut_telematics_monthly_summary
+          aliases: [telematics_monthly_summary, auto_telematics, auto_connected_vehicle_events, Segmentation/automotive/telematics_monthly_summary]
+        aut_trade_ins: {table: aut_trade_ins}
+        aut_vehicles:
+          table: aut_vehicles
+          aliases: [vehicles, Segmentation/automotive/vehicles]
+        aut_vehicle_health_reports: {table: aut_vehicle_health_reports, aliases: [auto_connected_vehicle_events]}
+        aut_vehicle_models: {table: aut_vehicle_models}
+        aut_vehicle_ownership:
+          table: aut_vehicle_ownership
+          aliases: [vehicle_ownership, Segmentation/automotive/vehicle_ownership]
+        aut_warranty_claims: {table: aut_warranty_claims, aliases: [auto_warranty_claims]}
+        aut_website_sessions: {table: aut_website_sessions, aliases: [auto_web_events]}
+      telecom:
+        tel_customers: {table: tel_customers}
+        tel_accounts: {table: tel_accounts}
+        tel_subscriptions: {table: tel_subscriptions}
+        tel_devices: {table: tel_devices}
+        tel_usage_monthly: {table: tel_usage_monthly}
+        tel_billing: {table: tel_billing}
+        tel_support_cases: {table: tel_support_cases}
+        tel_app_events: {table: tel_app_events}
+        tel_network_events: {table: tel_network_events}
+        tel_campaign_interactions: {table: tel_campaign_interactions}
+        tel_consent_preferences: {table: tel_consent_preferences}
+        tel_households: {table: tel_households}
+      enrichment:
+        2p_fan_scores: {table: 2p_fan_scores}
+        2p_location_data: {table: 2p_location_data}
+        3p_demographics: {table: 3p_demographics}
+        3p_ltv_propensity: {table: 3p_ltv_propensity}
+
+  marketing_cdp:
+    schema: marketing_cdp
+    required: true
+    source_scoped_tables:
+      all_preprocessed:
+        table_pattern: "std_{prefix}_all_preprocessed"
+        aliases:
+          - preprocessed_data/{source}/all_preprocessed
+      all_standardized:
+        table_pattern: "std_{prefix}_all_standardized"
+        aliases:
+          - standardized_data/{source}/all_standardized
+      enhanced_prepared_records:
+        table_pattern: "std_{prefix}_enhanced_prepared_records"
+        aliases:
+          - matching_output/{source}/enhanced_prepared_records
+      candidate_pairs:
+        table_pattern: "std_{prefix}_candidate_pairs"
+        aliases:
+          - matching_output/{source}/candidate_pairs
+      clustered_records:
+        table_pattern: "slv_{prefix}_clustered_records"
+        aliases:
+          - clustering_output/{source}/clustered_records
+      golden_records:
+        table_pattern: "slv_{prefix}_golden_records"
+        aliases:
+          - golden_records_output/{source}/golden_records
+      superseded_ids:
+        table_pattern: "slv_{prefix}_superseded_ids"
+        aliases:
+          - golden_records_output/{source}/superseded_ids
+          - superseded_ids
+      customer_profile_export:
+        table_pattern: "slv_{prefix}_customer_profile_export"
+        aliases:
+          - customer_profile_export
+      household_links:
+        table_pattern: "slv_{prefix}_household_links"
+        aliases:
+          - clustering_output/{source}/household_links
+          - golden_records_output/{source}/household_links
+          - household_links
+    generated_tables:
+      identity_graph:
+        table: slv_identity_graph
+        aliases: [generated_data/identity_graph]
+      activity_detail_fields:
+        table: slv_activity_detail_fields
+        aliases: [activity_detail_fields]
+      consent_golden_record:
+        table: slv_consent_golden_record
+        aliases: [consent_data/enriched/consent_golden_record, generated_data/enriched/consent_golden_record]
+      consent_resolved:
+        table: slv_consent_resolved
+        aliases: [consent_data/enriched/consent_resolved, generated_data/enriched/consent_resolved]
+      consent_event_ledger:
+        table: slv_consent_event_ledger
+        aliases: [consent_data/enriched/consent_event_ledger, generated_data/enriched/consent_event_ledger]
+      consent_linked:
+        table: slv_consent_linked
+        aliases: [generated_data/enriched/consent_linked, generated_data/enriched/consent_events_linked]
+      consent_unlinked:
+        table: slv_consent_unlinked
+        aliases: [generated_data/enriched/consent_unlinked, generated_data/enriched/consent_events_unlinked]
+    derived_table_patterns:
+      preprocessed: "preprocessed_{source_table}"
+      standardized: "standardized_{source_table}"
+
+  marketing_copilot:
+    schema: marketing_copilot
+    required: false
+    tables:
+      ai_segment_gh_fan_score_males_aged_25_34_in_the_north_region_1779902970:
+        table: ai_segment_gh_fan_score_males_aged_25_34_in_the_north_region_1779902970
+      ai_segment_high_fan_score_males_25_34_north_region_1779899238:
+        table: ai_segment_high_fan_score_males_25_34_north_region_1779899238
+      segment_members:
+        table: gld_segment_members
+      dynamic_segments:
+        table: gld_dynamic_segments
+      custom_segments:
+        table: gld_custom_segments
+      copilot_segments:
+        table: gld_copilot_segments
+      segment_activation_exports:
+        table: gld_segment_activation_exports
+      audience_overlap_results:
+        table: gld_audience_overlap_results
+
+  marketing_audit:
+    schema: marketing_audit
+    required: false
+    tables:
+      # Authentication state is governed in Unity Catalog.  Keep these names
+      # explicit so login never falls back to broad table discovery or local
+      # CSV files.
+      users: {table: users}
+      auth_sessions: {table: auth_sessions}
+      auth_logs: {table: auth_logs}
+      consent_gate_results: {table: gld_consent_gate_results}
+      suppression_list_full: {table: gld_suppression_list_full}
+      household_consent_flags: {table: gld_household_consent_flags}
+      demo_personas: {table: gld_demo_personas}
+      evaluation_metrics: {table: gld_evaluation_metrics}
+      cluster_index: {table: slv_cluster_index}
+
+artifacts:
+  volume_files:
+    marketing_cdp:
+      profile_mode_flag: legacy_idres/.profile_mode
+      blocking_config: legacy_idres/blocking_config.json
+      source_preferences: legacy_idres/source_preferences.json
+      data_overview_registered_sources: legacy_idres/data_overview_registered_sources.json
+      tag_mappings: legacy_idres/tag_mappings.json
+      tag_mappings_cache: legacy_idres/tag_mappings_cache.json
+      data_source_classification: legacy_idres/data_source_classification.json
+      golden_record_summary: legacy_idres/golden_record_summary.json
+      household_summary: legacy_idres/household_summary.json
+      cluster_summary: legacy_idres/cluster_summary.json
+      golden_record_provenance:
+        pattern: golden_records_output/{source}/golden_record_provenance.json
+      enhanced_identity_config_override:
+        pattern: enhanced_identity_config/{source}_identity_config.override.json
+      cluster_summary_by_source:
+        pattern: clustering_output/{source}/cluster_summary.json
+      golden_record_summary_by_source:
+        pattern: golden_records_output/{source}/golden_record_summary.json
+      standardization_report:
+        pattern: standardization_reports/{source}/cleaning_standardization_report.json
+    marketing_copilot:
+      preset_journeys: data/journeys/*.json
+      custom_journeys: data/customJourneys/*.json
+      custom_segments: data/customSegments/*.json
+      campaigns_journeys_report: data/campaigns_journeys_report.json
+      copilot_segments: legacy_idres/backend/copilot_segments.json
+      ai_segments: legacy_idres/data/ai_segments/*.json
+    marketing_sources:
+      segmentation_schema: legacy_idres/Segmentation/schema.json
+      automotive_segmentation_schema: legacy_idres/Segmentation/automotive_schema.json
+      ground_truth:
+        pattern: generated_data/{source}/ground_truth.json
+    marketing_audit:
+      qa_automation_examples: data/qaAutomationExamples/*.json
+      evaluation_report:
+        pattern: evaluation_output/{source}/evaluation_report.json
+      automotive_campaign_ml_training_validation: legacy_idres/Segmentation/automotive/_automotive_campaign_ml_training_validation.json
+      automotive_ml_stitch_validation: legacy_idres/Segmentation/automotive/_automotive_ml_stitch_validation.json
+      campaign_validation_report: legacy_idres/Segmentation/automotive/_campaign_validation_report.json
+
+columns:
+  identity:
+    common: [record_id, source_file, source_system, golden_id, cluster_id, customer_id, email, phone, full_name]
+    household: [household_id, household_golden_id, relationship]
+  consent:
+    common:
+      - data_processing_consent
+      - global_consent
+      - marketing_email_consent
+      - tracking_cookie_consent
+      - marketing_comms_optout
+      - marketing_suppressed
+      - suppression_reason
+      - consent_last_updated
+  campaign_measurement:
+    common:
+      - campaign_id
+      - campaign_name
+      - event_name
+      - event_ts
+      - channel
+      - revenue
+      - bounce_classification
+
+events:
+  campaign_measurement:
+    email_events: [sent, delivered, opened, clicked, unsubscribed, bounced]
+    other_events: [submission]
+  statuses:
+    campaign: [Live, Ended]
+    consent: [opt_in, opt_out, withdrawn, unknown]
+  channels:
+    marketing: [email, sms, push, notification, whatsapp, call, crm]
+
+ajo:
+  endpoint_url: https://platform.adobe.io/ajo/im/executions/unitary
+  sandbox_name: exlservice-ucp
+  ims_org_id: 61761D4866A1EC800A495C1C@AdobeOrg
+  namespace: Email
+  authorization_env: AJO_AUTHORIZATION
+  bearer_token_env: AJO_BEARER_TOKEN
+  default_email_env: AJO_DEFAULT_EMAIL
+  api_keys:
+    automotive_env: AJO_AUTOMOTIVE_API_KEY
+    sports_env: AJO_SPORTS_API_KEY

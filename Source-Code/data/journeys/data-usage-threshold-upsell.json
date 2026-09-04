@@ -1,0 +1,173 @@
+{
+  "useCaseId": "data-usage-threshold-upsell",
+  "name": "Data Usage Threshold Upsell Journey",
+  "category": {
+    "categoryId": "upsell",
+    "categoryName": "Upsell"
+  },
+  "journeyTable": {
+    "journeyName": "High Data Usage Upsell",
+    "journeyGoal": "Encourage plan upgrades for heavy users",
+    "entryTrigger": "high_data_usage_detected",
+    "journeyCategory": "Upsell",
+    "totalDuration": "5 days",
+    "exitClause": "Exit after plan upgrade"
+  },
+  "entryCriteria": {
+    "event": "high_data_usage_detected",
+    "eventId": "evt_usage_001",
+    "conditions": [
+      {
+        "field": "dataUsagePercent",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 85
+      },
+      {
+        "field": "consecutiveBillingCycles",
+        "operator": "GREATER_THAN_EQUALS",
+        "value": 2
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Heavy_Data_Users"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Upgrade Recommendation",
+      "timing": {
+        "offsetHours": 0
+      },
+      "channel": "PUSH",
+      "messageTheme": "You are close to your data limit",
+      "cta": "Upgrade Plan",
+      "tracking": {
+        "campaignId": "push_data_upgrade",
+        "deliveryId": "del_push_d1",
+        "trackingEvents": [
+          "push_open",
+          "plan_upgrade"
+        ]
+      }
+    },
+    {
+      "tpId": "TP2",
+      "label": "Plan Comparison",
+      "timing": {
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Compare plans with more data",
+      "cta": "View Plans",
+      "tracking": {
+        "campaignId": "email_plan_comparison",
+        "deliveryId": "del_email_d2",
+        "trackingEvents": [
+          "email_open",
+          "plan_upgrade"
+        ]
+      }
+    }
+  ],
+  "journey": {
+    "type": "event-based",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "high_data_usage_detected",
+        "eventId": "evt_usage_001"
+      },
+      {
+        "id": "n2",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "plan_upgrade",
+          "field": "planUpgraded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n3"
+      },
+      {
+        "id": "n3",
+        "type": "WAIT",
+        "durationHours": 0
+      },
+      {
+        "id": "n4",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n5",
+        "type": "CONDITION",
+        "condition": {
+          "eventToCheck": "plan_upgrade",
+          "field": "planUpgraded",
+          "operator": "EQUALS",
+          "value": true
+        },
+        "trueBranch": "EXIT",
+        "falseBranch": "n6"
+      },
+      {
+        "id": "n6",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n7",
+        "type": "MESSAGE",
+        "tpId": "TP2"
+      },
+      {
+        "id": "n8",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "exitConditions": [
+    {
+      "event": "plan_upgrade",
+      "eventId": "evt_upgrade_001",
+      "condition": "planUpgraded == true",
+      "action": "EXIT"
+    }
+  ],
+  "ajoConfig": {
+    "frequencyCapping": {
+      "enabled": true,
+      "maxMessagesPerUser": 2,
+      "timeWindowHours": 120
+    },
+    "prioritization": {
+      "priority": "MEDIUM"
+    }
+  },
+  "tracking": {
+    "globalEvents": [
+      "plan_upgrade"
+    ],
+    "eventMapping": {
+      "plan_upgrade": "evt_upgrade_001"
+    }
+  },
+  "analytics": {
+    "primaryKPI": "plan_upgrade",
+    "secondaryKPIs": [
+      "push_open",
+      "email_open"
+    ],
+    "attribution": {
+      "model": "multi_touch",
+      "lookbackHours": 120
+    }
+  },
+  "version": "1.0",
+  "status": "READY"
+}

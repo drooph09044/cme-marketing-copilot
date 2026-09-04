@@ -1,0 +1,122 @@
+{
+  "id": "033",
+  "matrix_row_id": 33,
+  "matrix_row_name": "NBA Christmas Day Games",
+  "template": "tpl_game_day",
+  "league": "NBA",
+  "sport": "basketball",
+  "scope": "league",
+  "teams_referenced": "",
+  "seed_replica": false,
+  "prompts": [
+    "Build a game-day journey for the NBA Christmas Day five-game slate.",
+    "Create an NBA Christmas Day game-day journey covering the Dec 25 five-game slate. All-fans morning email at 9am ET with the full slate and broadcast info (ABC, ESPN). Per-game push at tipoff sent only to fans who favorite either competing team. Single channel: push for the day-of tipoff touches.",
+    "Need a Christmas Day journey for NBA. Morning email summarizes all five games, then per-game tipoff push fires for fans of each playing team."
+  ],
+  "journey": {
+    "schema_version": "0.1.0",
+    "id": "nba-christmas-day-2025",
+    "metadata": {
+      "name": "NBA Christmas Day Games",
+      "internal_name": "NBA_Christmas_Day_2025",
+      "brand": {"vertical": "sports_league", "league": "NBA", "team": null, "product": "NBA League Pass"},
+      "purpose": "Drive engagement and tune-in to the NBA Christmas Day five-game slate (Dec 25) with a morning slate-summary email and per-game tipoff push to fans of competing teams.",
+      "archetype": "game_day",
+      "launch_date": "2025-12-25",
+      "end_date": "2025-12-26",
+      "always_on": false,
+      "objectives": [
+        {"rank": "primary", "description": "Drive tune-in to Christmas Day games.", "kpi": "Christmas Day game tune-in viewership", "forecast": null}
+      ],
+      "context": {
+        "insights": null,
+        "strategy": "Single-channel push focus for the day-of tipoff touches. The morning slate email provides awareness of all five games; tipoff push narrows to fans with team affinity. Suppress fans without a fav team set (they're covered by the slate email only).",
+        "timing_rationale": "Christmas Day games start at noon ET and run through primetime. Morning email at 9am ET; per-game push at tipoff of each game.",
+        "notes": null
+      },
+      "considerations": [],
+      "capabilities_used": ["email", "push"],
+      "moments_that_matter": ["GET PUMPED", "GET READY"]
+    },
+    "audiences": [
+      {
+        "id": "aud_nba_fan",
+        "name": "Active NBA fan",
+        "criteria": {"field": "nba.activity_within_days", "op": "lte", "value": 180},
+        "refresh": "dynamic"
+      },
+      {
+        "id": "aud_christmas_team_fan",
+        "name": "Fan with fav team playing on Christmas",
+        "description": "Fan whose favorite team is one of the ten teams competing in the Dec 25 slate.",
+        "criteria": {"field": "favorite_team", "op": "in", "value": ["<christmas_team_1>", "<christmas_team_2>", "<christmas_team_3>", "<christmas_team_4>", "<christmas_team_5>", "<christmas_team_6>", "<christmas_team_7>", "<christmas_team_8>", "<christmas_team_9>", "<christmas_team_10>"]}
+      }
+    ],
+    "suppressions": [
+      {"id": "supp_optout", "name": "Email opted out", "scope": "global", "criteria": {"field": "consent.email", "op": "equals", "value": false}}
+    ],
+    "channels": [
+      {"id": "ch_push", "type": "push", "platform": "nba_app"}
+    ],
+    "personalization_tokens": [
+      {"key": "FN", "name": "First Name"},
+      {"key": "FT", "name": "Favorite Team"},
+      {"key": "MTC", "name": "Matchup"}
+    ],
+    "reentry_policy": {"allowed": false},
+    "frequency_caps": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "label": "Christmas Day cadence opens",
+        "entry_criteria": {"trigger": "schedule"}
+      },
+      {
+        "id": "dec_has_fav_team_playing",
+        "type": "decision",
+        "label": "Fav team playing today?",
+        "decision_basis": "audience",
+        "condition": {"field": "favorite_team", "op": "in", "value": ["<christmas_team_1>", "<christmas_team_2>", "<christmas_team_3>", "<christmas_team_4>", "<christmas_team_5>", "<christmas_team_6>", "<christmas_team_7>", "<christmas_team_8>", "<christmas_team_9>", "<christmas_team_10>"]}
+      },
+      {
+        "id": "dec_push_optin",
+        "type": "decision",
+        "label": "Push opted in (NBA App)?",
+        "decision_basis": "pull",
+        "condition": {"field": "consent.push_nba_app", "op": "equals", "value": true}
+      },
+      {
+        "id": "push_game_tipoff",
+        "type": "action",
+        "label": "Push - Fav-team game tipoff",
+        "channel": "ch_push",
+        "touch_id": "P1",
+        "timing": {
+          "type": "relative_to_event",
+          "event": "fav_team_christmas_tipoff",
+          "direction": "before",
+          "offset": {"value": 15, "unit": "minute"}
+        },
+        "copy": {"headline": "{{FT}} tipping off now - Christmas Day basketball on {{MTC}}"},
+        "personalization_used": ["FT", "MTC"],
+        "dynamic_content": true
+      },
+      {"id": "end_journey", "type": "end", "label": "Journey End", "reason": "completed"},
+      {"id": "end_no_fav_playing", "type": "end", "label": "Journey End - No fav team playing", "reason": "suppressed"}
+    ],
+    "edges": [
+      {"from": "start", "to": "dec_has_fav_team_playing"},
+      {"from": "dec_has_fav_team_playing", "to": "dec_push_optin", "branch_label": "yes"},
+      {"from": "dec_has_fav_team_playing", "to": "end_no_fav_playing", "branch_label": "no"},
+      {"from": "dec_push_optin", "to": "push_game_tipoff", "branch_label": "yes"},
+      {"from": "dec_push_optin", "to": "end_journey", "branch_label": "no"},
+      {"from": "push_game_tipoff", "to": "end_journey"}
+    ],
+    "measurement": {
+      "primary_kpis": [{"name": "Christmas Day game tune-in viewership"}],
+      "secondary_kpis": [{"name": "Push click-through rate per game window"}],
+      "tests": []
+    }
+  }
+}

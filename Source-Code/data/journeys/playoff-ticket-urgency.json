@@ -1,0 +1,90 @@
+{
+  "categoryId": "ticketing-sales",
+  "categoryName": "Ticketing & Sales",
+  "categoryDescription": "Journeys focused on ticket conversion, renewals, and premium inventory monetization.",
+  "subCategoryId": "acquisition-ticketing",
+  "subCategoryName": "Acquisition & Ticketing",
+  "slug": "playoff-ticket-urgency",
+  "name": "Playoff Ticket Urgency",
+  "brief": "Recent event attendees have not purchased the featured event. Use email and push, test generic versus personalized copy, track purchases, and reserve a 10 percent holdout for incrementality.",
+  "platform": "Adobe AJO",
+  "targetDate": "2026-04-18",
+  "journeyOverrides": {
+    "name": "Playoff Ticket Urgency - Featured Event",
+    "objective": "Drive incremental ticket purchases for the featured event using urgency-based orchestration, personalization, and a controlled holdout for lift measurement.",
+    "audience": "Recent_Event_Attendees_No_Purchase",
+    "variantA": "Standard urgency cadence",
+    "variantB": "Personalized plus priority access"
+  },
+  "touchpoints": [
+    {
+      "tpId": "TP1",
+      "label": "Primary Email",
+      "timing": {
+        "description": "24h from entry",
+        "offsetHours": 24
+      },
+      "channel": "EMAIL",
+      "messageTheme": "Recent event attendees have not purchased the featured event. Use email and push, test generic versus personalized copy, track purchases, and reserve a 10 percent holdout for incrementality.",
+      "cta": "Learn More",
+      "tracking": {
+        "campaignId": "email_primary",
+        "deliveryId": "del_email_1",
+        "trackingEvents": [
+          "email_sent",
+          "email_open",
+          "email_click"
+        ]
+      }
+    }
+  ],
+  "entryCriteria": {
+    "event": "playoff_ticket_urgency_qualified",
+    "eventId": "evt_playoff_ticket_urgency_001",
+    "conditions": [
+      {
+        "field": "audienceSegment",
+        "operator": "EQUALS",
+        "value": "Recent_Event_Attendees_No_Purchase"
+      }
+    ],
+    "identity": {
+      "primaryId": "customerId",
+      "namespace": "ECID"
+    },
+    "audienceName": "Recent_Event_Attendees_No_Purchase"
+  },
+  "exitConditions": [
+    {
+      "event": "purchase_completed",
+      "eventId": "evt_purchase_completed_001",
+      "action": "IMMEDIATE_EXIT"
+    }
+  ],
+  "journey": {
+    "type": "scheduled",
+    "nodes": [
+      {
+        "id": "n1",
+        "type": "ENTRY",
+        "event": "playoff_ticket_urgency_qualified",
+        "eventId": "evt_playoff_ticket_urgency_001"
+      },
+      {
+        "id": "n2",
+        "type": "WAIT",
+        "durationHours": 24
+      },
+      {
+        "id": "n3",
+        "type": "MESSAGE",
+        "tpId": "TP1"
+      },
+      {
+        "id": "n4",
+        "type": "EXIT"
+      }
+    ]
+  },
+  "useCaseId": "playoff-ticket-urgency"
+}
